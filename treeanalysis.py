@@ -24,3 +24,4 @@ for l1 in list4:
 			lowconf +=1
 print "below 70 per cent", float(lowconf)/(totconf)
 print "clades #", counter, ct
+#test
