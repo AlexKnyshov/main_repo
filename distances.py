@@ -8,7 +8,7 @@ loci = {}
 #files = ["./../T58_L1.phylip.fas"]
 files = glob.glob("./fasta/*.fas")
 progbarc = 0
-progbar = 0
+#progbar = 0
 for f in files:
 	print f
 	infile = open(f, "r")
@@ -60,31 +60,31 @@ for f in files:
 					elif pair1[index] == "G" and pair2[index] == "A":
 						countert += 1
 					elif pair1[index] == "A" and pair2[index] == "C":
-						counter +=1
+						counter +=5
 					elif pair1[index] == "A" and pair2[index] == "T":
-						counter +=1
+						counter +=5
 					elif pair1[index] == "T" and pair2[index] == "A":
-						counter +=1
+						counter +=5
 					elif pair1[index] == "T" and pair2[index] == "G":
-						counter +=1
+						counter +=5
 					elif pair1[index] == "C" and pair2[index] == "T":
 						countert +=1
 					elif pair1[index] == "T" and pair2[index] == "C":
 						countert +=1
 					elif pair1[index] == "C" and pair2[index] == "A":
-						counter +=1
+						counter +=5
 					elif pair1[index] == "C" and pair2[index] == "G":
-						counter +=1
+						counter +=5
 					elif pair1[index] == "G" and pair2[index] == "C":
-						counter +=1
+						counter +=5
 					elif pair1[index] == "G" and pair2[index] == "T":
-						counter +=1
+						counter +=5
 					elif pair1[index] == "-" and pair2[index] != "-":
 						counterindel +=1
 					elif pair2[index] == "-" and pair1[index] != "-":
 						counterindel +=1
 				#calculating the distance
-				val = round((float(counter)/(endpos-startpos+1)*100), 2) #transversions only, percent
+				val = round((float(counter+countert+counterindel)/(endpos-startpos+1)*100), 2) #transversions only, percent
 				#val = (float(counter+countert+counterindel)/(endpos-startpos+1)) #normal p-distance as in R package {ape} with pairwise deletion except weird indel counter
 			#matrix[inter+row][row] = val
 			# if labelvert == False:
