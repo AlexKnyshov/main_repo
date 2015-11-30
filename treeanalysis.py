@@ -57,6 +57,14 @@ for f in files:
 	fname = f.split("/")[2]
 	tr = fname.split(".")[0]
 	result[tr] = float(lowconf)/(totconf)
+	#progress bar
+	progbarc +=1
+	progbar = int(round(float(progbarc)/len(files)*100, 0))
+	hashes = '#' * int(progbar * 0.2)
+	spaces = ' ' * (20 - len(hashes))
+	print "-------------------------------------"
+	print "\rProgress: [{0}] {1}%".format(hashes + spaces, progbar)
+	print "-------------------------------------"
 #output the final table
 with open("treesfilter.tab", "w") as outfile:
 	for tc, tcv in result.items():
