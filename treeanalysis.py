@@ -18,7 +18,7 @@ if len(files) == 0:
 #starting to process files
 progbarc = 0
 result = {}
-
+#test
 for f in files:
 	print f
  	raxmlf = " -s "+f
