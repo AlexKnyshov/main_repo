@@ -2,7 +2,7 @@ from Bio import Phylo
 import os
 import sys
 import glob
-
+import getpass
 #filepath input
 if len(sys.argv) == 3:
 	files = glob.glob(sys.argv[1]+"/*.phylip")
@@ -28,7 +28,11 @@ for f in files:
  		if test.split("/")[1] in os.listdir("./"):
 			os.remove(test)
 	#run RAxML
-	os.system("raxmlHPC --silent -f a -c 25 -p 12345 -x 12345 -m GTRCAT -n TEST"+raxmlf+bootreps)
+	user = getpass.getuser()
+	if user == "aknys001":
+		os.system("raxmlHPC-HYBRID --silent -f a -c 25 -p 12345 -x 12345 -m GTRCAT -n TEST"+raxmlf+bootreps)
+	else:
+		os.system("raxmlHPC --silent -f a -c 25 -p 12345 -x 12345 -m GTRCAT -n TEST"+raxmlf+bootreps)
 	tree = Phylo.read("RAxML_bipartitions.TEST", "newick")
 	#tree = Phylo.read("./../testtree.tre", "newick")
 	if tree.is_bifurcating():
