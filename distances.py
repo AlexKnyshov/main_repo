@@ -1,14 +1,21 @@
 from Bio import SeqIO
 import glob
 import sys
+import os
+from fnmatch import fnmatch
+import operator
+#filepath input
+if len(sys.argv) > 1:
+	files = glob.glob(sys.argv[1]+"/*.fas")
+else:
+	print "FORMAT: python distances.py [folder with fasta]"
+	print "EXAMPLE: python distances.py ./fasta"
+	sys.exit()
+if len(files) == 0:
+	print "no fasta files in the directory"
+#starting processing files
 loci = {}
-#filename = raw_input("enter the filename")
-#infile = open(filename, "r")
-#infile = open("./../T58_L1.phylip.fas", "r")
-#files = ["./../T58_L1.phylip.fas"]
-files = glob.glob("./fasta/*.fas")
 progbarc = 0
-#progbar = 0
 for f in files:
 	print f
 	infile = open(f, "r")
@@ -113,6 +120,6 @@ for f in files:
 	sys.stdout.write("\rProgress: [{0}] {1}%".format(hashes + spaces, progbar))
 	sys.stdout.flush()
 with open("loci.tab", "w") as outfile:
-	for lc, lcv in loci.items():
+	for lc, lcv in sorted(loci.items(), key=operator.itemgetter(1)):
 		print >> outfile, lc, "\t", lcv
 print "Done"
