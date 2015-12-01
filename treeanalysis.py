@@ -64,6 +64,12 @@ for f in files:
 	fname = f.split("/")[2]
 	tr = fname.split(".")[0]
 	result[tr] = float(lowconf)/(totconf)
+	#clean up
+	os.remove("RAxML_bestTree.TEST")
+	os.remove("RAxML_info.TEST")
+	os.remove("RAxML_bipartitions.TEST")
+ 	os.remove("RAxML_bipartitionsBranchLabels.TEST")
+ 	os.remove("RAxML_bootstrap.TEST")
 	#progress bar
 	progbarc +=1
 	progbar = int(round(float(progbarc)/len(files)*100, 0))
