@@ -30,7 +30,7 @@ for f in files:
 	#run RAxML
 	user = getpass.getuser()
 	if user == "aknys001":
-		execfile('/usr/local/Modules/default/init/python.py')
+		execfile('/usr/share/Modules/init/python.py')
 		module('load','RAxML/8.2.3')
 		os.system("cd ~/gen220project")
 		os.system("raxmlHPC-HYBRID -T 16 --silent -f a -c 25 -p 12345 -x 12345 -m GTRCAT -n TEST"+raxmlf+bootreps)
