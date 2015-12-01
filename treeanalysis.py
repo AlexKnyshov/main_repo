@@ -33,7 +33,7 @@ for f in files:
 		execfile('/usr/share/Modules/init/python.py')
 		module('load','RAxML/8.2.3')
 		os.system("cd ~/gen220project")
-		os.system("raxmlHPC-HYBRID -T 16 --silent -f a -c 25 -p 12345 -x 12345 -m GTRCAT -n TEST"+raxmlf+bootreps)
+		os.system("raxmlHPC-PTHREADS-SSE3 -T 16 --silent -f a -c 25 -p 12345 -x 12345 -m GTRCAT -n TEST"+raxmlf+bootreps)
 	else:
 		os.system("raxmlHPC --silent -f a -c 25 -p 12345 -x 12345 -m GTRCAT -n TEST"+raxmlf+bootreps)
 	tree = Phylo.read("RAxML_bipartitions.TEST", "newick")
@@ -65,11 +65,12 @@ for f in files:
 	tr = fname.split(".")[0]
 	result[tr] = float(lowconf)/(totconf)
 	#clean up
-	os.remove("RAxML_bestTree.TEST")
-	os.remove("RAxML_info.TEST")
-	os.remove("RAxML_bipartitions.TEST")
- 	os.remove("RAxML_bipartitionsBranchLabels.TEST")
- 	os.remove("RAxML_bootstrap.TEST")
+	if user == "aknys001":
+		os.remove("RAxML_bestTree.TEST")
+		os.remove("RAxML_info.TEST")
+		os.remove("RAxML_bipartitions.TEST")
+ 		os.remove("RAxML_bipartitionsBranchLabels.TEST")
+ 		os.remove("RAxML_bootstrap.TEST")
 	#progress bar
 	progbarc +=1
 	progbar = int(round(float(progbarc)/len(files)*100, 0))
