@@ -1,0 +1,19 @@
+import Bio
+import sys
+import os
+from Bio import SeqIO
+from Bio.Seq import Seq
+
+filename=sys.argv[1]
+files = os.listdir(filename)
+if not os.path.exists ("./reduced"):
+	os.makedirs("./reduced")
+for file in files:
+	outputfile=open ("./reduced/"+file.split(".")[0]+".reduced.fas", "w")
+	for seq_record in SeqIO.parse(filename+"/"+file, "fasta"):
+		name = seq_record.id.split("_")
+		if name[3]=="Eucharitidae" or name[3]=="Perilampidae":
+			print >> outputfile, ">"+seq_record.id, "\n", seq_record.seq
+		if name[4]=="Chrysolampus" or name[4]=="Eutrichosoma":
+			print >> outputfile, ">"+seq_record.id, "\n", seq_record.seq
+	outputfile.close()
