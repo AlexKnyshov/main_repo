@@ -118,7 +118,14 @@ elif mode == "-gtr":
 	 		if test.split("/")[1] in os.listdir("./"):
 				os.remove(test)
 		#run RAxML
-		os.system("raxmlHPC --silent -f x -p 12345 -m GTRGAMMA -n TEST "+raxmlf)
+		user = getpass.getuser()
+		if user == "aknys001":
+			execfile('/usr/share/Modules/init/python.py')
+			module('load','RAxML/8.2.3')
+			os.system("cd ~/gen220project")
+			os.system("raxmlHPC-PTHREADS-SSE3 -T 16 --silent -f x -p 12345 -m GTRGAMMA -n TEST "+raxmlf)
+		else:
+			os.system("raxmlHPC --silent -f x -p 12345 -m GTRGAMMA -n TEST "+raxmlf)
 		#process RAxML output
 		filename = "RAxML_distances.TEST"
 		infile = open(filename, "r")
