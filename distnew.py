@@ -4,10 +4,10 @@ import glob
 import operator
 from Bio import SeqIO
 #filepath input
-inputfolder = sys.argv[2]
-mode = sys.argv[1]
 if len(sys.argv) == 3:
-	files = glob.glob(sys.argv[2]+"/*.fas")
+	inputfolder = sys.argv[2]
+	files = glob.glob(inputfolder+"/*.phylip")
+	mode = sys.argv[1]
 else:
 	print "FORMAT: python distances.py [mode: -p, -115, -gtr] [folder with phylip]"
 	print "EXAMPLE: python distances.py -gtr ./phylip"
@@ -26,7 +26,7 @@ if mode == "-p" or mode == "-115":
 		print f
 		infile = open(f, "r")
 		seqs = {}
-		for seq in SeqIO.parse(infile, "fasta"):
+		for seq in SeqIO.parse(infile, "phylip"):
 		    seqs[seq.id] = str(seq.seq)
 		#pairwise
 		names =[]
