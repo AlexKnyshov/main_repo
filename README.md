@@ -1,2 +1,0 @@
-# gen220project
-test
