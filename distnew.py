@@ -145,7 +145,13 @@ elif mode == "-gtr":
 		print "-------------------------------------"
 		print "\rProgress: [{0}] {1}%".format(hashes + spaces, progbar)
 		print "-------------------------------------"
-with open("locinew.tab", "w") as outfile:
+if mode == "-p":
+	outf = "lociraw.tab"
+elif mode == "-115":
+	outf = "loci115.tab"
+elif mode == "-gtr":
+	outf = "locigtrn.tab"
+with open(outf, "w") as outfile:
 	for lc, lcv in sorted(loci.items(), key=operator.itemgetter(1)):
 		print >> outfile, lc, "\t", lcv
 print "Done"
