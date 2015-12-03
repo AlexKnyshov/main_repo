@@ -1,2 +1,2 @@
 module load RAxML/8.2.3
-raxmlHPC-PTHREADS-SSE3 -T 16 --silent -f a -c 25 -p 12345 -x 12345 -m GTRCAT -n $(sed -n ${PBS_ARRAYID}p filelist.lst).tre -N 100 -s $(sed -n ${PBS_ARRAYID}p filelist.lst).phylip
+raxmlHPC-PTHREADS-SSE3 -T 16 --silent -f a -c 25 -p 12345 -x 12345 -m GTRCAT -n $1/$(sed -n ${PBS_ARRAYID}p filelist.lst).tre -N 100 -s $1/$(sed -n ${PBS_ARRAYID}p filelist.lst).phylip
