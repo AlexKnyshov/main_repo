@@ -2,11 +2,12 @@ from Bio import Phylo
 import os
 import sys
 import glob
-if len(sys.argv) == 2:
-	files = glob.glob(sys.argv[1]+"/*.tre")
+if len(sys.argv) == 3:
+	files = glob.glob(sys.argv[2]+"/*.tre")
+	opt = sys.argv[1]
 else:
-	print "FORMAT: python treeanalysis.py [folder with trees]"
-	print "EXAMPLE: python treeanalysis.py ./trees"
+	print "FORMAT: python treeanalysis.py [option: -75, -avg] [folder with trees]"
+	print "EXAMPLE: python treeanalysis.py -75 ./trees"
 	sys.exit()
 if len(files) == 0:
 	print "no trees in the directory"
@@ -15,6 +16,7 @@ progbarc = 0
 result = {}
 #test
 for f in files:
+	print f
 	tree = Phylo.read(f, "newick")
 	#tree = Phylo.read("./../testtree.tre", "newick")
 	if tree.is_bifurcating():
@@ -27,6 +29,7 @@ for f in files:
 	list4 = test.find_clades()
 	totconf = 0
 	lowconf = 0
+	conflist = []
 	for l1 in list4:
 		counter +=1
 		if l1.is_bifurcating():
@@ -36,13 +39,19 @@ for f in files:
 			totconf +=1
 			l3=l2.split(",")
 			l4 = l3[1][:-1].split("=")
-			if int(l4[1]) <70:
-				lowconf +=1
+			if opt == "-75":
+				if int(l4[1]) <75:
+					lowconf +=1
+			elif opt == "-avg":
+				conflist.append(int(l4[1]))
 	print "below 70 per cent", float(lowconf)/(totconf)
 	print "clades #", counter, ct
 	fname = f.split("/")[2]
-	tr = fname.split(".")[0]
-	result[tr] = float(lowconf)/(totconf)
+	tr = fname.split(".")[1]
+	if opt == "-75":
+		result[tr] = float(lowconf)/(totconf)
+	elif opt == "-avg":
+		result[tr] = float(sum(conflist)/len(conflist))
 	#progress bar
 	progbarc +=1
 	progbar = int(round(float(progbarc)/len(files)*100, 0))
