@@ -2,6 +2,7 @@ import os
 import sys
 import glob
 import operator
+import getpass
 from Bio import SeqIO
 #filepath input
 if len(sys.argv) == 3:
