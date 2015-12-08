@@ -1,1 +1,3 @@
-qsub -S $(which python) -l nodes=1:ppn=8 treeanalysis.py ./original_data 50
+cd ~/gen220project
+python distnew.py -gtr ./phylip
+#python pythie.py
