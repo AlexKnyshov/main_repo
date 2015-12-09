@@ -2,7 +2,7 @@ import os
 import sys
 import glob
 import operator
-import getpass
+import socket
 from Bio import SeqIO
 #filepath input
 if len(sys.argv) == 3:
@@ -119,8 +119,8 @@ elif mode == "-gtr":
 	 		if test.split("/")[1] in os.listdir("./"):
 				os.remove(test)
 		#run RAxML
-		user = getpass.getuser()
-		if user == "aknys001":
+		hostname = socket.gethostname()
+		if hostname == "pigeon":
 			execfile('/usr/share/Modules/init/python.py')
 			module('load','RAxML/8.2.3')
 			os.system("cd ~/gen220project")
