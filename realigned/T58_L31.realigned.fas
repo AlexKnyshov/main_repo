@@ -215,17 +215,7 @@ agatgc
 ---------------------------------------------aaagtagacgaaaac
 atggcaagagcacaaagaagaaatgctgtaaagtcagaaaagttttggtttagacgagat
 attacgtgcaacacgcaacaaggagatatcaaagatgaatttacagaatatacgatagat
-gaaatcgtaaatggaaaggtttgtttatttnnnnnnnnnnnnnnnaatta---ttttgca
-ggaaggcacatttcctggtttaattcccatggtcaattcttatctattaagtatggacgc
-agatgc
->I12631_4257_Hymenoptera_Perilampidae_Chrysolampus_sp_seq1 
-------------------------------------------------------------
-------------------------------------------------------------
-------------------------------------------------------------
----------------------------------------------aaagtagacgaaaac
-atggcaagagcacaaagaagaaatgctgtaaagtcagaaaagttttggtttagacgagat
-attacgtgcaacacgcaacaaggagatatcaaagatgaatttacagaatatacgatagat
-gaaatcgtaaatggaaaggtttgtttatttnnnnnnnnnnnnnnnaatta---ttttgca
+gaaatcgtaaatggaaaggtttgtttatttnnnnnnnnn---nnnnnnaattattttgca
 ggaaggcacatttcctggtttaattcccatggtcaattcttatctattaagtatggacgc
 agatgc
 >I12632_4258_Hymenoptera_Perilampidae_Perilampus_sp_seq1 
@@ -565,7 +555,7 @@ gaagtacaaattactgattttgaaaacgcagcttttgtttgttttgtggttcttttaaca
 cgagtcattttaagctataaacttaatcttttgataccaattagtaaagtagacgaaaat
 atggcaagagcacaaaaaagaaatgctgttaaggctgaaaagttttggtttagaaaagat
 attacgtgcaatactgaacaaggagatattaaagatgaatttacagaatatacaatagat
-gaaatcgtgaatggaaaggtttgttt-ttgcaaaatttcaaatnnnnnnn---nnnngca
+gaaatcgtgaatggaaaggtttgttt-ttgcaaaatttc---aaatnnnnnnnnnnngca
 ggaaggtacatttcctggtttgattccaatggtcaattcttatctcttaagtatggatac
 agatgc
 >I8166_4019_Hymenoptera_Pteromalidae_Eutrichosoma_mirabile_seq1 
@@ -575,7 +565,7 @@ gaagtgcagattaccgattttgaaaatgcagctattgtttgttttgtagttcttctaacc
 cgagttattctaagctacaaacttaatctgttgataccaattagcaaagtagacgaaaat
 atggcaagagcacaaaaaagagatgctattgggacagaaaagttttggtttaaaaaagat
 attacgtgcaataagcaggaaggcaatattgaagatgaatttacagaatatacaatagat
-gagattgtaaatggaaaggtttggttattttcctagatattattaa--ta---tattgta
+gagattgtaaatggaaaggtttggttattttcctagat-----attattaatatattgta
 ggaaggtgtatttcctggtctaataccaatggtcaattcttatcttttgagtatggatgc
 agatgc
 >I9730_4129_Hymenoptera_Eucharitidae_Orasema_nr_delicatula_seq1 

@@ -1,7 +1,7 @@
 >I12607_3689_Hymenoptera_Eucharitidae_Orasema_sp_seq1 
 ------------------------------------------------------------
 -----------------------------------gacgaggaagatctaaatgattcta
-attaygacga----------------------------------------gttctctggt
+attaygacg----------------------------------------agttctctggt
 tatrgaggatcattatttagtaaggtaattttgattcgaattatttgtttcaatgctaag
 ctttt-ttatcgtcaataggacccatatgacaaagatgacgaagaagcagatgctatata
 cgaagcaattgacaaacgtatggatgaaaaacgcaaagattatagagaaaaacgattgcg
@@ -31,7 +31,7 @@ catgattccttcttatggcggagatattaagtg
 >I12610_3820_Hymenoptera_Eucharitidae_Dilocantha_bennetti_seq1 
 gatattggtccagctcgagatgcaaatgatgtttcagagatgacaggcatgcaccaccaa
 caaagcgagcaaaaaagaaagaagaagaggaagaagacgaggaagatctgaatgattcta
-attatgatga----------------------------------------attctccgga
+attatgatg----------------------------------------aattctccgga
 tatggaggatcactgttcagcaaggtaaacttgacgtgtatcatttatttcaatactaag
 cttta-ctttcatcaataggacccatatgacaaagatgatgaagaagcagatgccatata
 cgaggcaattgacaaacgtatggatgaaaaacgtaaagattacagagaaagacggttgcg
@@ -46,7 +46,7 @@ catgattccttcttacggtggagatattaagta
 >I12611_3821_Hymenoptera_Eucharitidae_Isomerala_bouceki_seq1 
 gatattggtccagctcgagatgcaaatgatgtttcagagatgacaggcatgcaccaccaa
 caaagcgagcaaaaaagaaagaagaagaggaagaagacgaggaagatctgaatgattcta
-actatgatga----------------------------------------attctccgga
+actatgatg----------------------------------------aattctccgga
 tatggaggatcactattcagcaaggtaaacttgacgtgtatcatttagttcaatactaag
 cttta-ctgtcatcaataggacccatatgacaaagatgatgaagaagcagatgccatata
 cgaggcaattgacaaacgtatggatgaaaaacgtaaagattacagagaaagacggttgcg
@@ -61,7 +61,7 @@ catgattccttcttacggtggagatattaagta
 >I12612_3843_Hymenoptera_Eucharitidae_Colocharis_sp_seq1 
 gatattggtccagctcgagatgcaaatgatgtttcagagatgacaggcatgcaccaccaa
 caaagcgagcaaaaaagaaagaagaagaggaagaagacgaggaagatctgaatgattcta
-attatgatga----------------------------------------rttctctgga
+attatgatg----------------------------------------arttctctgga
 tatggaggatcactatttagcaaggtaaayttgacgtgtatcgtttatttcaatactaag
 cttta-ctgtcatcaataggacccatatgacaaagatgatgaagaagctgatgccatata
 cgaggcaattgataaacgtatggatgaaaaacgtaaagattacagagaaagacggttgcg
@@ -76,7 +76,7 @@ catgatcccttcttacggtggagatattaagta
 >I12613_3853_Hymenoptera_Eucharitidae_Kapala_sp_seq1 
 gatattggtccagctcgagatgcaaatgatgtttcagagatgataggcatgcaccaccaa
 caaagcgagcaaaaaagaaagaagaagaggaagaagacgaggaagatctgaatgattcta
-attatgatga----------------------------------------attctccgga
+attatgatg----------------------------------------aattctccgga
 tatggaggatcactattcagcaaggtaaacttgactagtatcgtttatttcaatactaag
 cttta-ctgtcatcaataggacccatatgacaaagatgatgaagaagcagatgccatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaagattacagagaaagaagattgcg
@@ -91,7 +91,7 @@ catgattccttcttacggtggagatattaagta
 >I12614_3960_Hymenoptera_Eucharitidae_Orasema_sp_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcatgcaccaccaa
 caaagcgtgcaaaaaagaaagaagaagaggaagaagacgaggaagatctaaatgattcta
-attatgacga----------------------------------------gttttctggt
+attatgacg----------------------------------------agttttctggt
 tacggaggatcattatttagcaaggtaatcttgatttggattatttgttccaatactaag
 ctctt-ttaatgtcgataggacccatatgacaaagatgacgaagaagcagacgctatata
 cgaagcaattgacaaacgtatggatgagaaacgcaaagattatagagaaagacgattgcg
@@ -106,7 +106,7 @@ tatgatcccttcttacggcggagatattaagtg
 >I12615_3966_Hymenoptera_Eucharitidae_nr_Indosema_sp_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcatgcaccaccaa
 caaagcgtgcgaaaaagaaggaagaagaggaagaagacgaggaagatctaaatgattcta
-attatgacga----------------------------------------gttttctggt
+attatgacg----------------------------------------agttttctggt
 tatggaggatcactatttagtaaggtaattcttatctgaattatttgttccaacgctaag
 ttcat-ttattgtcaataggacccgtatgataaagatgacgaagaagcagatgctatata
 cgaagcaattgacaaacgtatggacgaaaaacgcaaagattatagagaaaaacgattgcg
@@ -121,7 +121,7 @@ catgatcccttcttatggtggagatattaagtg
 >I12616_4001_Hymenoptera_Eucharitidae_Kapala_ivorensis_seq1 
 gatattggtccagctcgagatgcaaatgatgtttcagagatgacaggcatgcaccaccaa
 caaagcgagcaaaaaagaaagaagaagaggaagaagacgaggaagatctgaatgattcta
-attatgatga----------------------------------------attctccgga
+attatgatg----------------------------------------aattctccgga
 tatggaggatcactattcagcaaggtaaacttgacgtgtatcatttagttcaatactaag
 cttta-ctgtcatcaataggacccatatgacaaagatgatgaagaagcagatgccatata
 cgaggcaattgacaaacgtatggatgaaaaacgtaaagattacagagaaagacggttgcg
@@ -136,7 +136,7 @@ catgatcccttcttacggtggagatattaagta
 >I12617_4002_Hymenoptera_Eucharitidae_Kapala_ivorensis_seq1 
 gatattggtccagctcgagatgcaaatgatgtttcagagatgacaggcatgcaccaccaa
 caaagcgagcaaaaaagaaagaagaagaggaagaagacgaggaagatctgaatgattcta
-attatgatga----------------------------------------attctccgga
+attatgatg----------------------------------------aattctccgga
 tatggaggatcactattcagcaaggtaaacttgacgtgtatcatttagttcaatactaag
 cttta-ctgtcatcaataggacccatatgacaaagatgatgaagaagcagatgccatata
 cgaggcaattgacaaacgtatggatgaaaaacgtaaagattacagagaaagacggttgcg
@@ -151,7 +151,7 @@ catgatcccttcttacggtggagatattaagta
 >I12618_4097_Hymenoptera_Eucharitidae_Orasema_bakeri_gp_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacagacatgcaccaccaa
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaagatctaaatgattcta
-attatgacga----------------------------------------gttctctggc
+attatgacg----------------------------------------agttctctggc
 tatggaggatcattatttagtaaggtaattttgattcgaaccatttgtttctatactaag
 ctttt-cttctgtcaataggacccatatgacaaagatgatgaagaagcagatgctatata
 tgaagcaattgacaaacgtatggatgaaaaacgtaaagattatagggaaaaacgattgcg
@@ -166,7 +166,7 @@ catgataccctcttatggcggagatatcaagtg
 >I12619_4107_Hymenoptera_Eucharitidae_Orasema_tolteca_gp_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcacgcgccaccaa
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaagatttaaatgattcta
-attatgacga----------------------------------------gttctctggt
+attatgacg----------------------------------------agttctctggt
 tatggaggctcattatttagtaaggtaactttgattcacatcatttgattcgatgctaag
 cttct-ttattgtcaataggacccatatgacaaagatgatgaggaagcagatgctatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaagattatagagaaagacgattacg
@@ -181,7 +181,7 @@ catgataccttcttatggtggagatattaagtg
 >I12620_4124_Hymenoptera_Eucharitidae_Orasema_aenea_gp_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcatgcaccaccaa
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaggatctaaatgattcta
-attatgatga----------------------------------------gttctctggt
+attatgatg----------------------------------------agttctctggt
 tatggaggatcattgttcagcaaggtaattttgatcagaattatttgtttcaatactaag
 ctttt-ttattgccaataggatccatatgacaaagatgatgaagaagcagatgctatata
 cgaagcaattgacaaacgtatggatgagaaacghaaagattatagagaaagahgattgcg
@@ -196,7 +196,7 @@ catgataccttcrtahggyggakatattaagtr
 >I12621_4127_Hymenoptera_Eucharitidae_Orasema_xanthopus_gp_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcatgcaccaccaa
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaagatctaaatgattcta
-attatgatga----------------------------------------gttctctggt
+attatgatg----------------------------------------agttctctggt
 tatggaggatcattgtttagtaaggtaattttgatcagaattatttgtttcaatact-ag
 ctttt-ttattgccaataggatccatatgacaaagatgatgaagaagcagatgctatata
 tgaagcaattgacaaacgtatggatgagaaacgcaaagattatagagaaaaacgattgcg
@@ -211,7 +211,7 @@ catgataccttcttacggcggagatattaagtg
 >I12623_4159_Hymenoptera_Eucharitidae_Kapala_floridana_seq1 
 gatattggtccagctcgagatgcaaatgatgtttcagagatgacaggcatgcaccaccaa
 caaagcgagcaaaaaagaaagaagaagaggaagaagacgaagaagatctgaatgattcta
-attatgatga----------------------------------------attctccgga
+attatgatg----------------------------------------aattctccgga
 tatggaggatcactatttagcaaggtaaacttgacgtgtatcatttagttcaatactaag
 cttta-ctgtcatcaataggacccatatgacaaagatgatgaagaagcagatgccatata
 cgaggcaattgacaaacgtatggatgaaaaacgtaaagattacagagaaagacgattgcg
@@ -226,7 +226,7 @@ catgatcccttcttacggtggagatattaagta
 >I12624_4163_Hymenoptera_Eucharitidae_Orasema_minuta_seq1 
 gatattggtcctgctcgagatgcaaatgacgtctcagagatgacagacacgcgccaccaa
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaagatttaaatgattcta
-attatgacga----------------------------------------gttctctggt
+attatgacg----------------------------------------agttctctggt
 tatggaggttcattatttagtaaggtaactttgattcatattatttatttcgatgctaag
 cttct-ttgttgtcaataggacccatatgacaaagatgatgaggaagcagatgctatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaagattatagagaaagacgattacg
@@ -241,7 +241,7 @@ catgataccttcttatggtggagatattaagtg
 >I12626_4190_Hymenoptera_Eucharitidae_Orasema_synempora_seq1 
 gatatcggtcctgctcgagatgcaaatgacgtttcagagatgacagacatgcaccaccaa
 caaagcgtgcaaaaaaaaaggaagaagaggaggaagacgaggaagatttaaatgattcta
-attatgacga----------------------------------------gttctctggt
+attatgacg----------------------------------------agttctctggt
 tatggaggatcgttatttagtaaggtaatcttgatttgaattatttgtttcaatactaag
 ctttt-ttatcgtcaataggacccatatgacaaagatgatgaagaagcagatgctatata
 cgaagcaatcgacaaacgtatggatgaaaaacgaaaagattatagagaaaaacgattgcg
@@ -256,7 +256,7 @@ catgatcccttcttatggcggagatattaagtg
 >I12627_4193_Hymenoptera_Eucharitidae_Orasema_simplex_seq1 
 gatattggccctgctcgagatgcaaatgacgtttcagagatgacaggcatgcaccaccaa
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaagatctaaatgattcta
-attatgatga----------------------------------------gttctctggt
+attatgatg----------------------------------------agttctctggt
 tatggaggatcattgtttagtaaggtaattttgatcagaattatttgtttcaatact-ag
 ctttt-ttattgccaataggatccatatgacaaagatgatgaagaagcagatgctatata
 tgaagcaattgacaaacgtatggatgagaaacgcaaagattatagagaaaaacgattgcg
@@ -271,7 +271,7 @@ catgataccttcttacggcggagatattaagtg
 >I12628_4212_Hymenoptera_Eucharitidae_Orasema_coloradensis_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcatgcaccaccaa
 ctaagcgtgctaaaaagaaggaagaagaggaagaagaggaagaagatctaaatgattcta
-attatgatga----------------------------------------gttctctggt
+attatgatg----------------------------------------agttctctggt
 tatggaggatcattatttagtaaggtaattttgatcagaattatttgtttcaatactaag
 cttat-gtattgtcaataggatccatacgacaaagatgatgaagaagcagatgctatata
 cgaagcaattgataaacgtatggatgaaaaacgcaaagattatagagaaagacgattgcg
@@ -286,7 +286,7 @@ catgataccttcttatggcggagatattaagtg
 >I12629_4254_Hymenoptera_Perilampidae_Monacon_sp_seq1 
 -----------------------------------agagatgacagacatgccccaccaa
 ctaaacgagctaaaaagaaggaagaggaggaagaagatgaagaagatctcaatgattcta
-attacgatga----------------------------------------attttctggg
+attacgatg----------------------------------------aattttctggg
 tatggaggatcattattcagtaaggtaagtttaaatcatattatnnnnnnnnnnnncaat
 ttwwt-gaatgtaatttaggatccatatgataaagacgatgaagaagcagahgctattta
 tgaagcaatagacaaacggatggatgaaaaacgtaaagattatagagaaaaacggttgcg
@@ -301,7 +301,7 @@ catgattccatcttatggaggtgatattannnn
 >I12630_4255_Hymenoptera_Perilampidae_Perilampus_sp_seq1 
 gatattggaccagctcgagatgcaaacgatgtttcnnnnnnnnnnnncatgctccaccaa
 ctaagcgagcaaaaaagaaggaagaggaggaagaagatgaagaagatctcaatgattcca
-attacgacga----------------------------------------attttctggg
+attacgacg----------------------------------------aattttctggg
 tatggaggatcattattcagcaaggtaagttcaaattatattatnnnnnnnnnnnntaat
 ttatt-nnnnnnnnnnnnnnnnnnnnatgataaagatgatgaagaagcagatgctattta
 tgaagcgatagataaacggatggatgaaaaacgtaaagattatagagaaaaacgattgcg
@@ -316,22 +316,7 @@ tatgatcccatcttatggaggtgatatnnnnnn
 >I12631_4257_Hymenoptera_Perilampidae_Chrysolampus_sp_seq1 
 gatattggacctgctcgagacgcaaatgacgtttcagagatgacagacatgcaccgccaa
 ctaagcgtgcaaaaaagaaagaagaagaggaagaagatgaggaagatcttaacgactcta
-attatgacga----------------------------------------attttctgga
-tatggaggatcattgtttagcaaggtnnnnnnnnnnnnnnnnnnttgattaaattcaacn
-nnnnn-nnnnnnnn------nnnnnnnnnataaagacgatgaggaagctgatgctatata
-tgaagcaatagacaaacgtatggatgaaaaacgtaaagattacagagaaaaacgattacg
-tgaggaattagaacgttatcgacaagagagacccaaaattcaacagcaattttcggatct
-caagagagaattagcgaatgtttctgaaaatgaatggagaaatgtgcctgaagttggaga
-tgccaggaacagaaagcaaagaaatcccagggcagaaaaattcactcctttaccagattc
-agtattagcaagaaatttaggtggagaaactgcgactagtttagatccgacaagtggtct
-agcatctatgttgccaggagtagctactcctggaatgttaactccaacaggcgatttaga
-tttaagaaaaattggtcaagctagaaacaacttgatgaacgtgaagttgagacaagtttc
-agactctgttgaaggacaaactgtagtagatcctaaaggttaccttacagatttacagag
-tatgatcccttcttatggtggcgacattannnn
->I12631_4257_Hymenoptera_Perilampidae_Chrysolampus_sp_seq1 
-gatattggacctgctcgagacgcaaatgacgtttcagagatgacagacatgcaccgccaa
-ctaagcgtgcaaaaaagaaagaagaagaggaagaagatgaggaagatcttaacgactcta
-attatgacga----------------------------------------attttctgga
+attatgacg----------------------------------------aattttctgga
 tatggaggatcattgtttagcaaggtnnnnnnnnnnnnnnnnnnttgattaaattcaacn
 nnnnn-nnnnnnnn------nnnnnnnnnataaagacgatgaggaagctgatgctatata
 tgaagcaatagacaaacgtatggatgaaaaacgtaaagattacagagaaaaacgattacg
@@ -346,7 +331,7 @@ tatgatcccttcttatggtggcgacattannnn
 >I12632_4258_Hymenoptera_Perilampidae_Perilampus_sp_seq1 
 gatataggacctgctcgagatgcaaacgatgtttcagggatgacagacatgctccaccaa
 ctaagagaactaaaaagaaagaagaggaggaagaagatgaagaagatcttaatgattcaa
-attacgatga----------------------------------------attttctggg
+attacgatg----------------------------------------aattttctggg
 tatggaggatcattattcagtaaggtaagcttaaattatattatnnnnnnnagtagtaat
 ttatt-gaatatattttaggatccatatgataaagatgatgaagaagcagatgcgatcta
 tgaagcaatagataaacgaatggatgaaaaacgtaaagattatagagaaaaacgattgcg
@@ -361,7 +346,7 @@ tatgattccatcttatggaggtgacataannnn
 >I12634_4262_Hymenoptera_Perilampidae_Perilampus_sp_seq1 
 gatataggaccggctcgagatgcaaacgatgtttmagagatgayagacatgctccrccaa
 ctaagcgarcaaaaaagaaggaagaagaggaagaagatgaagargayctyaatgattcta
-attatgatga----------------------------------------attttckggg
+attatgatg----------------------------------------aattttckggg
 tatggwggatcattattcagcaaagtaagttcaaattatattatnnnnnnnnnnnncaat
 ttgtt-gaatataatttaggatccatatgataaagatgatgaagaagcagatgctattta
 tgaagcaatagacaadhgaatggatgaaaaacgtaaagattatagagaraaacgattgcg
@@ -376,7 +361,7 @@ yatgattccatcntatggaggtgatatmaagtg
 >I12635_4263_Hymenoptera_Eucharitidae_Orasema_festiva_gp_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcatgcaccgccga
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaagatttaaatgattcta
-attatgatga----------------------------------------gttctctggt
+attatgatg----------------------------------------agttctctggt
 tatggaggatcgttgtttagtaaggtaattttgatcagaattatttgtttcaatactaag
 ctttt-ttattgctaataggatccatatgacaaagatgatgaagaagcagatgctatata
 tgaagcgattgacaaacgtatggatgagaaacgcaaagattatcgagaaaaacgattgcg
@@ -406,7 +391,7 @@ tatgattccatcttatggaggtgatatnnnnnn
 >I12637_4268_Hymenoptera_Eucharitidae_Orasema_sp_seq1 
 gatattggtcctgcccgagatgcaaatgacgtttcagagatgacaggcacgcgccaccaa
 caaagcgtgcaaaaaagaaggaagaagargaagaagacgaggaagatttaaatgattcta
-attatgacga----------------------------------------gttctctggt
+attatgacg----------------------------------------agttctctggt
 tatggaggttcattatttagtaaggtaactttgattcacatcatttgtttcgatgctaag
 yttct-ttattgtcaataggacccatatgacaaagatgatgaggaagcagatgctatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaagattatagagaaagacgattacg
@@ -421,7 +406,7 @@ catgataccttcgtatggtggagatattaagtg
 >I12638_4269_Hymenoptera_Eucharitidae_Orasema_sp_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcacgcgccaccaa
 caaagcgtgcaaaaaagaaggaagaagaagaagaagacgaggaagatttaaatgattcta
-attatgacga----------------------------------------gttctctggt
+attatgacg----------------------------------------agttctctggt
 tatggaggttcattatttagtaaggtaactttgattcacatcatttgtttcgatgctaag
 cttct-ttattgtcaataggacccatatgacaaagatgatgaggaagcagatgctatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaagattatagagaaagacgattacg
@@ -436,7 +421,7 @@ catgataccttcgtatggtggagatattaagtg
 >I12639_4271_Hymenoptera_Perilampidae_Perilampus_sp_seq1 
 gatataggacctgctcgagatgcaaatgatgtttcnnnnnnnncagacacgctcctccaa
 ctaaacgagcaaaaaagaaggaagaggaggaagaagatgaggaagatcttaatgattcga
-actatgatga----------------------------------------attttctggg
+actatgatg----------------------------------------aattttctggg
 tatggaggatcattgttcagtaaagtgagttcaaatttt-----------------ttac
 atttt-acatgtacactaggatccatatgataaagatgacgaagaagcagatgctattta
 tgaagcaatcgacaaacgaatggatgaaaaacgtaaagattatagagaaaaacgattacg
@@ -451,7 +436,7 @@ catgattccatcttatggaggtgatannnnnnn
 >I12640_4272_Hymenoptera_Perilampidae_Perilampus_sp_seq1 
 gatataggacctgctcgagatgcaaatgatgtttcagggatgacagacacgctcctccaa
 ctaaacgagcaaaaaagaaggaagaggaggaagaagatgaggaagatcttaatgattcra
-actacgatga----------------------------------------attttcgggg
+actacgatg----------------------------------------aattttcgggg
 tatggaggatcattgttcagtaaagtgagttcgaattttatcatctatttgaatgataac
 attttcacatatac-ttaggatccatatgataaagatgatgaagaagcagatgctattta
 tgaagcaatcgacaaacgaatggatgaaaaacgtaaagattatagagaaaaacgattacg
@@ -466,7 +451,7 @@ catgattccatcttatggaggtgatatcaagta
 >I12641_4273_Hymenoptera_Eucharitidae_Orasema_cockerelli_gp_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacagacacgcgccaccaa
 caaagcgtgcaaaaaagaaggaggaagaggaagaagacgaggaagatctaaatgattcta
-attatgacga----------------------------------------gttctctggt
+attatgacg----------------------------------------agttctctggt
 tatggaggttcattatttagcaaggtaattttgattcacatcgtttgtttctatactamg
 cttct-ttattgtcaataggacccgtatgacaaagatgatgaggaagcagatgctatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaagattatagagaaagacgattacg
@@ -496,7 +481,7 @@ catgattccatcatatggaggtgatatcaagtg
 >I12644_4277_Hymenoptera_Eucharitidae_Orasema_aenea_gp_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcatgcaccaccaa
 cgaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaggatctaaatgattcta
-attatgacga----------------------------------------attctctggt
+attatgacg----------------------------------------aattctctggt
 tatggaggatcattgtttagcaaggtaattttgatcagaattatttgtttcaatactaaa
 ctttt-ttattgccaataggatccatatgataaagatgatgaagaagcagatgctatata
 bgaagcaattgacaaacgtatggatgagaaacgcaaagattatagagaaagaygattgcg
@@ -511,7 +496,7 @@ catgataccttcgtacggtggagatattaagtg
 >I12645_4278_Hymenoptera_Eucharitidae_Orasema_simulatrix_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcatgcgccaccaa
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaagatctaaatgattcta
-attatgacga----------------------------------------gttctctgga
+attatgacg----------------------------------------agttctctgga
 tatggaggatcattatttagtaaggtaattttgattcgaattatttgtttctatactaag
 ctttt-ttattgttaataggacccatatgacaaagatgatgaagaagcagatgctatata
 tgaagcaattgacaaacgcatggatgaaaaacgcaaggattatagagaaaaacgattgcg
@@ -526,7 +511,7 @@ tatgataccttcttatggtggagatattaagtg
 >I12646_4286_Hymenoptera_Eucharitidae_Akapala_rudis_seq1 
 gatatcggccctgctcgagatgcgaatgacgtttcagagatgacagacatgctccaccaa
 cgaagcgaacaaaaaagaaagaagaggaggaagaagatgaagaagatctcaatgattcta
-attatgacga----------------------------------------attttctgga
+attatgacg----------------------------------------aattttctgga
 tatggaggatcactgtttagcaaggtnnnnnnnnnnnnncacgctaactcttattgtgct
 gtcta-ggatcct------------tatgataaagacgatgaagaagcagatgctatata
 tgaggcaatagataaacgtatggatgaaaaacgtaaagattatagagaaaaacgattacg
@@ -541,7 +526,7 @@ tatgatcccctcttatggtggagatat------
 >I12647_4288_Hymenoptera_Eucharitidae_Colocharis_sp_seq1 
 gatattggtccagctcgagatgcaaatgatgtttcagagatgacaggcatgcaccaccaa
 caaagcgagcaaaaaagaaagaagaagaggaagaagacgaggaagatctgaatgattcta
-attatgatga----------------------------------------attctcygga
+attatgatg----------------------------------------aattctcygga
 tatggaggatcvytatttagcaaggtaaactdgacgtgtatcgtttatttcaatactaag
 ckywa-ctgtcatcaataggacccatatgacaaagatgatgaagaagctgatgccatata
 cgaggcaattgataaacgtatggatgaaaaacgtaaagattacagagaaagacggttgcg
@@ -556,7 +541,7 @@ catgatcccttcttacggtggagatattaagta
 >I12648_4290_Hymenoptera_Eucharitidae_Psilocharis_sp_seq1 
 gatattggtccagctcgagatgcaaatgatgtttcagagatgacaggcacgcaccaccga
 caaagcgtgcaaaaaagaaagaagaggaggaagaagacgaggaagatctaaatgattcta
-attatgatga----------------------------------------gttctccgga
+attatgatg----------------------------------------agttctccgga
 tatggaggatcattatttagcaaggtaaacttgatctgtaccatttgttcctatactaag
 cttct-atgtcatcaataggatccatacgataaagatgatgaagaagcagatgctatata
 cgaagcaattgacaaacgtatggatgagaaacgtaaagattacagagaaaagcgattgcg
@@ -571,7 +556,7 @@ catgatcccctcttacggtggagatatcaagta
 >I12649_4292_Hymenoptera_Eucharitidae_Anorasema_sp_seq1 
 gatattggtccggctcgagatgcaaatgacgtttcagagatgacagacatgcaccaccaa
 caaaacgtactaaaaaaaaagaagaagaagaagaagatgaagargatttgaatgactcka
-attatgatga----------------------------------------atthtctggc
+attatgatg----------------------------------------aatthtctggc
 tatggaggatcattatttagcaaagtaaactwcdtttatttgact-----------caaa
 gtttt-ttatttthattaggatccatatgacaaagatgatgaggaagcggatgctatata
 tgaagccattgataaacgtatggatgaaaaacgtaaagattatagagaaagacgattacg
@@ -586,7 +571,7 @@ catgattccttcatatggtggygatatcaagta
 >I12650_4293_Hymenoptera_Eucharitidae_Pseudometagea_sp_seq1 
 ------------------------------gtttcagagatgacaggcatgcaccaccaa
 caaagcgtgcaaaaaagaaagaagaagaggaggaagatgaggaagatctgaatgattcta
-attatgatga----------------------------------------gttctccggg
+attatgatg----------------------------------------agttctccggg
 tatggaggatcattatttagcaaggtaaacttgatctgtatcatttgtttcaatactaat
 cttta-ctttcatcgataggatccatatgacaaagatgatgaagaagcagatgccatata
 cgaagcgattgacaaacgtatggatgaaaagcgtaaagattacagagaaagacgattgcg
@@ -601,7 +586,7 @@ catgatcccttcttatggtggagatattaagta
 >I12651_4296_Hymenoptera_Eucharitidae_Gollumiella_sp_seq1 
 -----------------------------------------------catgcaccaccaa
 cgaagcgtgctaaaaagaaggaggaagaagaagaggatgaggaagatttgaatgattcta
-attatgatga----------------------------------------attctctggc
+attatgatg----------------------------------------aattctctggc
 tatggaggatcgttgtttagtaaagtaaaattcatctttgctgttcact-----------
 -tgtt-accccttcattaggatccatatgataaagatgacgaagaagccgatgctatata
 tgaagcaatagacaaacgtatggatgagaaacgtaaagattacagagaacggcgcctacg
@@ -616,7 +601,7 @@ nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnna-------------------
 >I12652_4297_Hymenoptera_Eucharitidae_Kapala_iridicolor_seq1 
 --------------------------------------------------------ccaa
 caaagcgagcaaaaaagaaagaagaagaggaagaagacgaggaagatctgaatgattcta
-attatgatga----------------------------------------attctccgga
+attatgatg----------------------------------------aattctccgga
 tatggaggatcactattcagcaaggtaaaattgatgtatatcgtttatttcaatactaag
 cttta-ctgtcgtcaataggacccatatgacaaagatgatgaagaagcagatgccatata
 cgaggcaattgacaaacgtatggatgaaaaacgtaaagattacagagaaagacggttgcg
@@ -631,7 +616,7 @@ catgatcccttcttacggtggagatattaagta
 >I12653_4299_Hymenoptera_Eucharitidae_Kapala_sulcifacies_seq1 
 -----------------------------------agagatgacaggcatgcaccaccaa
 caaaacgagcaaaaaagaaagaagaagaggaagaagacgaggaagatctgaatgattcta
-attatgatga----------------------------------------attctccgga
+attatgatg----------------------------------------aattctccgga
 tatggaggatcactattcagcaaggtaaacttgactagtatcgtttatttcaatactaar
 cttta-ctgtcatcaataggacccatatgacaaagatgatgaagaagcagatgccatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaagattacagagaaagaagattgcg
@@ -646,7 +631,7 @@ catgattccttcttacggtggagatattaagta
 >I12655_3824_Hymenoptera_Eucharitidae_Kapala_sp_seq1 
 gatattggtccagctcgagatgcaaatgatgtatcagagatgacaggcatgcaccaccaa
 caaaacgagcaaaaaagaaagaagaagaggaagaagacgaggaagatctgaatgattcta
-attatgatga----------------------------------------attctccgga
+attatgatg----------------------------------------aattctccgga
 tatggaggatcactattcagcaaggtaaacttgactagtatcgtttatttcaatactaag
 cttta-ctgtcatcaataggacccatatgacaaagatgatgaagaagcagatgccatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaagattacagagaaagaagattgcg
@@ -661,7 +646,7 @@ catgattccttcttacggtggagatattaagta
 >I12658_4276_Hymenoptera_Perilampidae_Perilampus_sp_seq1 
 ------------------------------gtttcagagatgacagacatgctccaccaa
 ctaaacgaacaaaaaagaaggaagaggaggaagaagatgaagaagatcttaatgattcta
-attacgatga----------------------------------------attttctgga
+attacgatg----------------------------------------aattttctgga
 tatggaggatcattattcagcaaggtaagttcaaattaaattatnnnnnnnaataacgat
 ttatt-nnnnnnnnnnnnnnnnnnnnatgataaagatgatgaagaagcagatgctattta
 tgaagcaatagacaaacgaatggatgagaagcgtaaagattatagagaaaaacgattgcg
@@ -676,7 +661,7 @@ tatgattccatcttatggaggtgatatcannnn
 >I8136_4083_Hymenoptera_Eucharitidae_Eucharis_adscendens_seq1 
 gatattggtccagctcgagatgcaaatgatgtttcagagatgacaggcatgcaccaccaa
 caaagcgtgcaaaaaagaaagaagaagaggaggaagacgaggaagatctgaatgattcta
-attatgatga----------------------------------------gttytccggg
+attatgatg----------------------------------------agttytccggg
 tatggaggatcattatttagcaaggtaaacttgatctgtatcatttgtttcaatactaaa
 cttta-ctgtcatcaataggacccatatgacaaagatgatgaagaagcagatgccatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaagattacagagaaagacgattgcg
@@ -691,7 +676,7 @@ catgatcccttcttatggtggagatattaagta
 >I8138_4060WGA_Hymenoptera_Eucharitidae_Lirata_sp_seq1 
 gatattggtccagctcgagatgcaaatgatgtttcagagatgacaggcatgcaccaccaa
 caaaacgagcaaaaaagaaagaagaagaggaagaagacgaggaagatctgaatgattcta
-attatgatga----------------------------------------attctccgga
+attatgatg----------------------------------------aattctccgga
 tatggaggatcattattcagcaaggtgaacttgatgtgtatcatttatttcaatactaag
 attta-ctgtcatcaataggacccatatgacaaagatgatgaagaagcagatgccatata
 cgaggcaattgacaaacgtatggatgaaaagcggaaagattacagagaaagacggttgcg
@@ -706,7 +691,7 @@ tatgatcccttcttacggtggagatattaagta
 >I8139_4058_Hymenoptera_Eucharitidae_Lophyrocera_sp_seq1 
 gatattggtccggctcgagatgcaaatgatgtttcagagatgacaggcatgcaccaccaa
 caaagcgtgcaaaaaagaaagaagaagaggaggaggatgaagaagatttgaatgattcta
-attacgatga----------------------------------------gttctctggg
+attacgatg----------------------------------------agttctctggg
 tatggaggatcattatttagcaaggtaaacctgatatgcacaatttgttttaatactaaa
 ttcta-ccttcatcaataggacccctatgataaagatgacgaagaagcagatgccattta
 cgaagcaatcgataaacgtatggatgaaaaacgtaaagattacagagaaagacgattgcg
@@ -721,7 +706,7 @@ tatgataccgtcttatggtggagatattaagta
 >I8140_4048_Hymenoptera_Eucharitidae_Neolosbanus_sp_seq1 
 gatattggtccagctcgagatgcaaatgatgtttcnnnnnnnacagacatgcaccgccaa
 caaaacgtgcaaaaaagaaagaagaagaggaggaagatgaggaagatctaaacgattcga
-attatgatga----------------------------------------gttctcaggg
+attatgatg----------------------------------------agttctcaggg
 tatggaggatcgttatttagcaaggtaaatttgatctgtattcattgtttcaatactggg
 ctttt-ctatcatcaataggatccatatgacaaagatgacgaagaagcagatgctattta
 cgaagcaattgacaaacgaatggatgaaaaacgcaaagattacagagaaagacgattacg
@@ -736,7 +721,7 @@ catgatcccatcttatggtggagatattaagta
 >I8141_3218_Hymenoptera_Eucharitidae_Orasema_cockerelli_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcacgcgccaccaa
 caaagcgtgcaaaaaagaaggaagaagaagaagaagacgaggaagatttaaatgattcta
-attatgacga----------------------------------------gttctctggt
+attatgacg----------------------------------------agttctctggt
 tatggaggttcattatttagtaaggtaactttgattcacatcatttgtttcgatgctaag
 cttct-ttattgtcaataggacccatatgacaaagatgatgaggaagcagatgctatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaagattatagagaaagacgattacg
@@ -751,7 +736,7 @@ catgataccttcgtatggtggagatattaagtg
 >I8142_3967_Hymenoptera_Eucharitidae_Orasema_communis_seq1 
 -----------------------------------agagatgacaggcatgcaccaccga
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaagatctaaatgattcta
-attatgacga----------------------------------------gttctctggt
+attatgacg----------------------------------------agttctctggt
 tatggaggatcattatttagtaaggtaaatttgattcgaattatttgttttaatactaaa
 ctttt-ttattgtcaacaggacccatatgacaaagatgacgaagaagcagatgctatata
 tgaagcaattgacaagcgtatggatgaaaaacgcaaagattatagagaaaaacgattgcg
@@ -766,7 +751,7 @@ catgatcccttcttatggtggagatattaagtg
 >I8143_4077_Hymenoptera_Eucharitidae_Orasema_nrcockerelli_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcacgcgccaccaa
 caaagcgtgcaaaaaagaaggaagaagaagaagaagacgaggaagatttaaatgattcta
-attatgacga----------------------------------------gttctctggt
+attatgacg----------------------------------------agttctctggt
 tatggaggttcattatttagtaaggtaactttgattcacatcatttgtttcgatgctaag
 cttct-ttattgtcaataggacccatatgacaaagatgatgaggaagcagatgctatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaagattatagagaaagacgattacg
@@ -781,7 +766,7 @@ catgataccttcgtatggtggagatattaagtg
 >I8145_4022_Hymenoptera_Eucharitidae_Orasema_occidentalis_seq1 
 -----------------------------------agagatgacaggcacgcgccaccaa
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaagatttaaatgattcta
-attatgacga----------------------------------------gttctctggt
+attatgacg----------------------------------------agttctctggt
 tatggaggttcattatttagtaaggtaactttgattcacatcatttgtttcaatgctaag
 cttct-ttattgtcaataggacccatatgacaaagatgacgaggaagcagatgctatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaagattatagggaaagacgattacg
@@ -796,7 +781,7 @@ catgataccttcttatggtggagatattaagtg
 >I8146_4021_Hymenoptera_Eucharitidae_Orasema_simplex_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcatgcaccaccaa
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaagatctgaatgattcta
-attatgacga----------------------------------------attctctggt
+attatgacg----------------------------------------aattctctggt
 tatggaggatcattgtttagtaaggtaattttgatcagaattatttgtttcaatgctaag
 ctttt-ttattgtcaataggatccatatgacaaagatgatgargaagcagatgctatata
 cgaagcaattgacaaacgtatggatgagaaacgcaaagattatagagaaaaacgattgcg
@@ -811,7 +796,7 @@ catgataccttcttacggcggagatattaagtg
 >I8150_4079_Hymenoptera_Eucharitidae_Orasema_sp_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcatgcaccaccaa
 cgaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaggatctaaatgattcta
-attatgacga----------------------------------------attctctggt
+attatgacg----------------------------------------aattctctggt
 tatggaggatcattgtttagcaaggtaattttgatcagaattatttgtttcaatactaag
 ctttt-ttattgccaataggatccatatgacaaagatgatgaagaagcagatgctatata
 cgaagcaattgacaaacgtatggatgagaaacgcaaagattatagagaaagaygattgcg
@@ -826,7 +811,7 @@ catgataccttcgtacggtggagatattaagtg
 >I8151_4080_Hymenoptera_Eucharitidae_Orasema_sp_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcatgcaccaccaa
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaggatctaaatgattcta
-attatgacga----------------------------------------attctctggt
+attatgacg----------------------------------------aattctctggt
 tatggaggatcattgtttagcaaggtaattttgatcagaataatttgtttcaatactaaa
 ctttt-ttattgtcaataggatccatatgataaagatgatgaagaagcagatgctatata
 hgaagcaattgacaaacgtatggatgagaaabgcaaagattatadagaaagaygattgcg
@@ -841,7 +826,7 @@ catgataccttcgtacggtggagatattaagtg
 >I8153_4081_Hymenoptera_Eucharitidae_Orasemorpha_didentata_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacagacatgcaccaccaa
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaagatctaaatgattcta
-attatgacga----------------------------------------gttctctggt
+attatgacg----------------------------------------agttctctggt
 tatggcggatcgttatttwgtaaggdaattttgattcgaattatttgtttcgataccaag
 ctttt-ttattgtcaataggacccatacgacaaagatgacgaggaagcagatgctatata
 tgaggcaattgacaaacgtatggatgaaaaacgcaaagattatagagaaaaacgattgcg
@@ -856,7 +841,7 @@ catgatcccttcttatggtggagatattaagtg
 >I8156_4072_Hymenoptera_Eucharitidae_Stilbula_sp_seq1 
 gatattggtccagctcgagatgcaaatgacgtttcagagatgacagacatgcaccaccaa
 caaaacgcgcaaaaaagaaagaagaagaggaggaagacgaggaagatttgaatgattcga
-actatgatga----------------------------------------gttctctggg
+actatgatg----------------------------------------agttctctggg
 tatggaggatcattatttagcaaggtaaacttg-----tatcacttgtttgaatattaag
 ctttt-gtgtcattaataggatccatatgacaaagatgatgaagaagcagatgctatata
 cgaggcaattgacaaacgtatggatgaaaaacgtaaagattacagagaaagacgactgcg
@@ -901,7 +886,7 @@ tatgattccctcttatggtggagatnnnnnnnn
 >I9730_4129_Hymenoptera_Eucharitidae_Orasema_nr_delicatula_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcatgcaccaccga
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaagatttaaatgattcta
-attatgatga----------------------------------------gttctctggt
+attatgatg----------------------------------------agttctctggt
 tatggaggatcgttgtttagtaaggtaattttgatcagaattgtttgtttcaatactaag
 ctttt-ttattgccaataggatccatatgacaaagatgatgaagaagcagatgctatata
 tgaagcgattgacaaacgtatggatgagaaacgcaaagattatagagaaaaacgattgcg
@@ -916,7 +901,7 @@ catgataccttcttacggcggggatattaagtg
 >I9731_4131_Hymenoptera_Eucharitidae_Orasema_trimaculata_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcatgcgccaccaa
 caaagcgtgcaaaaaagaaggaagaagaagaagaagacgaggaagatctaaatgattcta
-attatgacga----------------------------------------gttctctggt
+attatgacg----------------------------------------agttctctggt
 tatggaggatcattatttagtaaggtaagtttaactcga---atttgttcctatactaag
 ctttt-ttattgttaataggacccatatgacaaagatgatgaggaagcagatgctatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaggattatagagaaaaacgattgcg
@@ -931,7 +916,7 @@ tatgataccttcttatggtggagatattaagtg
 >I9732_4133_Hymenoptera_Eucharitidae_Orasema_tolteca_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttcagagatgacaggcacgcgccgccaa
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaagatttaaatgattcta
-attatgacga----------------------------------------gttctctggt
+attatgacg----------------------------------------agttctctggt
 tatggaggttcattatttagtaaggtaactttgattcacatcatttgtttctctgctaag
 cttct-ttattgccaataggacccatatgacaaagatgatgaggaagcagatgctatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaagattatagagaaaaacgattacg
@@ -946,7 +931,7 @@ catgataccttcttatggtggagatattaagtg
 >I9733_4192_Hymenoptera_Eucharitidae_Timioderus_peridentatus_seq1 
 gatattggtcctgctcgagatgcaaatgatgtttcagagatgacagacatgcaccaccaa
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaagatctaaatgattcca
-attatgacga----------------------------------------gttctctggt
+attatgacg----------------------------------------agttctctggt
 tatggaggatcattatttagtaaggtaattttgatttgaattatttgtttcgatactgag
 ctctt-tcattgtcaataggacccgtatgacaaagatgacgaagaagctgatgctatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaagattatagagaaaaacgattgcg
@@ -961,7 +946,7 @@ catgatcccttcttatggcggagatattaagtg
 >I13800_TransEuc_Hymenoptera_Eucharitidae_Eucharis_adscendens_seq1 
 gatataggaccggctcgagatgcaaatgatgtttca--gatgacagacatgctccaccaa
 ctaagcgagcaaaaaagaaggaagaggaggaagaagatgaagaagatcttaatgattcca
-attacgacga----------------------------------------attttcaggg
+attacgacg----------------------------------------aattttcaggg
 tatggaggatcattatttagcaaag-----------------------------------
 --------------------atccatatgataaagatgatgaagaagcagatgctattta
 tgaagcaatagacaaacggatggatgaaaaacgtaaagattatagagaaaaacgattgcg
@@ -976,7 +961,7 @@ tatgattccatcttatggaggtgatattaa---
 >I13801_TransOra_Hymenoptera_Eucharitidae_Orasema_simulatrix_seq1 
 gatattggtcctgctcgagatgcaaatgacgtttc--agatgacaggcatgcgccaccaa
 caaagcgtgcaaaaaagaaggaagaagaggaagaagacgaggaagatctaaatgattcta
-attatgacga----------------------------------------gttctctgga
+attatgacg----------------------------------------agttctctgga
 tatggaggatcattatttagta--------------------------------------
 -----------------aggacccatatgacaaagatgatgaagaagcagatgctatata
 tgaagcaattgacaaacgcatggatgaaaaacgcaaggattatagagaaaaacgattgcg
@@ -991,7 +976,7 @@ tatgataccttcttatggtggagatattaa---
 >I13802_TransPer_Hymenoptera_Perilampidae_Perilampus_aeneus_seq1 
 gatattggtccagctcgagatgcaaatgatgtttc--agatgataggcatgcaccaccaa
 ccaagcgtgcaaaaaagaaagaagaagaggaggaagacgaggaagatctgaatgattcta
-attatgacga----------------------------------------gttctctggg
+attatgacg----------------------------------------agttctctggg
 tatggagggtcattatttagca--------------------------------------
 -----------------aggacccatatgacaaagatgatgaagaagcagatgccatata
 cgaagcaattgacaaacgtatggatgaaaaacgtaaagattacagagaaagacgattgcg

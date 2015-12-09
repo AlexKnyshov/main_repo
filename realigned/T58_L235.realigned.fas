@@ -166,14 +166,6 @@ ctatcaagcgcacctccattacagctcggtgagaggtacttccagctctatccggaggag
 acggatcccgtctggggtgtaagtccgaaattgttatagaatccctgtgatgatcagcgg
 catcaaaggatttggtcgaaaaataagacgtgcgatcagttaccaaggtttttggtgatc
 gg
->I12631_4257_Hymenoptera_Perilampidae_Chrysolampus_sp_seq1 
-------------------------------------------------------------
-------------cagataaacatttttatgacgcacatgtcaaactacggcaacgaccgg
-ctcgcgctctacacgttcgagtcagtcatcaagttcattcagtgttggacaaacctacga
-ctatcaagcgcacctccattacagctcggtgagaggtacttccagctctatccggaggag
-acggatcccgtctggggtgtaagtccgaaattgttatagaatccctgtgatgatcagcgg
-catcaaaggatttggtcgaaaaataagacgtgcgatcagttaccaaggtttttggtgatc
-gg
 >I12632_4258_Hymenoptera_Perilampidae_Perilampus_sp_seq1 
 nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnngagatcgtcnnnnnnnnnnnnnnttc
 tgaatatttttacagataaatattttcatgacgcacatgtcaaattacggaaacgatcgg
@@ -311,7 +303,7 @@ atggatccagtctggggtgtaagtattagatctttttagaatccatgcgatgatttgcga
 catcagaggatctggtcgaagaataaaacgtgcgatcaactgccaaggtttctcgtgatt
 gg
 >I12651_4296_Hymenoptera_Eucharitidae_Gollumiella_sp_seq1 
-cgattcataatatacgcgctcgatgatttgcgacgagtcaggctaaaataaaat---nnn
+cgattcataatatacgcgctcgatgatttgcgacgagtcaggctaaaataaaatnn---n
 nnnnnnnnnnngtagatcaacattttcatgacgcacatgtcgaactacggaaacgatcga
 ctcgctctctacacattcgagtccgtcatcaagttcattcagtgctggacgaatctacga
 ctgtcgagcgcaccaccgctacaacttggcgaaaggtactttcaactctatcccgaagaa
