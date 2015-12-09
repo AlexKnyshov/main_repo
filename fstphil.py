@@ -23,8 +23,10 @@ for f in files:
 	fn = fnew[len(fnew)-1]
 	print fn[:(len(fn)-extlen)]
 	print outputfolder+"/"+fn[:(len(fn)-extlen)]+outputext
-	alignments = AlignIO.parse(f, inputformat)
-	AlignIO.write(alignments, outputfolder+"/"+fn[:(len(fn)-extlen)]+outputext, outputformat)
+	input_handle = open(f, "rU")
+	output_handle = open(outputfolder+"/"+fn[:(len(fn)-extlen)]+outputext, "w")
+	alignments = AlignIO.parse(input_handle, inputformat)
+	AlignIO.write(alignments, output_handle, outputformat)
 	output_handle.close()
 	input_handle.close()
 	#count = SeqIO.convert(f, inputformat, outputfolder+"/"+fn[:(len(fn)-extlen)]+"phylip", outputformat)
