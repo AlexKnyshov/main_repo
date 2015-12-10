@@ -3,7 +3,7 @@ import sys
 import glob
 import operator
 import socket
-from Bio import SeqIO
+from Bio import AlignIO
 #filepath input
 if len(sys.argv) == 3:
 	inputfolder = sys.argv[2]
@@ -27,8 +27,8 @@ if mode == "-p" or mode == "-115":
 		print f
 		infile = open(f, "r")
 		seqs = {}
-		for seq in SeqIO.parse(infile, "phylip"):
-		    seqs[seq.id] = str(seq.seq)
+		for seq in AlignIO.read(infile, "phylip-relaxed"):
+		    seqs[seq.id] = str(seq.seq).upper()
 		#pairwise
 		names =[]
 		for key in seqs.keys():
