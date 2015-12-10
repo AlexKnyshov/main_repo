@@ -6,8 +6,8 @@ if len(sys.argv) == 3:
 	files = glob.glob(sys.argv[2]+"/*.tre")
 	opt = sys.argv[1]
 else:
-	print "FORMAT: python treeanalysis.py [option: -75, -avg] [folder with trees]"
-	print "EXAMPLE: python treeanalysis.py -75 ./trees"
+	print "FORMAT: python treeprocsep.py [option: -75, -avg] [folder with trees]"
+	print "EXAMPLE: python treeprocsep.py -75 ./trees"
 	sys.exit()
 if len(files) == 0:
 	print "no trees in the directory"
