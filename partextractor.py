@@ -27,9 +27,9 @@ print >> outputfile, "[data_blocks]"
 for x, y in sorted(d.items()):
 	#x(len(fn)-extlen)
 	key = str(x)
-	print >> outputfile, key[:(len(key)-4)]+"_1 = "+str(y[0])+" - "+str(y[1])+"\\3;"
-	print >> outputfile, key[:(len(key)-4)]+"_2 = "+str(y[0]+1)+" - "+str(y[1])+"\\3;"
-	print >> outputfile, key[:(len(key)-4)]+"_3 = "+str(y[0]+2)+" - "+str(y[1])+"\\3;"
+	print >> outputfile, key[:(len(key)-4)]+"_1 = "+str(y[0]+1)+" - "+str(y[1]+1)+"\\3;"
+	print >> outputfile, key[:(len(key)-4)]+"_2 = "+str(y[0]+2)+" - "+str(y[1]+1)+"\\3;"
+	print >> outputfile, key[:(len(key)-4)]+"_3 = "+str(y[0]+3)+" - "+str(y[1]+1)+"\\3;"
 print >> outputfile, "[schemes]"
 print >> outputfile, "search = greedy;"
 outputfile.close()
