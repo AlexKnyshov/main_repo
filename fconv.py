@@ -1,27 +1,33 @@
-from Bio import AlignIO
+#from Bio import AlignIO
+from Bio import SeqIO
 import sys
 import glob
 import os
-if len(sys.argv) == 7:
-	inputfolder = sys.argv[1]
-	inputformat = sys.argv[2]
-	inputext = sys.argv[3]
-	outputfolder = sys.argv[4]
-	outputformat = sys.argv[5]
-	outputext = sys.argv[6]
-elif len(sys.argv) == 5:
-	infilename = sys.argv[1]
-	inputformat = sys.argv[2]
-	outputformat = sys.argv[3]
-	outfileext = sys.argv[4]
+if len(sys.argv) == 8:
+	option = sys.argv[1]
+	inputfolder = sys.argv[2]
+	inputformat = sys.argv[3]
+	inputext = sys.argv[4]
+	outputfolder = sys.argv[5]
+	outputformat = sys.argv[6]
+	outputext = sys.argv[7]
+elif len(sys.argv) == 6:
+	option = sys.argv[1]
+	infilename = sys.argv[2]
+	inputformat = sys.argv[3]
+	outputformat = sys.argv[4]
+	outfileext = sys.argv[5]
 else:
-	print "FORMAT: python fconv.py [inputfolder] [inputformat] [inputext] [outputfolder] [outputformat] [outputext]"
-	print "EXAMPLE: python fconv.py ./fasta fasta fas ./phylip phylip-relaxed phylip"
-	print "FORMAT: python fconv.py [inputfile] [inputformat] [outputformat] [outputext]"
-	print "EXAMPLE: python fconv.py ./test.fas fasta phylip-relaxed .phy"
+	print "fconv.py script for converting aligned or unaligned sequence files"
+	print "-----------folder input------------"
+	print "FORMAT: python fconv.py [option: -a, -s] [inputfolder] [inputformat] [inputext] [outputfolder] [outputformat] [outputext]"
+	print "EXAMPLE: python fconv.py -a ./fasta fasta fas ./phylip phylip-relaxed phylip"
+	print "------------file input-------------"
+	print "FORMAT: python fconv.py [option: -a, -s] [inputfile] [inputformat] [outputformat] [outputext]"
+	print "EXAMPLE: python fconv.py -a ./test.fas fasta phylip-relaxed .phy"
 	sys.exit()
 
-if len(sys.argv == 7):
+if len(sys.argv) == 8:
 	files = glob.glob(inputfolder+"/*."+inputext)
 	extlen = len(inputext)
 	if not os.path.exists ("./"+outputfolder):
@@ -34,19 +40,29 @@ if len(sys.argv == 7):
 		print outputfolder+"/"+fn[:(len(fn)-extlen)]+outputext
 		input_handle = open(f, "rU")
 		output_handle = open(outputfolder+"/"+fn[:(len(fn)-extlen)]+outputext, "w")
-		alignments = AlignIO.parse(input_handle, inputformat)
-		AlignIO.write(alignments, output_handle, outputformat)
+		if option == "-a":
+			alignments = AlignIO.parse(input_handle, inputformat)
+			AlignIO.write(alignments, output_handle, outputformat)
+		elif option == "-s":
+			sequences = SeqIO.parse(input_handle, inputformat)
+			SeqIO.write(sequences, output_handle, outputformat)
 		output_handle.close()
 		input_handle.close()
 		count += 1
 	print "Converted %i records" % count
-elif len(sys.argv == 5):
+elif len(sys.argv) == 6:
 	fnew = infilename+outfileext
 	input_handle = open(infilename, "rU")
 	output_handle = open(fnew, "w")
 	print "converting", infilename, "to", fnew
-	alignments = AlignIO.parse(input_handle, inputformat)
-	AlignIO.write(alignments, output_handle, outputformat)
+	if option == "-a":
+		alignments = AlignIO.parse(input_handle, inputformat)
+		AlignIO.write(alignments, output_handle, outputformat)
+	elif option == "-s":
+		sequences = SeqIO.parse(input_handle, inputformat)
+		#print sequences
+		#SeqIO.write(sequences, output_handle, outputformat)
+		SeqIO.convert(input_handle, inputformat, output_handle, outputformat)
 	output_handle.close()
 	input_handle.close()	
 print "Done"
