@@ -1,4 +1,4 @@
-#from Bio import AlignIO
+from Bio import AlignIO
 from Bio import SeqIO
 import sys
 import glob
@@ -21,14 +21,18 @@ else:
 	print "fconv.py script for converting aligned or unaligned sequence files"
 	print "-----------folder input------------"
 	print "FORMAT: python fconv.py [option: -a, -s] [inputfolder] [inputformat] [inputext] [outputfolder] [outputformat] [outputext]"
-	print "EXAMPLE: python fconv.py -a ./fasta fasta fas ./phylip phylip-relaxed phylip"
+	print "EXAMPLE: python fconv.py -a ./fasta fasta .fas ./phylip phylip-relaxed .phy"
 	print "------------file input-------------"
 	print "FORMAT: python fconv.py [option: -a, -s] [inputfile] [inputformat] [outputformat] [outputext]"
 	print "EXAMPLE: python fconv.py -a ./test.fas fasta phylip-relaxed .phy"
+	print "--------some format options--------"
+	print "fasta - fasta format"
+	print "phylip - basic phylip with truncated names"
+	print "phylip-relaxed - extended phylip (only in -a mode)"
 	sys.exit()
 
 if len(sys.argv) == 8:
-	files = glob.glob(inputfolder+"/*."+inputext)
+	files = glob.glob(inputfolder+"/*"+inputext)
 	extlen = len(inputext)
 	if not os.path.exists ("./"+outputfolder):
 		os.makedirs("./"+outputfolder)
@@ -60,9 +64,7 @@ elif len(sys.argv) == 6:
 		AlignIO.write(alignments, output_handle, outputformat)
 	elif option == "-s":
 		sequences = SeqIO.parse(input_handle, inputformat)
-		#print sequences
-		#SeqIO.write(sequences, output_handle, outputformat)
-		SeqIO.convert(input_handle, inputformat, output_handle, outputformat)
+		SeqIO.write(sequences, output_handle, outputformat)
 	output_handle.close()
 	input_handle.close()	
 print "Done"
