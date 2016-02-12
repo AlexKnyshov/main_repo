@@ -22,7 +22,6 @@ d = {}
 # for x in files:
 # 	d["{0}".format(x)]=[]
 #print d
-c=0
 for infile in files:
 	input_handle = open(infile, "rU")
 	alignments = SeqIO.parse(input_handle, "fasta")
@@ -33,11 +32,15 @@ for infile in files:
 		else:
 			d[seq.id] = []
 			d[seq.id].append(infile.split("/")[-1])
-	c+=1
 # taxalist = []
 result = {}
 for key, value in sorted(d.items()):
-	print key, value
+	#print key, len(value), value
+	c = set(value)
+	if len(c) != len(value):
+		print "warning", key, len(value), value
+	else:
+		print key, len(value), value
 	result[key] = len(value)
 # for key, value in sorted(result.items(), key=operator.itemgetter(0)):
 # 	print key, value
