@@ -8,15 +8,30 @@ import sys
 import glob
 import os
 
-if len(sys.argv) == 3:
+if len(sys.argv) >= 3:
 	inputfolder = sys.argv[1]
 	partnum = sys.argv[2]
+	if len(sys.argv) == 4:
+		exclusion_file = sys.argv[3]
 else:
+	print "FORMAT: python concat.py [folder with fasta] [split to codon positions: -3 (yes), -1 (no)] ([exclusion list])"
+	print "EXAMPLE: python concat.py ./fasta -1"
+	print "EXAMPLE: python concat.py ./fasta -1 list.lst"
 	sys.exit()
 
 files = glob.glob(inputfolder+"/*.fas")
 
 outputfile = open("partitions.prt", "w")
+exclusion_list = []
+if len(sys.argv) == 4:
+	print "reading exclusion list..."
+	exfile = open(exclusion_file, "r")
+	for line in exfile:
+		l = line.strip()
+		exclusion_list.append(l)
+	exfile.close()
+print "read", len(exclusion_list), "records"
+#print exclusion_list
 
 d = {}
 print "creating a list of taxa"
@@ -26,9 +41,9 @@ for f in files:
 	alignment = AlignIO.read(f, "fasta", alphabet=Gapped(IUPAC.ambiguous_dna))
 	length = alignment.get_alignment_length()
 	for seq in alignment:
-		if seq.id in d:
+		if seq.id in d and seq.id not in exclusion_list:
 			d[seq.id].append(fn)
-		else:
+		elif seq.id not in exclusion_list:
 			d[seq.id] = []
 			d[seq.id].append(fn)
 print "concatenation"
@@ -37,7 +52,7 @@ skips = 0
 align = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna)) # new ali
 for dx in d.keys():
 	align.append(SeqRecord(Seq("", Gapped(IUPAC.ambiguous_dna)), id=dx)) #add taxa
-#print align 
+#print align
 counter = 0
 for f in files:
 	temp = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna)) #temp ali
@@ -48,7 +63,8 @@ for f in files:
 	missed = list(d)
  	for seq in alignment:
  		temp.append(seq) #add original to temp
- 		missed.remove(seq.id)
+ 		if seq.id in missed:
+ 			missed.remove(seq.id)
  	for m in missed:
  		temp.append(SeqRecord(Seq("?"*length, Gapped(IUPAC.ambiguous_dna)), id=m)) #add dummies
  	counter = 0
@@ -64,13 +80,14 @@ for f in files:
  	sys.stdout.flush()
  	align = temp2
  	counter += align.get_alignment_length()
- 	if partnum == "3":
+ 	if partnum == "-3":
 		print >> outputfile, "DNA, "+fn+"-1 = "+str(start)+" - "+str(end)+"\\3"
 		print >> outputfile, "DNA, "+fn+"-2 = "+str(start+1)+" - "+str(end)+"\\3"
 		print >> outputfile, "DNA, "+fn+"-3 = "+str(start+2)+" - "+str(end)+"\\3"
-	elif partnum == "1":
+	elif partnum == "-1":
 	 	print >> outputfile, "DNA, "+fn+" = "+str(start)+" - "+str(end)
 print ""
+outputfile.close()
 print "writing"
 AlignIO.write(align, "COMBINEX.fas", "phylip-relaxed")
 print "done"
