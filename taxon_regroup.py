@@ -17,9 +17,9 @@ Ogeriinae = []
 Schizos = []
 Others = []
 
-Hypsolist = ["Duonota", "Glyptocombus", "Hypselosoma", "Lativena", "Macromannus", "Pateena", "Rectilamina", "Williamsocoris"]
+Hypsolist = ["Duonota", "Glyptocombus", "Hypselosoma", "Lativena", "Macromannus", "Pateena", "Rectilamina", "Williamsocoris", "Ommatides", "Hypselosomatinae", "NrHypselosoma"]
 Ogerolist = ["Chinannus", "Kaimon", "Kokeshia", "Ogeria", "nr Kokeshia", "nr Ogeria", "nr Pachyplagioides"]
-Schizolist = ["Ceratocomboides", "Corixidea", "Dundonannus", "Hoplonannus", "Membracioides", "Nannocoris", "Pinochius", "Ptenidiophyes", "Schizoptera", "Voccoroda", "Voragocoris", "nr Ceratocomboides", "nr Corixidea", "nr Dundonannus", "nr Hoplonannus", "nr Membracioides", "nr Ptenidiophyes", "nr Semanganannus", "nr Semangananus"]
+Schizolist = ["Ceratocomboides", "Corixidea", "Dundonannus", "Hoplonannus", "Membracioides", "Nannocoris", "Pinochius", "Ptenidiophyes", "Schizoptera", "Voccoroda", "Voragocoris", "nr Ceratocomboides", "nr Corixidea", "nr Dundonannus", "nr Hoplonannus", "nr Membracioides", "nr Ptenidiophyes", "nr Semanganannus", "nr Semangananus", "Nannodictyus"]
 
 with open(csvname, "rb") as csvfile:
 	reader = csv.reader(csvfile)
@@ -76,7 +76,14 @@ for seq in alignments:
 			Schizos.append(index)
 
 		if db[EDfasta] == "Other":
-			Others.append(index)
+			if genusfasta in Hypsolist:
+				Hypsos.append(index)
+			elif genusfasta in Ogerolist:
+				Ogeriinae.append(index)
+			elif genusfasta in Schizolist:
+				Schizos.append(index)
+			else:
+				Others.append(index)
 	else:
 		print seq.id
 		Others.append(index)
