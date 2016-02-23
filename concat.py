@@ -96,8 +96,8 @@ if phyliptype == "-i":
 	AlignIO.write(align, "COMBINED.phy", "phylip-relaxed")
 elif phyliptype == "-s":
 	outf = open("COMBINED.phy", "w")
-	print >> outf, len(align), " ", align.get_alignment_length()
+	print >> outf, str(len(align))+" "+str(align.get_alignment_length())
 	for seq in align:
-		print >> outf, seq.id, " ", seq.seq
+		print >> outf, str(seq.id)+" "+str(seq.seq)
 	outf.close()
 print "done"
