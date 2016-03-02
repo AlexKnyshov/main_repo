@@ -3,6 +3,7 @@
 #include <QAbstractTableModel>
 #include <QBrush>
 
+
 const int COLS= 3;
 const int ROWS= 2;
 

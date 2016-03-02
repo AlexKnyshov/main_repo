@@ -1,3 +1,4 @@
+#include "extern.h"
 #include "table.h"
 #include "functions.h"
 

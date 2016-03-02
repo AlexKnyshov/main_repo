@@ -1,3 +1,4 @@
+#include "extern.h"
 #include "functions.h"
 
 using namespace std;
