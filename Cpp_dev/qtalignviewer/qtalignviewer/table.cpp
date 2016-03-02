@@ -1,8 +1,19 @@
 #include "table.h"
+#include "functions.h"
 
 MyModel::MyModel(QObject *parent)
     :QAbstractTableModel(parent)
 {
+    std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
+    std::cout << "call func";
+    fastalen(test);
+    for ( auto x : test){
+      //cout << x.first << string(maxsize - x.first.length(), ' ') << " " << x.second.substr(0, 30) << endl;
+      m_gridData[0][0] = QString::fromStdString(x.first);
+      //m_gridData[0][1] = QString::fromStdString(x.second.substr(0, 1));
+      //m_gridData[0][2] = QString::fromStdString(x.second.substr(1, 1));
+    }
+    m_gridData[0][1] = QString::number(test.size());
 }
 
 int MyModel::rowCount(const QModelIndex & /*parent*/) const
