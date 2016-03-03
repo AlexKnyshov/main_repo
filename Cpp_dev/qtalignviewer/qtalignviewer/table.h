@@ -19,7 +19,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex & index) const ;
     QTimer *timer;
 //private:
-    QString m_gridData[ROWS][COLS];  //holds text entered into QTableView
+    //QString m_gridData[ROWS][COLS];  //holds text entered into QTableView
 signals:
     void editCompleted(const QString &);
 private slots:

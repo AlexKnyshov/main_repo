@@ -93,6 +93,23 @@ void fillvector (std::vector< std::vector<std::string> >& vec, std::map <std::st
         }
         vec.push_back(row); // Add the row to the main vector
     }
+//    map<string, string>::iterator it;
+//    int rowcount = 0;
+//    for ( it = dict.begin(); it != dict.end(); it++ )
+//    {
+//        vec[rowcount][0] = it->first;
+//        //cout << "row" << rowcount << endl;
+//        for (int z = 1; z < COLS; z++)//it->second.length(); z++)
+//        {
+//            vec[rowcount][z] = it->second.substr(z, 1);
+//            //cout << "line" << z << endl;
+//        }
+//        rowcount += 1;
+//    }
+}
+
+void updatevector (vector< vector<string> >& vec, map <string, string> dict)
+{
     map<string, string>::iterator it;
     int rowcount = 0;
     for ( it = dict.begin(); it != dict.end(); it++ )

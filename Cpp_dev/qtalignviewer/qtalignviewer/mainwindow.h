@@ -7,6 +7,7 @@ QT_BEGIN_NAMESPACE // QT_BEGIN_NAMESPACE / QT_END_NAMESPACE are not needed in Qt
 class QTableView; //forward declaration
 QT_END_NAMESPACE
 
+// native code
 
 //class MainWindow : public QMainWindow
 //{
@@ -29,19 +30,9 @@ public:
     MainWindow(QWidget *parent = 0);
     //~MainWindow();
 public slots:
-    void testfunc();
+    void testfunc(); //button func
 private:
 
 };
-
-
-
-
-
-
-
-
-
-
 
 #endif // MAINWINDOW_H

@@ -3,14 +3,14 @@
 #include "functions.h"
 #include <QTime>
 
-std::vector< std::vector<std::string> > vector1;
+//std::vector< std::vector<std::string> > vector1;
 
 MyModel::MyModel(QObject *parent)
     :QAbstractTableModel(parent)
 {
-    std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
-    std::cout << "call func";
-    //fastalen(test);
+//    std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
+//    std::cout << "call func";
+//    //fastalen(test);
     //for ( auto x : test){
       //cout << x.first << string(maxsize - x.first.length(), ' ') << " " << x.second.substr(0, 30) << endl;
       //m_gridData[0][0] = QString::fromStdString(x.first);
@@ -18,16 +18,17 @@ MyModel::MyModel(QObject *parent)
       //m_gridData[0][2] = QString::fromStdString(x.second.substr(1, 1));
     //}
 
-    //std::vector< std::vector<std::string> > vector1;
-    std::cout << "fillvec called" << test.size() << std::endl;
-    fillvector (vector1, test);
-    std::cout << "filling..." << vector1.size() << std::endl;
+//    std::cout << "fillvec called" << test.size() << std::endl;
+//    fillvector (vector1, test);
+
+
+//    std::cout << "filling..." << vector1.size() << std::endl;
 //    for (int x = 0; x < ROWS; x++)
 //    {
 //        for (int y = 0; y < COLS; y++)
 //        {
-//            //std::cout << "test" << x << " " << y << " " << vector1[x][y] << std::endl;
-//            m_gridData[x][y] = QString::fromStdString(vector1[x][y]);
+//            std::cout << "test" << x << " " << y << " " << vector1[x][y] << std::endl;
+//            //m_gridData[x][y] = QString::fromStdString(vector1[x][y]);
 //        }
 //    }
     //m_gridData[0][1] = QString::fromStdString(valuetogrid(0, 1));
@@ -98,8 +99,10 @@ void MyModel::timerHit()
 {
     //we identify the top left cell
     QModelIndex topLeft = createIndex(0,0);
+    QModelIndex bottomRight = createIndex(9,19);
     //emit a signal to make the view reread identified data
-    std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
-    fillvector (vector1, test);
-    emit dataChanged(topLeft, topLeft);
+    //std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
+    //fillvector (vector1, test);
+    emit dataChanged(topLeft, bottomRight);
+    //emit layoutChanged();
 }

@@ -6,32 +6,43 @@
 #include "functions.h"
 #include "extern.h"
 
+std::vector< std::vector<std::string> > vector1;
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    QWidget *centralWidget = new QWidget(this);
-    this->setCentralWidget( centralWidget );
-    QVBoxLayout *layout = new QVBoxLayout(centralWidget);
+    QWidget *centralWidget = new QWidget(this); //add mainwidget
+    this->setCentralWidget( centralWidget ); //cet it central
+    QVBoxLayout *layout = new QVBoxLayout(centralWidget); //add box layout
+
+    //add table
     QTableView *tableView;
-    //QVBoxLayout *layout = new QVBoxLayout();
     tableView = new QTableView(centralWidget);
-    //setCentralWidget(tableView);
+    //add model
     QAbstractTableModel *myModel = new MyModel(this);
     tableView->setModel(myModel);
+    //add header
     QHeaderView* header = tableView->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::Stretch);
-    //readfastafile("winglesscat.fas");
-    //transfer changes to the model to the window title
+    //connect model to window title
     connect(myModel, SIGNAL(editCompleted(const QString &)), this, SLOT(setWindowTitle(const QString &)));
-    //QVBoxLayout *layout = new QVBoxLayout(tableView);
+
+    //add and connect button
     QPushButton *train_button = new QPushButton();
     connect(train_button, SIGNAL(released()), this, SLOT(testfunc()));
-    //connect(train_button, SIGNAL(released()), tableView, SLOT(timerHit()));
     train_button->setText(tr("something"));
+
+    //set layouts
     layout->addWidget(train_button);
     layout->addWidget(tableView);
-    //setLayout(layout);
+
     setWindowTitle(tr("Basic Layouts"));
+
+    std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
+    std::cout << "call func";
+    std::cout << "fillvec called" << test.size() << std::endl;
+    fillvector (vector1, test);
+
 }
 
 //void MainWindow::showWindowTitle(const QString & title)
@@ -42,10 +53,10 @@ void MainWindow::testfunc()
 {
 //    int size;
     std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
-    std::vector< std::vector<std::string> > vector1;
+    //std::vector< std::vector<std::string> > vector1;
 //    size = fastalen(test);
 //    int *pArray = new int[size];
     //return;
     //MyModel::MyModel->m_gridData[0][2] = QString::number(size);
-    fillvector(vector1, test);
+    updatevector(vector1, test);
 }
