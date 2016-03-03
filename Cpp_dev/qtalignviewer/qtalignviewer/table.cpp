@@ -5,6 +5,9 @@
 
 //std::vector< std::vector<std::string> > vector1;
 
+int ROWS;
+int COLS;
+
 MyModel::MyModel(QObject *parent)
     :QAbstractTableModel(parent)
 {
@@ -40,11 +43,14 @@ MyModel::MyModel(QObject *parent)
 
 int MyModel::rowCount(const QModelIndex & /*parent*/) const
 {
+    //std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
    return ROWS;
 }
 
 int MyModel::columnCount(const QModelIndex & /*parent*/) const
 {
+    //std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
+    //
     return COLS;
 }
 
@@ -99,7 +105,7 @@ void MyModel::timerHit()
 {
     //we identify the top left cell
     QModelIndex topLeft = createIndex(0,0);
-    QModelIndex bottomRight = createIndex(9,19);
+    QModelIndex bottomRight = createIndex(ROWS,COLS);
     //emit a signal to make the view reread identified data
     //std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
     //fillvector (vector1, test);

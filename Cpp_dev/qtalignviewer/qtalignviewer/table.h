@@ -4,9 +4,6 @@
 #include <QBrush>
 #include <QTimer>
 
-const int COLS= 20;
-const int ROWS= 9;
-
 class MyModel : public QAbstractTableModel
 {
     Q_OBJECT

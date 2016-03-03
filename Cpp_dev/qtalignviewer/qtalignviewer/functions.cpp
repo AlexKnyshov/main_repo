@@ -3,6 +3,9 @@
 
 using namespace std;
 
+//int COLS;
+//int ROWS;
+
 std::map <std::string, std::string> readfastafile(string filename)
 {
   std::map <std::string, std::string> dict;
@@ -79,6 +82,9 @@ int fastalen(std::map<string, string> dict2)
 //}
 void fillvector (std::vector< std::vector<std::string> >& vec, std::map <std::string, std::string> dict)
 {
+    //int ROWS, COLS;
+    cout << "test" << endl;
+    cout << ROWS << " " << COLS << endl;
     int size;
     //map <string, string> test = readfastafile("winglesscat.fas");
     size = fastalen(dict);
@@ -110,16 +116,35 @@ void fillvector (std::vector< std::vector<std::string> >& vec, std::map <std::st
 
 void updatevector (vector< vector<string> >& vec, map <string, string> dict)
 {
+    int size = fastalen(dict);
+    int rowsize = dict.size();
+    COLS = size;
+    cout << COLS << endl;
+    ROWS = rowsize;
+    cout << ROWS << endl;
+
+    for (int i = 0; i < ROWS; i++) {
+        vector<string> row; // Create an empty row
+        //cout << "row" << i << endl;
+        for (int j = 0; j < COLS; j++) {
+            row.push_back("Temp"); // Add an element (column) to the row
+            //cout << "line" << j << endl;
+        }
+        vec.push_back(row); // Add the row to the main vector
+    }
+
+
+
     map<string, string>::iterator it;
     int rowcount = 0;
     for ( it = dict.begin(); it != dict.end(); it++ )
     {
         vec[rowcount][0] = it->first;
-        //cout << "row" << rowcount << endl;
-        for (int z = 1; z < COLS; z++)//it->second.length(); z++)
+        cout << "row" << rowcount << " " << it->second.substr(0, it->second.length()) << endl;
+        for (int z = 0; z < (it->second.length())-1; z++)
         {
-            vec[rowcount][z] = it->second.substr(z, 1);
-            //cout << "line" << z << endl;
+            vec[rowcount][z+1] = it->second.substr(z, 1);
+            //cout << "line" << z << " " << it->second.substr(z, 1) << endl;
         }
         rowcount += 1;
     }

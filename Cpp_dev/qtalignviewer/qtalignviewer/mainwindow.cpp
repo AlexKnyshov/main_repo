@@ -15,6 +15,20 @@ MainWindow::MainWindow(QWidget *parent)
     this->setCentralWidget( centralWidget ); //cet it central
     QVBoxLayout *layout = new QVBoxLayout(centralWidget); //add box layout
 
+    std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
+    std::cout << "call func";
+    std::cout << "fillvec called" << test.size() << std::endl;
+    //fillvector (vector1, test);
+    int size = fastalen(test);
+    COLS = size;
+    std::cout << "columns " << COLS << std::endl;
+    int rowsize = test.size();
+    ROWS = rowsize;
+    std::cout << "rows " << ROWS << std::endl;
+    fillvector (vector1, test);
+
+
+
     //add table
     QTableView *tableView;
     tableView = new QTableView(centralWidget);
@@ -37,12 +51,6 @@ MainWindow::MainWindow(QWidget *parent)
     layout->addWidget(tableView);
 
     setWindowTitle(tr("Basic Layouts"));
-
-    std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
-    std::cout << "call func";
-    std::cout << "fillvec called" << test.size() << std::endl;
-    fillvector (vector1, test);
-
 }
 
 //void MainWindow::showWindowTitle(const QString & title)
