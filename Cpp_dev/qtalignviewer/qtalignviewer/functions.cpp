@@ -149,3 +149,28 @@ void updatevector (vector< vector<string> >& vec, map <string, string> dict)
         rowcount += 1;
     }
 }
+
+void savefile (vector< vector<string> >& vec, string outfile)
+{
+    cout << "outfile " << outfile << endl;
+    ofstream myoutfile;
+    myoutfile.open (outfile);
+    for (int x = 0; x < ROWS; x++)
+        {
+            string temp = "";
+            for (int y = 0; y < COLS; y++)
+            {
+                cout << "test" << x << " " << y << " " << vector1[x][y] << std::endl;
+                if (y == 0)
+                {
+                    myoutfile << ">"+vector1[x][y] << endl;
+                }
+                else
+                {
+                    temp  += vector1[x][y];
+                }
+            }
+            myoutfile << temp << endl;
+        }
+}
+

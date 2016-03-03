@@ -64,12 +64,37 @@ QVariant MyModel::data(const QModelIndex &index, int role) const
         return  QString::fromStdString(vector1[index.row()][index.column()]);
         break;
     case Qt::BackgroundRole:
-        if (row % 10 == 0 && col % 10 == 0)
-        {
-            QBrush redBackground(Qt::red);
+        //if (row % 10 == 0 && col % 10 == 0)
+        std::map<std::string, int> m = {{"A", 1}, {"C", 2}, {"T", 3}, {"G", 4},{"a", 1}, {"c", 2}, {"t", 3}, {"g", 4}};
+        int nt = m[vector1[index.row()][index.column()]];
+//        if (vector1[index.row()][index.column()] == "A")
+//        {
+//            QBrush redBackground(Qt::red);
+//            return redBackground;
+//        }
+//        break;
+        QBrush redBackground(Qt::red);
+        QBrush greenBackground(Qt::green);
+        QBrush blueBackground(Qt::blue);
+        QBrush yellowBackground(Qt::yellow);
+        switch(nt){
+        case 1:
+            //QBrush redBackground(Qt::red);
             return redBackground;
+            break;
+        case 2:
+
+            return greenBackground;
+            break;
+        case 3:
+
+            return blueBackground;
+            break;
+        case 4:
+
+            return yellowBackground;
+            break;
         }
-        break;
     }
     return QVariant();
 }

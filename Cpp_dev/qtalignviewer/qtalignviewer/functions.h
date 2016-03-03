@@ -16,5 +16,6 @@ void fillvector (std::vector< std::vector<std::string> >& vec, std::map <std::st
 
 void updatevector (std::vector< std::vector<std::string> >& vec, std::map <std::string, std::string> dict);
 
+void savefile (std::vector< std::vector<std::string> >& vec, std::string outfile);
 
 #endif // FUNCTIONS_H

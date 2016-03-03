@@ -31,6 +31,7 @@ public:
     //~MainWindow();
 public slots:
     void testfunc(); //button func
+    void savefunc(); //save button func
 private:
 
 };
