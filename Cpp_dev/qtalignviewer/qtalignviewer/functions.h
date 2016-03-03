@@ -12,7 +12,8 @@ int fastalen(std::map <std::string, std::string> dict2);
 
 std::string valuetogrid (int row, int col, std::map <std::string, std::string> d);
 
-//std::map <std::string, std::string> dict;
+void fillvector (std::vector< std::vector<std::string> >& vec, std::map <std::string, std::string> dict);
 
+//std::map <std::string, std::string> dict;
 
 #endif // FUNCTIONS_H

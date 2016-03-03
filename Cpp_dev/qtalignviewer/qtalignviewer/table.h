@@ -2,10 +2,10 @@
 #define TABLE_H
 #include <QAbstractTableModel>
 #include <QBrush>
+#include <QTimer>
 
-
-const int COLS= 10;
-const int ROWS= 20;
+const int COLS= 20;
+const int ROWS= 9;
 
 class MyModel : public QAbstractTableModel
 {
@@ -17,9 +17,12 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
     Qt::ItemFlags flags(const QModelIndex & index) const ;
+    QTimer *timer;
 //private:
     QString m_gridData[ROWS][COLS];  //holds text entered into QTableView
 signals:
     void editCompleted(const QString &);
+private slots:
+    void timerHit();
 };
 #endif // TABLE_H

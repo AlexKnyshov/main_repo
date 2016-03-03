@@ -70,36 +70,40 @@ int fastalen(std::map<string, string> dict2)
     return int(maxsize);
 }
 
-string valuetogrid (int row, int col, map <string, string> d)
+//string valuetogrid (int row, int col, map <string, string> d)
+//{
+
+//    //cout << vec[0][0];
+//    return vec[row][col];
+//    //int *pArray = new int[rowsize];
+//}
+void fillvector (std::vector< std::vector<std::string> >& vec, std::map <std::string, std::string> dict)
 {
     int size;
     //map <string, string> test = readfastafile("winglesscat.fas");
-    size = fastalen(d);
-    int rowsize = d.size();
-    vector< vector<string> > vec;
+    size = fastalen(dict);
+    int rowsize = dict.size();
+    //vector< vector<string> > vec;
     for (int i = 0; i < ROWS; i++) {
         vector<string> row; // Create an empty row
+        //cout << "row" << i << endl;
         for (int j = 0; j < COLS; j++) {
-            row.push_back("9"); // Add an element (column) to the row
+            row.push_back("Temp"); // Add an element (column) to the row
+            //cout << "line" << j << endl;
         }
         vec.push_back(row); // Add the row to the main vector
     }
-    if (rowsize > row && size > col)
+    map<string, string>::iterator it;
+    int rowcount = 0;
+    for ( it = dict.begin(); it != dict.end(); it++ )
     {
-        map<string, string>::iterator it;
-        int rowcount = 0;
-        for ( it = d.begin(); it != d.end(); it++ )
+        vec[rowcount][0] = it->first;
+        //cout << "row" << rowcount << endl;
+        for (int z = 1; z < COLS; z++)//it->second.length(); z++)
         {
-            vec[rowcount][0] = it->first;
-
-            for (int z = 1; z < COLS; z++)
-            {
-                vec[rowcount][z] = it->second.substr(z, 1);
-            }
-            rowcount += 1;
+            vec[rowcount][z] = it->second.substr(z, 1);
+            //cout << "line" << z << endl;
         }
+        rowcount += 1;
     }
-    //cout << vec[0][0];
-    return vec[row][col];
-    //int *pArray = new int[rowsize];
 }

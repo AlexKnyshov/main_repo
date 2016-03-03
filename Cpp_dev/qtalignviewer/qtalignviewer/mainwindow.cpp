@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     //QVBoxLayout *layout = new QVBoxLayout(tableView);
     QPushButton *train_button = new QPushButton();
     connect(train_button, SIGNAL(released()), this, SLOT(testfunc()));
+    //connect(train_button, SIGNAL(released()), tableView, SLOT(timerHit()));
     train_button->setText(tr("something"));
     layout->addWidget(train_button);
     layout->addWidget(tableView);
@@ -39,10 +40,12 @@ MainWindow::MainWindow(QWidget *parent)
 //}
 void MainWindow::testfunc()
 {
-    int size;
+//    int size;
     std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
-    size = fastalen(test);
-    int *pArray = new int[size];
+    std::vector< std::vector<std::string> > vector1;
+//    size = fastalen(test);
+//    int *pArray = new int[size];
     //return;
     //MyModel::MyModel->m_gridData[0][2] = QString::number(size);
+    fillvector(vector1, test);
 }
