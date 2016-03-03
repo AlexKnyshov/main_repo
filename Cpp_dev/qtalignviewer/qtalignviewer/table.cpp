@@ -7,14 +7,22 @@ MyModel::MyModel(QObject *parent)
 {
     std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
     std::cout << "call func";
-    fastalen(test);
-    for ( auto x : test){
+    //fastalen(test);
+    //for ( auto x : test){
       //cout << x.first << string(maxsize - x.first.length(), ' ') << " " << x.second.substr(0, 30) << endl;
-      m_gridData[0][0] = QString::fromStdString(x.first);
+      //m_gridData[0][0] = QString::fromStdString(x.first);
       //m_gridData[0][1] = QString::fromStdString(x.second.substr(0, 1));
       //m_gridData[0][2] = QString::fromStdString(x.second.substr(1, 1));
+    //}
+    for (int x = 0; x < ROWS; x++)
+    {
+        for (int y = 0; y < COLS; y++)
+        {
+            std::cout << "test" << x << " " << y << " " << valuetogrid(x, y, test) << std::endl;
+            m_gridData[x][y] = QString::fromStdString(valuetogrid(x, y, test));
+        }
     }
-    m_gridData[0][1] = QString::number(test.size());
+    //m_gridData[0][1] = QString::fromStdString(valuetogrid(0, 1));
 }
 
 int MyModel::rowCount(const QModelIndex & /*parent*/) const

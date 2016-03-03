@@ -4,8 +4,8 @@
 #include <QBrush>
 
 
-const int COLS= 3;
-const int ROWS= 2;
+const int COLS= 10;
+const int ROWS= 20;
 
 class MyModel : public QAbstractTableModel
 {
@@ -17,7 +17,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
     Qt::ItemFlags flags(const QModelIndex & index) const ;
-private:
+//private:
     QString m_gridData[ROWS][COLS];  //holds text entered into QTableView
 signals:
     void editCompleted(const QString &);

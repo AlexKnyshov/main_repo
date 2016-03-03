@@ -47,9 +47,9 @@ std::map <std::string, std::string> readfastafile(string filename)
   {
     cout << "cannot open the file" << endl;
   }
-  for ( auto x : dict){
-    cout << x.first << string(maxsize - x.first.length(), ' ') << " " << x.second.substr(0, 30) << endl;
-  }
+//  for ( auto x : dict){
+//    cout << x.first << string(maxsize - x.first.length(), ' ') << " " << x.second.substr(0, 30) << endl;
+//  }
   cout << "total sequences read: " << dict.size() << endl;
   cout << "done" << endl;
 
@@ -58,14 +58,48 @@ std::map <std::string, std::string> readfastafile(string filename)
 
 int fastalen(std::map<string, string> dict2)
 {
-    cout << "fastalen called";
+    //cout << "fastalen called";
     size_t maxsize = 0;
     for ( auto x : dict2){
-        cout << maxsize << " " << x.second.length();
-        if (maxsize > x.second.length())
+        //cout << "maxs " << maxsize << " x.sec " << x.second.length() << endl;
+        if (maxsize < x.second.length())
         {
           maxsize = x.second.length();
         }
     }
-    return maxsize;
+    return int(maxsize);
+}
+
+string valuetogrid (int row, int col, map <string, string> d)
+{
+    int size;
+    //map <string, string> test = readfastafile("winglesscat.fas");
+    size = fastalen(d);
+    int rowsize = d.size();
+    vector< vector<string> > vec;
+    for (int i = 0; i < ROWS; i++) {
+        vector<string> row; // Create an empty row
+        for (int j = 0; j < COLS; j++) {
+            row.push_back("9"); // Add an element (column) to the row
+        }
+        vec.push_back(row); // Add the row to the main vector
+    }
+    if (rowsize > row && size > col)
+    {
+        map<string, string>::iterator it;
+        int rowcount = 0;
+        for ( it = d.begin(); it != d.end(); it++ )
+        {
+            vec[rowcount][0] = it->first;
+
+            for (int z = 1; z < COLS; z++)
+            {
+                vec[rowcount][z] = it->second.substr(z, 1);
+            }
+            rowcount += 1;
+        }
+    }
+    //cout << vec[0][0];
+    return vec[row][col];
+    //int *pArray = new int[rowsize];
 }

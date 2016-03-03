@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "table.h"
 #include "functions.h"
+#include "extern.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -24,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(myModel, SIGNAL(editCompleted(const QString &)), this, SLOT(setWindowTitle(const QString &)));
     //QVBoxLayout *layout = new QVBoxLayout(tableView);
     QPushButton *train_button = new QPushButton();
+    connect(train_button, SIGNAL(released()), this, SLOT(testfunc()));
     train_button->setText(tr("something"));
     layout->addWidget(train_button);
     layout->addWidget(tableView);
@@ -35,3 +37,12 @@ MainWindow::MainWindow(QWidget *parent)
 //{
 //setWindowTitle(title);
 //}
+void MainWindow::testfunc()
+{
+    int size;
+    std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
+    size = fastalen(test);
+    int *pArray = new int[size];
+    //return;
+    //MyModel::MyModel->m_gridData[0][2] = QString::number(size);
+}
