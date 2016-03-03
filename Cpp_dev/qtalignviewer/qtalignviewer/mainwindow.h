@@ -32,6 +32,7 @@ public:
 public slots:
     void testfunc(); //button func
     void savefunc(); //save button func
+    void translate(); //save button func
 private:
 
 };

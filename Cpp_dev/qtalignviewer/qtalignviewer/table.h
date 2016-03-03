@@ -15,8 +15,6 @@ public:
     bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
     Qt::ItemFlags flags(const QModelIndex & index) const ;
     QTimer *timer;
-//private:
-    //QString m_gridData[ROWS][COLS];  //holds text entered into QTableView
 signals:
     void editCompleted(const QString &);
 private slots:

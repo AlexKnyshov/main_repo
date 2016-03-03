@@ -3,9 +3,6 @@
 
 using namespace std;
 
-//int COLS;
-//int ROWS;
-
 std::map <std::string, std::string> readfastafile(string filename)
 {
   std::map <std::string, std::string> dict;
@@ -50,9 +47,7 @@ std::map <std::string, std::string> readfastafile(string filename)
   {
     cout << "cannot open the file" << endl;
   }
-//  for ( auto x : dict){
-//    cout << x.first << string(maxsize - x.first.length(), ' ') << " " << x.second.substr(0, 30) << endl;
-//  }
+
   cout << "total sequences read: " << dict.size() << endl;
   cout << "done" << endl;
 
@@ -73,45 +68,26 @@ int fastalen(std::map<string, string> dict2)
     return int(maxsize);
 }
 
-//string valuetogrid (int row, int col, map <string, string> d)
-//{
-
-//    //cout << vec[0][0];
-//    return vec[row][col];
-//    //int *pArray = new int[rowsize];
-//}
 void fillvector (std::vector< std::vector<std::string> >& vec, std::map <std::string, std::string> dict)
 {
-    //int ROWS, COLS;
+
     cout << "test" << endl;
     cout << ROWS << " " << COLS << endl;
     int size;
-    //map <string, string> test = readfastafile("winglesscat.fas");
+
     size = fastalen(dict);
     int rowsize = dict.size();
-    //vector< vector<string> > vec;
+
     for (int i = 0; i < ROWS; i++) {
         vector<string> row; // Create an empty row
         //cout << "row" << i << endl;
         for (int j = 0; j < COLS; j++) {
-            row.push_back("Temp"); // Add an element (column) to the row
+            row.push_back("?"); // Add an element (column) to the row
             //cout << "line" << j << endl;
         }
         vec.push_back(row); // Add the row to the main vector
     }
-//    map<string, string>::iterator it;
-//    int rowcount = 0;
-//    for ( it = dict.begin(); it != dict.end(); it++ )
-//    {
-//        vec[rowcount][0] = it->first;
-//        //cout << "row" << rowcount << endl;
-//        for (int z = 1; z < COLS; z++)//it->second.length(); z++)
-//        {
-//            vec[rowcount][z] = it->second.substr(z, 1);
-//            //cout << "line" << z << endl;
-//        }
-//        rowcount += 1;
-//    }
+
 }
 
 void updatevector (vector< vector<string> >& vec, map <string, string> dict)
@@ -123,15 +99,15 @@ void updatevector (vector< vector<string> >& vec, map <string, string> dict)
     ROWS = rowsize;
     cout << ROWS << endl;
 
-    for (int i = 0; i < ROWS; i++) {
-        vector<string> row; // Create an empty row
-        //cout << "row" << i << endl;
-        for (int j = 0; j < COLS; j++) {
-            row.push_back("Temp"); // Add an element (column) to the row
-            //cout << "line" << j << endl;
-        }
-        vec.push_back(row); // Add the row to the main vector
-    }
+//    for (int i = 0; i < ROWS; i++) {
+//        vector<string> row; // Create an empty row
+//        //cout << "row" << i << endl;
+//        for (int j = 0; j < COLS; j++) {
+//            row.push_back("Temp"); // Add an element (column) to the row
+//            //cout << "line" << j << endl;
+//        }
+//        vec.push_back(row); // Add the row to the main vector
+//    }
 
 
 
@@ -160,17 +136,91 @@ void savefile (vector< vector<string> >& vec, string outfile)
             string temp = "";
             for (int y = 0; y < COLS; y++)
             {
-                cout << "test" << x << " " << y << " " << vector1[x][y] << std::endl;
+                cout << "test" << x << " " << y << " " << vec[x][y] << std::endl;
                 if (y == 0)
                 {
-                    myoutfile << ">"+vector1[x][y] << endl;
+                    myoutfile << ">"+vec[x][y] << endl;
                 }
                 else
                 {
-                    temp  += vector1[x][y];
+                    temp  += vec[x][y];
                 }
             }
             myoutfile << temp << endl;
         }
 }
 
+void translatevector (std::vector< std::vector<std::string> >& vec)
+{
+    cout << "translatevector() called" << endl;
+
+    map<string, string> transtable = {{"TTT", "F"}, {"TTC", "F"}, {"TTA", "L"}, {"TTG", "i"},
+                                                     {"CTT", "L"}, {"CTC", "L"}, {"CTA", "L"}, {"CTG", "i"},
+                                                     {"ATT", "I"}, {"ATC", "I"}, {"ATA", "I"}, {"ATG", "i"},
+                                                     {"GTT", "V"}, {"GTC", "V"}, {"GTA", "V"}, {"GTG", "V"},
+                                                     {"TCT", "S"}, {"TCC", "S"}, {"TCA", "S"}, {"TCG", "S"},
+                                                     {"CCT", "P"}, {"CCC", "P"}, {"CCA", "P"}, {"CCG", "P"},
+                                                     {"ACT", "T"}, {"ACC", "T"}, {"ACA", "T"}, {"ACG", "T"},
+                                                     {"GCT", "A"}, {"GCC", "A"}, {"GCA", "A"}, {"GCG", "A"},
+                                                     {"TAT", "Y"}, {"TAC", "Y"}, {"TAA", "*"}, {"TAG", "*"},
+                                                     {"CAT", "H"}, {"CAC", "H"}, {"CAA", "Q"}, {"CAG", "Q"},
+                                                     {"AAT", "N"}, {"AAC", "N"}, {"AAA", "K"}, {"AAG", "K"},
+                                                     {"GAT", "D"}, {"GAC", "D"}, {"GAA", "E"}, {"GAG", "E"},
+                                                     {"TGT", "C"}, {"TGC", "C"}, {"TGA", "*"}, {"TGG", "W"},
+                                                     {"CGT", "R"}, {"CGC", "R"}, {"CGA", "R"}, {"CGG", "R"},
+                                                     {"AGT", "S"}, {"AGC", "S"}, {"AGA", "R"}, {"AGG", "R"},
+                                                     {"GGT", "G"}, {"GGC", "G"}, {"GGA", "G"}, {"GGG", "G"}};
+    vector< vector<string> > tempvec;
+    int prot_col = 0;
+    for (int x = 0; x < ROWS; x++)
+        {
+            int temp_col = 0;
+            string temp = "";
+            string codontemp = "";
+            vector<string> row;
+            for (int y = 0; y < COLS-2; y++)
+            {
+                //cout << "test" << x << " " << y << " " << vec[x][y] << std::endl;
+                if (y == 0)
+                {
+                    cout << ">"+vec[x][y] << endl; //title
+                    row.push_back(vec[x][y]);
+                }
+                else
+                {
+                    if (y % 3 == 0)
+                    {
+                        codontemp  += vec[x][y+2];//creating seq
+                        for (auto & c: codontemp) c = toupper(c);
+                        cout << "yes " << y << transtable[codontemp] << endl;
+                        temp += transtable[codontemp];
+                        row.push_back(transtable[codontemp]);
+                        temp_col += 1;
+                        codontemp = "";
+
+                    }
+                    else
+                    {
+
+                        codontemp  += vec[x][y+2];//creating seq
+                        cout << "else " << y << codontemp << endl;
+                    }
+                }
+            }
+            cout << temp << endl;
+            tempvec.push_back(row);
+            if (temp_col > prot_col)
+            {
+                prot_col = temp_col;
+            }
+
+            //myoutfile << temp << endl;
+        }
+        //cout << prot_col;
+    //vector output
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < prot_col; j++) {
+                vec[i][j] = tempvec[i][j];
+            }
+        }
+}

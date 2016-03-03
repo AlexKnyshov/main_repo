@@ -5,6 +5,8 @@
 #include "table.h"
 #include "functions.h"
 #include "extern.h"
+#include <QHBoxLayout>
+#include <QRadioButton>
 
 std::vector< std::vector<std::string> > vector1;
 
@@ -16,10 +18,10 @@ MainWindow::MainWindow(QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout(centralWidget); //add box layout
 
     //std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
-    std::map <std::string, std::string> test = readfastafile("COI_aligned");
+    std::map <std::string, std::string> test = readfastafile("winconcat.fas.fas");
     std::cout << "call func";
     std::cout << "fillvec called" << test.size() << std::endl;
-    //fillvector (vector1, test);
+
     int size = fastalen(test);
     COLS = size;
     std::cout << "columns " << COLS << std::endl;
@@ -47,6 +49,8 @@ MainWindow::MainWindow(QWidget *parent)
     //connect model to window title
     connect(myModel, SIGNAL(editCompleted(const QString &)), this, SLOT(setWindowTitle(const QString &)));
 
+    QHBoxLayout *horiz_menu = new QHBoxLayout;
+
     //add and connect button
     QPushButton *train_button = new QPushButton();
     connect(train_button, SIGNAL(released()), this, SLOT(testfunc()));
@@ -57,42 +61,48 @@ MainWindow::MainWindow(QWidget *parent)
     connect(save_button, SIGNAL(released()), this, SLOT(savefunc()));
     save_button->setText(tr("Save the file"));
 
+    //add and connect button
+    QPushButton *translate_button = new QPushButton();
+    connect(translate_button, SIGNAL(released()), this, SLOT(translate()));
+    translate_button->setText(tr("Translate"));
+
+    //add and connect button
+    QPushButton *translate_button = new QPushButton();
+    connect(translate_button, SIGNAL(released()), this, SLOT(translate()));
+    translate_button->setText(tr("Translate"));
+
     //set layouts
-    layout->addWidget(train_button);
-    layout->addWidget(save_button);
+    //layout->addWidget(train_button);
+    //layout->addWidget(save_button);
+    layout->addLayout(horiz_menu);
+    horiz_menu->addWidget(train_button);
+    horiz_menu->addWidget(save_button);
+    horiz_menu->addWidget(translate_button);
+
     layout->addWidget(tableView);
 
     setWindowTitle(tr("Basic Layouts"));
 }
 
-//void MainWindow::showWindowTitle(const QString & title)
-//{
-//setWindowTitle(title);
-//}
 void MainWindow::testfunc()
 {
-//    int size;
+
     //std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
-    std::map <std::string, std::string> test = readfastafile("COI_aligned");
-    //std::vector< std::vector<std::string> > vector1;
-//    size = fastalen(test);
-//    int *pArray = new int[size];
-    //return;
-    //MyModel::MyModel->m_gridData[0][2] = QString::number(size);
+    std::map <std::string, std::string> test = readfastafile("winconcat.fas.fas");
+
     updatevector(vector1, test);
 }
 
 void MainWindow::savefunc()
 {
-//    int size;
-    //std::map <std::string, std::string> test = readfastafile("winglesscat.fas");
-    //std::map <std::string, std::string> test = readfastafile("COI_aligned");
-    //std::vector< std::vector<std::string> > vector1;
-//    size = fastalen(test);
-//    int *pArray = new int[size];
-    //return;
-    //MyModel::MyModel->m_gridData[0][2] = QString::number(size);
-    //updatevector(vector1, test);
+
     std::cout << "savefunc called" << std::endl;
     savefile(vector1, "testicula");
+}
+
+void MainWindow::translate()
+{
+
+    std::cout << "translate() called" << std::endl;
+    translatevector(vector1);
 }
