@@ -9,10 +9,10 @@ int COLS;
 MyModel::MyModel(QObject *parent)
     :QAbstractTableModel(parent)
 {
-    timer = new QTimer(this);
-    timer->setInterval(1000);
-    connect(timer, SIGNAL(timeout()) , this, SLOT(timerHit()));
-    //timer->start();
+//    timer = new QTimer(this);
+//    timer->setInterval(1000);
+//    connect(timer, SIGNAL(timeout()) , this, SLOT(timerHit()));
+//    //timer->start();
 }
 
 int MyModel::rowCount(const QModelIndex & /*parent*/) const
@@ -76,13 +76,12 @@ Qt::ItemFlags MyModel::flags(const QModelIndex & /*index*/) const
 {
     return Qt::ItemIsSelectable |  Qt::ItemIsEnabled;// | Qt::ItemIsEditable;
 }
-void MyModel::timerHit()
-{
-    //we identify the top left cell
-    QModelIndex topLeft = createIndex(0,0);
-    QModelIndex bottomRight = createIndex(ROWS,COLS);
-    //emit a signal to make the view reread identified data
-    emit dataChanged(topLeft, bottomRight);
-    //emit headerDataChanged(Qt::Horizontal, 0 ,);
-}
-//void MyModel::
+//void MyModel::timerHit()
+//{
+//    //we identify the top left cell
+//    QModelIndex topLeft = createIndex(0,0);
+//    QModelIndex bottomRight = createIndex(ROWS,COLS);
+//    //emit a signal to make the view reread identified data
+//    emit dataChanged(topLeft, bottomRight);
+//    //emit headerDataChanged(Qt::Horizontal, 0 ,);
+//}

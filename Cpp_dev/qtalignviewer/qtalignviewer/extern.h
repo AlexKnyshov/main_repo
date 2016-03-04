@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-extern int COLS;
-extern int ROWS;
+extern int COLS; //global var for tableview dimensions
+extern int ROWS; //global var for tableview dimensions
 
 extern std::vector< std::vector<std::string> > vector1; //global vector storing alignment
 

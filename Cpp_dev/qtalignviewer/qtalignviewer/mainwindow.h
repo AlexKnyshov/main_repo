@@ -41,6 +41,7 @@ public slots:
     void translate_option2(bool); //set transl option
     void translate_option3(bool); //set transl option
     void deleteRow(); //set transl option
+    void shiftA(); //set transl option
 private:
 
 };

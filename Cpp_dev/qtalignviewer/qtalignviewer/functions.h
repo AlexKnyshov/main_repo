@@ -19,4 +19,6 @@ void savefile (std::vector< std::vector<std::string> >& vec, std::string outfile
 
 int translatevector(std::vector< std::vector<std::string> >& vec, int option); //translate and update seq
 
+void shiftnucl (std::vector< std::vector<std::string> >& vec, int xpos, int ypos);
+
 #endif // FUNCTIONS_H

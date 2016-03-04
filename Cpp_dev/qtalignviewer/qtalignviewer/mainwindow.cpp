@@ -113,9 +113,12 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle(tr("Basic Layouts"));
 
 
-
+    //edit shortcuts
     QShortcut* shortcut = new QShortcut(QKeySequence(Qt::Key_A), tableView);
     connect(shortcut, SIGNAL(activated()), this, SLOT(deleteRow()));
+    //shift
+    QShortcut* shift_A = new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_A), tableView);
+    connect(shift_A, SIGNAL(activated()), this, SLOT(shiftA()));
 
 
 
@@ -142,7 +145,8 @@ void MainWindow::testfunc()
 //    QModelIndex bottomRight = createIndex(ROWS,COLS);
 //    //emit a signal to make the view reread identified data
 //    tableView->model()->dataChanged(topLeft, bottomRight);
-    tableView->reset();
+    tableView->model()->headerDataChanged(Qt::Horizontal, 0 , COLS);
+    //tableView->reset();
 
     //myModel->select();
 }
@@ -207,4 +211,11 @@ void MainWindow::deleteRow()
         std::cout << tableView->currentIndex().row() << std::endl;
         vector1[tableView->currentIndex().row()][tableView->currentIndex().column()]="A";
         tableView->model()->dataChanged(tableView->currentIndex(), tableView->currentIndex());
+}
+void MainWindow::shiftA(){
+    std::cout << "shiftA called" << std::endl;
+    shiftnucl(vector1, tableView->currentIndex().row(), tableView->currentIndex().column());
+    tableView->model()->headerDataChanged(Qt::Horizontal, 0 , COLS);
+    tableView->setColumnWidth(COLS-1,20);
+    //tableView->reset();
 }

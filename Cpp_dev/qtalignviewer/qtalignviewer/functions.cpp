@@ -234,3 +234,21 @@ int translatevector (std::vector< std::vector<std::string> >& vec, int option)
         cout << COLS << " cols" << endl;
         return out;
 }
+
+void shiftnucl (std::vector< std::vector<std::string> >& vec, int xpos, int ypos)
+{
+    cout << "shift called " << xpos << " " << ypos << endl;
+    //ROWS += 1;
+    COLS += 1;
+    //moving current row
+     cout << "adding new column" << endl;
+    for (int i = 0; i < ROWS; i++) {
+        vec[i].push_back("?");
+    }
+    //vec[xpos].push_back("?");
+    cout << "moving" << endl;
+    for (int j = COLS-1; j > ypos; j--) {
+        vec[xpos][j] = vec[xpos][j-1];
+    }
+    vec[xpos][ypos] = "X";
+}
