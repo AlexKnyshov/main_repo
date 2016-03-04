@@ -10,9 +10,9 @@ MyModel::MyModel(QObject *parent)
     :QAbstractTableModel(parent)
 {
     timer = new QTimer(this);
-    timer->setInterval(2000);
+    timer->setInterval(1000);
     connect(timer, SIGNAL(timeout()) , this, SLOT(timerHit()));
-    timer->start();
+    //timer->start();
 }
 
 int MyModel::rowCount(const QModelIndex & /*parent*/) const
@@ -66,6 +66,7 @@ bool MyModel::setData(const QModelIndex & index, const QVariant & value, int rol
     if (role == Qt::EditRole)
     {
         //save value from editor to member m_gridData
+        std::cout << "editrole!" << std::endl;
         QString result = value.toString();
         vector1[index.row()][index.column()] = result.toUtf8().constData();
     }
@@ -73,7 +74,7 @@ bool MyModel::setData(const QModelIndex & index, const QVariant & value, int rol
 }
 Qt::ItemFlags MyModel::flags(const QModelIndex & /*index*/) const
 {
-    return Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled ;
+    return Qt::ItemIsSelectable |  Qt::ItemIsEnabled;// | Qt::ItemIsEditable;
 }
 void MyModel::timerHit()
 {
@@ -82,4 +83,6 @@ void MyModel::timerHit()
     QModelIndex bottomRight = createIndex(ROWS,COLS);
     //emit a signal to make the view reread identified data
     emit dataChanged(topLeft, bottomRight);
+    //emit headerDataChanged(Qt::Horizontal, 0 ,);
 }
+//void MyModel::

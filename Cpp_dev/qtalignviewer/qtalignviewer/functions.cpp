@@ -99,15 +99,16 @@ void updatevector (vector< vector<string> >& vec, map <string, string> dict)
     ROWS = rowsize;
     cout << ROWS << endl;
 
-//    for (int i = 0; i < ROWS; i++) {
-//        vector<string> row; // Create an empty row
-//        //cout << "row" << i << endl;
-//        for (int j = 0; j < COLS; j++) {
-//            row.push_back("Temp"); // Add an element (column) to the row
-//            //cout << "line" << j << endl;
-//        }
-//        vec.push_back(row); // Add the row to the main vector
-//    }
+    for (int i = 0; i < ROWS; i++) {
+        vector<string> row; // Create an empty row
+        //cout << "row" << i << endl;
+        for (int j = 0; j < COLS; j++) {
+            row.push_back("?"); // Add an element (column) to the row
+            //cout << "line" << j << endl;
+        }
+        vec[i].swap(row);
+        //vec.push_back(row); // Add the row to the main vector
+    }
 
 
 
@@ -150,10 +151,10 @@ void savefile (vector< vector<string> >& vec, string outfile)
         }
 }
 
-void translatevector (std::vector< std::vector<std::string> >& vec)
+int translatevector (std::vector< std::vector<std::string> >& vec, int option)
 {
     cout << "translatevector() called" << endl;
-
+    int out = COLS;
     map<string, string> transtable = {{"TTT", "F"}, {"TTC", "F"}, {"TTA", "L"}, {"TTG", "i"},
                                                      {"CTT", "L"}, {"CTC", "L"}, {"CTA", "L"}, {"CTG", "i"},
                                                      {"ATT", "I"}, {"ATC", "I"}, {"ATA", "I"}, {"ATG", "i"},
@@ -178,23 +179,27 @@ void translatevector (std::vector< std::vector<std::string> >& vec)
             string temp = "";
             string codontemp = "";
             vector<string> row;
-            for (int y = 0; y < COLS-2; y++)
+            for (int y = 0; y < COLS-option; y++)
             {
                 //cout << "test" << x << " " << y << " " << vec[x][y] << std::endl;
                 if (y == 0)
                 {
-                    cout << ">"+vec[x][y] << endl; //title
+                    //cout << ">"+vec[x][y] << endl; //title
                     row.push_back(vec[x][y]);
                 }
                 else
                 {
                     if (y % 3 == 0)
                     {
-                        codontemp  += vec[x][y+2];//creating seq
+                        codontemp  += vec[x][y+option];//creating seq
                         for (auto & c: codontemp) c = toupper(c);
-                        cout << "yes " << y << transtable[codontemp] << endl;
-                        temp += transtable[codontemp];
-                        row.push_back(transtable[codontemp]);
+                        //cout << "yes " << y << transtable[codontemp] << endl;
+                        if ( transtable.find(codontemp) == transtable.end() ) {
+                          row.push_back("-");
+                        } else {
+                          row.push_back(transtable[codontemp]);
+                        }
+
                         temp_col += 1;
                         codontemp = "";
 
@@ -202,12 +207,12 @@ void translatevector (std::vector< std::vector<std::string> >& vec)
                     else
                     {
 
-                        codontemp  += vec[x][y+2];//creating seq
-                        cout << "else " << y << codontemp << endl;
+                        codontemp  += vec[x][y+option];//creating seq
+                        //cout << "else " << y << codontemp << endl;
                     }
                 }
             }
-            cout << temp << endl;
+            //cout << temp << endl;
             tempvec.push_back(row);
             if (temp_col > prot_col)
             {
@@ -222,5 +227,10 @@ void translatevector (std::vector< std::vector<std::string> >& vec)
             for (int j = 0; j < prot_col; j++) {
                 vec[i][j] = tempvec[i][j];
             }
+            vec[i].erase(vec[i].begin()+prot_col, vec[i].end());
         }
+        cout << COLS << " cols" << endl;
+        COLS = prot_col;
+        cout << COLS << " cols" << endl;
+        return out;
 }

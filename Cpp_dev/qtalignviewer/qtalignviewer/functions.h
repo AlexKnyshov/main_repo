@@ -17,6 +17,6 @@ void updatevector (std::vector< std::vector<std::string> >& vec, std::map <std::
 
 void savefile (std::vector< std::vector<std::string> >& vec, std::string outfile); // save file
 
-void translatevector (std::vector< std::vector<std::string> >& vec); //translate and update seq
+int translatevector(std::vector< std::vector<std::string> >& vec, int option); //translate and update seq
 
 #endif // FUNCTIONS_H

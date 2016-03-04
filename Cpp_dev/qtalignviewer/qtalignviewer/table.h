@@ -3,6 +3,9 @@
 #include <QAbstractTableModel>
 #include <QBrush>
 #include <QTimer>
+#include<QKeyEvent>
+#include<QMessageBox>
+#include <iostream>
 
 class MyModel : public QAbstractTableModel
 {
@@ -15,6 +18,15 @@ public:
     bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
     Qt::ItemFlags flags(const QModelIndex & index) const ;
     QTimer *timer;
+protected:
+    void keyPressEvent(QKeyEvent* e)
+    {
+        std::cout << "qkey!!" << std::endl;
+              QMessageBox* box = new QMessageBox();
+              box->setWindowTitle(QString("Hello"));
+              box->setText(QString("You Pressed: ")+ e->text());
+              box->show();
+    };
 signals:
     void editCompleted(const QString &);
 private slots:
