@@ -250,5 +250,23 @@ void shiftnucl (std::vector< std::vector<std::string> >& vec, int xpos, int ypos
     for (int j = COLS-1; j > ypos; j--) {
         vec[xpos][j] = vec[xpos][j-1];
     }
-    vec[xpos][ypos] = "X";
+    //vec[xpos][ypos] = "X";
 }
+
+void deletenucl (std::vector< std::vector<std::string> >& vec, int xpos, int ypos)
+{
+    cout << "delete nucl called " << xpos << " " << ypos << endl;
+    vec[xpos].push_back("?");
+    vec[xpos].erase(vec[xpos].begin()+ypos);
+}
+void deletecol (std::vector< std::vector<std::string> >& vec, int ypos, int count)
+{
+    cout << "delete col called " << ypos << endl;
+    for (int i = 0; i < ROWS; i++)
+    {
+        vec[i].erase(vec[i].begin()+ypos, vec[i].begin()+ypos+count);
+    }
+    COLS -= count;
+
+}
+

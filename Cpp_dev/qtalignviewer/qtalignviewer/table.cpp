@@ -85,3 +85,11 @@ Qt::ItemFlags MyModel::flags(const QModelIndex & /*index*/) const
 //    emit dataChanged(topLeft, bottomRight);
 //    //emit headerDataChanged(Qt::Horizontal, 0 ,);
 //}
+bool MyModel::removeColumns(int column, int count, const QModelIndex &parent)
+{
+    std::cout << "remove column called" << std::endl;
+     beginRemoveColumns(parent, column, column+count);
+    deletecol(vector1, column, count);
+    endRemoveColumns();
+
+}

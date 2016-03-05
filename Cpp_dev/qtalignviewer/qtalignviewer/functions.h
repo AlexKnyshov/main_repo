@@ -21,4 +21,8 @@ int translatevector(std::vector< std::vector<std::string> >& vec, int option); /
 
 void shiftnucl (std::vector< std::vector<std::string> >& vec, int xpos, int ypos);
 
+void deletenucl (std::vector< std::vector<std::string> >& vec, int xpos, int ypos);
+
+void deletecol (std::vector< std::vector<std::string> >& vec, int ypos, int count);
+
 #endif // FUNCTIONS_H

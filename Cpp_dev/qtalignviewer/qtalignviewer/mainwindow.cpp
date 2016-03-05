@@ -12,7 +12,7 @@
 std::vector< std::vector<std::string> > vector1;
 
 int opt = 1;
-    QTableView *tableView;
+    myTableView *tableView;
     QAbstractTableModel *myModel;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     //add table
 
-    tableView = new QTableView(centralWidget);
+    tableView = new myTableView(centralWidget);
     //add model
     QAbstractTableModel *myModel = new MyModel(this);
     tableView->setModel(myModel);
@@ -52,6 +52,8 @@ MainWindow::MainWindow(QWidget *parent)
     {
        tableView->setColumnWidth(col,20);
     }
+    QHeaderView* vheader = tableView->verticalHeader();
+    vheader->setSectionResizeMode(QHeaderView::Fixed);
     //header->setSectionResizeMode(QHeaderView::Fixed);
     //connect model to window title
     connect(myModel, SIGNAL(editCompleted(const QString &)), this, SLOT(setWindowTitle(const QString &)));
@@ -72,6 +74,11 @@ MainWindow::MainWindow(QWidget *parent)
     QPushButton *translate_button = new QPushButton();
     connect(translate_button, SIGNAL(released()), this, SLOT(translate()));
     translate_button->setText(tr("Translate"));
+
+    //add and connect button
+    QPushButton *remcolbut = new QPushButton();
+    connect(remcolbut, SIGNAL(released()), this, SLOT(removecol()));
+    remcolbut->setText(tr("Remove column"));
 
     //group box
     QGroupBox *groupBox = new QGroupBox(tr("Translate options"));
@@ -105,7 +112,7 @@ MainWindow::MainWindow(QWidget *parent)
     horiz_menu->addWidget(train_button);
     horiz_menu->addWidget(save_button);
     horiz_menu->addWidget(translate_button);
-    //horiz_menu->addWidget(translate_option1);
+    horiz_menu->addWidget(remcolbut);
     horiz_menu->addWidget(groupBox);
 
     layout->addWidget(tableView);
@@ -114,17 +121,11 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     //edit shortcuts
-    QShortcut* shortcut = new QShortcut(QKeySequence(Qt::Key_A), tableView);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(deleteRow()));
-    //shift
-    QShortcut* shift_A = new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_A), tableView);
-    connect(shift_A, SIGNAL(activated()), this, SLOT(shiftA()));
-
-
-
-
-
-
+//    QShortcut* shortcut = new QShortcut(QKeySequence(Qt::Key_A), tableView);
+//    connect(shortcut, SIGNAL(activated()), this, SLOT(deleteRow()));
+//    //shift
+//    QShortcut* shift_A = new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_A), tableView);
+//    connect(shift_A, SIGNAL(activated()), this, SLOT(shiftA()));
 
 
 }
@@ -202,20 +203,108 @@ void MainWindow::translate_option3(bool)
     std::cout << "translate(3) called " << opt << std::endl;
     //translatevector(vector1);
 }
-void MainWindow::deleteRow()
+//void MainWindow::deleteRow()
+//{
+//    std::cout << "deleterow called" << std::endl;
+//    //QModelIndex idx = tableView->currentIndex();
+//    //if (idx.isValid())
+//    //   tableView->model()->removeRow(idx.row(), idx.parent());
+////        std::cout << tableView->currentIndex().row() << std::endl;
+////        vector1[tableView->currentIndex().row()][tableView->currentIndex().column()]="A";
+////        tableView->model()->dataChanged(tableView->currentIndex(), tableView->currentIndex());
+//}
+//void MainWindow::shiftA(){
+//    std::cout << "shiftA called" << std::endl;
+//    shiftnucl(vector1, tableView->currentIndex().row(), tableView->currentIndex().column());
+//    tableView->model()->headerDataChanged(Qt::Horizontal, 0 , COLS);
+//    tableView->setColumnWidth(COLS-1,20);
+//    //tableView->reset();
+//}
+void myTableView::keyPressEvent(QKeyEvent *tablekey)
 {
-    std::cout << "deleterow called" << std::endl;
-    //QModelIndex idx = tableView->currentIndex();
-    //if (idx.isValid())
-    //   tableView->model()->removeRow(idx.row(), idx.parent());
-        std::cout << tableView->currentIndex().row() << std::endl;
+    std::cout << tableView->currentIndex().row() << std::endl;
+    switch(tablekey->key())
+    {
+    case Qt::Key_S:
+        std::cout << "S pressed" << std::endl;
+        if (tablekey->modifiers()==Qt::ShiftModifier)
+        {
+            std::cout << "shiftS called" << std::endl;
+        }
+        break;
+    case Qt::Key_A:
+        std::cout << "A pressed" << std::endl;
+        if (tablekey->modifiers()==Qt::ShiftModifier)
+        {
+            std::cout << "shiftA called" << std::endl;
+            shiftnucl(vector1, tableView->currentIndex().row(), tableView->currentIndex().column());
+            tableView->model()->headerDataChanged(Qt::Horizontal, 0 , COLS);
+            tableView->setColumnWidth(COLS-1,20);
+        }
         vector1[tableView->currentIndex().row()][tableView->currentIndex().column()]="A";
         tableView->model()->dataChanged(tableView->currentIndex(), tableView->currentIndex());
+        break;
+    case Qt::Key_T:
+        std::cout << "T pressed" << std::endl;
+        if (tablekey->modifiers()==Qt::ShiftModifier)
+        {
+            std::cout << "shiftA called" << std::endl;
+            shiftnucl(vector1, tableView->currentIndex().row(), tableView->currentIndex().column());
+            tableView->model()->headerDataChanged(Qt::Horizontal, 0 , COLS);
+            tableView->setColumnWidth(COLS-1,20);
+        }
+        vector1[tableView->currentIndex().row()][tableView->currentIndex().column()]="T";
+        tableView->model()->dataChanged(tableView->currentIndex(), tableView->currentIndex());
+        break;
+    case Qt::Key_G:
+        if (tablekey->modifiers()==Qt::ShiftModifier)
+        {
+            std::cout << "shiftA called" << std::endl;
+            shiftnucl(vector1, tableView->currentIndex().row(), tableView->currentIndex().column());
+            tableView->model()->headerDataChanged(Qt::Horizontal, 0 , COLS);
+            tableView->setColumnWidth(COLS-1,20);
+        }
+        std::cout << "G pressed" << std::endl;
+        vector1[tableView->currentIndex().row()][tableView->currentIndex().column()]="G";
+        tableView->model()->dataChanged(tableView->currentIndex(), tableView->currentIndex());
+        break;
+    case Qt::Key_C:
+        if (tablekey->modifiers()==Qt::ShiftModifier)
+        {
+            std::cout << "shiftA called" << std::endl;
+            shiftnucl(vector1, tableView->currentIndex().row(), tableView->currentIndex().column());
+            tableView->model()->headerDataChanged(Qt::Horizontal, 0 , COLS);
+            tableView->setColumnWidth(COLS-1,20);
+        }
+        std::cout << "C pressed" << std::endl;
+        vector1[tableView->currentIndex().row()][tableView->currentIndex().column()]="C";
+        tableView->model()->dataChanged(tableView->currentIndex(), tableView->currentIndex());
+        break;
+    case Qt::Key_Minus:
+        if (tablekey->modifiers()==Qt::ShiftModifier)
+        {
+            std::cout << "shiftA called" << std::endl;
+            shiftnucl(vector1, tableView->currentIndex().row(), tableView->currentIndex().column());
+            tableView->model()->headerDataChanged(Qt::Horizontal, 0 , COLS);
+            tableView->setColumnWidth(COLS-1,20);
+        }
+        std::cout << "- pressed" << std::endl;
+        vector1[tableView->currentIndex().row()][tableView->currentIndex().column()]="-";
+        tableView->model()->dataChanged(tableView->currentIndex(), tableView->currentIndex());
+        break;
+    case Qt::Key_Delete:
+        std::cout << "Del pressed" << std::endl;
+        deletenucl(vector1, tableView->currentIndex().row(), tableView->currentIndex().column());
+        tableView->model()->headerDataChanged(Qt::Horizontal, 0 , COLS);
+        break;
+    default:
+        QTableView::keyPressEvent(tablekey);
+    }
 }
-void MainWindow::shiftA(){
-    std::cout << "shiftA called" << std::endl;
-    shiftnucl(vector1, tableView->currentIndex().row(), tableView->currentIndex().column());
+
+void MainWindow::removecol(){
+    std::cout << "test" << std::endl;
+
+    tableView->model()->removeColumns(tableView->currentIndex().column(),tableView->selectionModel()->selectedColumns(0).count(),tableView->currentIndex());
     tableView->model()->headerDataChanged(Qt::Horizontal, 0 , COLS);
-    tableView->setColumnWidth(COLS-1,20);
-    //tableView->reset();
 }

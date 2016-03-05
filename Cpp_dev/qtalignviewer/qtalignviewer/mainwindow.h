@@ -2,12 +2,15 @@
 #define MAINWINDOW_H
 #include <QMainWindow>
 #include <QVBoxLayout>
+#include <QKeyEvent>
+#include <QTableView>
+#include <iostream>
 
 
 #include <QAbstractTableModel>
 
 QT_BEGIN_NAMESPACE // QT_BEGIN_NAMESPACE / QT_END_NAMESPACE are not needed in Qt user code
-class QTableView; //forward declaration
+//class QTableView; //forward declaration
 QT_END_NAMESPACE
 
 // native code
@@ -40,10 +43,35 @@ public slots:
     void translate_option1(bool); //set transl option
     void translate_option2(bool); //set transl option
     void translate_option3(bool); //set transl option
-    void deleteRow(); //set transl option
-    void shiftA(); //set transl option
+    void removecol(); //rem
+//    void deleteRow(); //set transl option
+//    void shiftA(); //set transl option
 private:
 
 };
+
+//overriding QTableView:
+class myTableView : public QTableView
+{
+    Q_OBJECT
+public:
+    myTableView(QWidget * parent = 0)
+    {}
+
+private:
+    void keyPressEvent(QKeyEvent* tablekey);
+//    {
+//        if (tablekey->key() == Qt::Key_S)
+//        {
+//            std::cout << "S pressed" << std::endl;
+//        }
+//        else
+//        {
+//            QTableView::keyPressEvent(tablekey);
+//        }
+//    }
+};
+
+
 
 #endif // MAINWINDOW_H
