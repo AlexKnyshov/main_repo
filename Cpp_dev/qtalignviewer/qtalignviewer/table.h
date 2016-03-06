@@ -19,6 +19,10 @@ public:
     Qt::ItemFlags flags(const QModelIndex & index) const ;
     QTimer *timer;
     bool removeColumns(int column, int count, const QModelIndex &parent);
+    //dnd
+    bool removeRows(int row, int count, const QModelIndex &parent);
+    bool insertRows(int row, int count, const QModelIndex &parent);
+    Qt::DropActions supportedDropActions() const;
 signals:
     void editCompleted(const QString &);
 private slots:

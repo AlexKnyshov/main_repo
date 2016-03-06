@@ -45,6 +45,15 @@ MainWindow::MainWindow(QWidget *parent)
     //add model
     QAbstractTableModel *myModel = new MyModel(this);
     tableView->setModel(myModel);
+
+    //drag and drop related
+    tableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    tableView->setDragEnabled(true);
+    tableView->setAcceptDrops(true);
+    tableView->setDropIndicatorShown(true);
+    tableView->setDefaultDropAction(Qt::MoveAction);
+    tableView->setDragDropMode(QAbstractItemView::InternalMove);
+    tableView->setDragDropOverwriteMode(false);
     //add header
     QHeaderView* header = tableView->horizontalHeader();
     //header->setSectionResizeMode(QHeaderView::Stretch);
@@ -53,7 +62,10 @@ MainWindow::MainWindow(QWidget *parent)
        tableView->setColumnWidth(col,20);
     }
     QHeaderView* vheader = tableView->verticalHeader();
+    //vheader->setMovable(true);
     vheader->setSectionResizeMode(QHeaderView::Fixed);
+    //header->setDragEnabled(true);
+    //header->setDragDropMode(QAbstractItemView::InternalMove);
     //header->setSectionResizeMode(QHeaderView::Fixed);
     //connect model to window title
     connect(myModel, SIGNAL(editCompleted(const QString &)), this, SLOT(setWindowTitle(const QString &)));
@@ -140,7 +152,7 @@ void MainWindow::testfunc()
     for (int col=1; col<COLS; col++)
     {
         tableView->setColumnWidth(col,20);
-        std::cout << "test funct goes " << col << " " << tableView->columnWidth(col) << std::endl;
+        //std::cout << "test funct goes " << col << " " << tableView->columnWidth(col) << std::endl;
     }
 //    QModelIndex topLeft = tableView->model()->QAbstractItemModel::createIndex(0,0);
 //    QModelIndex bottomRight = createIndex(ROWS,COLS);
@@ -281,13 +293,15 @@ void myTableView::keyPressEvent(QKeyEvent *tablekey)
         tableView->model()->dataChanged(tableView->currentIndex(), tableView->currentIndex());
         break;
     case Qt::Key_Minus:
-        if (tablekey->modifiers()==Qt::ShiftModifier)
-        {
-            std::cout << "shiftA called" << std::endl;
-            shiftnucl(vector1, tableView->currentIndex().row(), tableView->currentIndex().column());
-            tableView->model()->headerDataChanged(Qt::Horizontal, 0 , COLS);
-            tableView->setColumnWidth(COLS-1,20);
-        }
+        std::cout << "- pressed" << std::endl;
+        vector1[tableView->currentIndex().row()][tableView->currentIndex().column()]="-";
+        tableView->model()->dataChanged(tableView->currentIndex(), tableView->currentIndex());
+        break;
+    case Qt::Key_Underscore:
+        std::cout << "shiftA called" << std::endl;
+        shiftnucl(vector1, tableView->currentIndex().row(), tableView->currentIndex().column());
+        tableView->model()->headerDataChanged(Qt::Horizontal, tableView->currentIndex().column() , COLS);
+        tableView->setColumnWidth(COLS-1,20);
         std::cout << "- pressed" << std::endl;
         vector1[tableView->currentIndex().row()][tableView->currentIndex().column()]="-";
         tableView->model()->dataChanged(tableView->currentIndex(), tableView->currentIndex());
@@ -304,7 +318,17 @@ void myTableView::keyPressEvent(QKeyEvent *tablekey)
 
 void MainWindow::removecol(){
     std::cout << "test" << std::endl;
-
-    tableView->model()->removeColumns(tableView->currentIndex().column(),tableView->selectionModel()->selectedColumns(0).count(),tableView->currentIndex());
+    QModelIndexList selection_list = tableView->selectionModel()->selectedColumns();
+    int beg = 0;
+    for (int i = 0; i < selection_list.count(); i++)
+    {
+        std::cout << selection_list.at(i).column() << std::endl;
+        if (i == 0)
+        {
+            beg = selection_list.at(i).column();
+        }
+    }
+    //std::cout << tableView->selectionModel()->selectedColumns() << std::endl;
+    tableView->model()->removeColumns(beg,selection_list.count());
     tableView->model()->headerDataChanged(Qt::Horizontal, 0 , COLS);
 }

@@ -25,4 +25,8 @@ void deletenucl (std::vector< std::vector<std::string> >& vec, int xpos, int ypo
 
 void deletecol (std::vector< std::vector<std::string> >& vec, int ypos, int count);
 
+void dnd_row (std::vector< std::vector<std::string> >& vec, int row, int count);
+
+void insert_dnd_row (int row, int count);
+
 #endif // FUNCTIONS_H

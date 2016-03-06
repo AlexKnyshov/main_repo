@@ -6,6 +6,8 @@
 int ROWS; //for some reason, first mentioned here
 int COLS;
 
+//std::vector<std::string> temp_vec;
+
 MyModel::MyModel(QObject *parent)
     :QAbstractTableModel(parent)
 {
@@ -72,9 +74,14 @@ bool MyModel::setData(const QModelIndex & index, const QVariant & value, int rol
     }
     return true;
 }
-Qt::ItemFlags MyModel::flags(const QModelIndex & /*index*/) const
+Qt::ItemFlags MyModel::flags(const QModelIndex & index) const
 {
-    return Qt::ItemIsSelectable |  Qt::ItemIsEnabled;// | Qt::ItemIsEditable;
+    if (index.isValid())
+        return Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable |  Qt::ItemIsEnabled;
+    else
+        return Qt::ItemIsDropEnabled | Qt::ItemIsSelectable |  Qt::ItemIsEnabled ;
+
+    //return Qt::ItemIsSelectable |  Qt::ItemIsEnabled ;// | Qt::ItemIsEditable;
 }
 //void MyModel::timerHit()
 //{
@@ -93,3 +100,39 @@ bool MyModel::removeColumns(int column, int count, const QModelIndex &parent)
     endRemoveColumns();
 
 }
+
+
+
+//dnd
+bool MyModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    std::cout << "remove row called" << std::endl;
+    beginRemoveRows(parent, row, row+count-1);
+
+
+    insert_dnd_row(row, count);
+
+
+    //ROWS -= 1;
+    endRemoveRows();
+    return true;
+
+}
+
+bool MyModel::insertRows(int row, int count, const QModelIndex &parent)
+{
+    std::cout << "insert row called" << std::endl;
+    beginInsertRows(parent, row, row+count-1);
+
+    dnd_row(vector1, row, count);
+    //ROWS += 1;
+    endInsertRows();
+    return true;
+
+}
+
+
+Qt::DropActions MyModel::supportedDropActions() const
+ {
+     return Qt::CopyAction | Qt::MoveAction;
+ }

@@ -3,6 +3,8 @@
 
 using namespace std;
 
+vector< vector<string> > temp_vec;
+
 std::map <std::string, std::string> readfastafile(string filename)
 {
   std::map <std::string, std::string> dict;
@@ -270,3 +272,41 @@ void deletecol (std::vector< std::vector<std::string> >& vec, int ypos, int coun
 
 }
 
+void dnd_row (std::vector< std::vector<std::string> >& vec, int row, int count)
+{
+    std::cout << "dnd_row called" << std::endl;
+    //temp_vec.clear();
+    for (int i = 0; i < count; i++)
+    {
+        temp_vec.push_back(vec[row+i]);
+    }
+    std::cout << "vector copied" << std::endl;
+    for (int i = 0; i < count; i++)
+    {
+        string temp = "";
+        for (int j = 0; j < COLS; j++)
+        {
+            temp += temp_vec[i][j];
+        }
+        cout << temp << endl;
+        //vector<int>::iterator it = vector1.begin();
+    }
+    vec.erase(vec.begin()+row, vec.begin()+row+count);
+    std::cout << "row erased" << std::endl;
+    for (int i = 0; i < count; i++)
+    {
+        //vector<int>::iterator it = vector1.begin();
+        vec.insert(vec.begin()+row+i, temp_vec[i]);
+    }
+    //std::cout << "row inserted" << std::endl;
+}
+void insert_dnd_row (int row, int count)
+{
+    std::cout << "insert_row called" << std::endl;
+    for (int i = 0; i < count; i++)
+    {
+        //vector<int>::iterator it = vector1.begin();
+        vector1.insert(vector1.begin()+row+i, temp_vec[i]);
+    }
+    std::cout << "row inserted" << std::endl;
+}
