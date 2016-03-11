@@ -4,20 +4,20 @@ import glob
 import sys
 import os
 if len(sys.argv) == 3:
-	if sys.argv[1] == "-1":
-		infile = sys.argv[2]
+	if sys.argv[2] == "-1":
+		infile = sys.argv[1]
 		files = [infile]
-	elif sys.argv[1] == "-m":
-		files = glob.glob(sys.argv[2]+"/*")
+	elif sys.argv[2] == "-m":
+		files = glob.glob(sys.argv[1]+"/*")
 else:
 	print "removeHyphen.py script for dealigning sequence files in FASTA format"
 	print "existing files will be replaced with new content!"
 	print "-----------folder input------------"
-	print "FORMAT: python removeHyphen.py -m [inputfolder]"
-	print "EXAMPLE: python removeHyphen.py -m ./fasta/"
+	print "FORMAT: python removeHyphen.py [inputfolder] -m"
+	print "EXAMPLE: python removeHyphen.py ./fasta/ -m"
 	print "------------file input-------------"
-	print "FORMAT: python removeHyphen.py -1 [inputfile]"
-	print "EXAMPLE: python removeHyphen.py -1 ./test.fas"
+	print "FORMAT: python removeHyphen.py [inputfile] -1"
+	print "EXAMPLE: python removeHyphen.py ./test.fas -1"
 	sys.exit()
 
 for f in files:
