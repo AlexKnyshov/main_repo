@@ -37,17 +37,17 @@ for f in files:
 	#pairwise
 	names =[]
 	lengths = []
-	if trimopt == "-%":
-		for key in seqs.keys():
-			names.append(key)
-			lengths.append(len(seqs[key])) #replace with a simplier solution - no need for this
-			#print key, len(seqs[key])	
-	else:
-		for key in seqs.keys():
-			if key in taxalist:
-				names.append(key)
-				lengths.append(len(seqs[key])) #replace with a simplier solution - no need for this
-				#print key, len(seqs[key])	
+	#if trimopt == "-%":
+	for key in seqs.keys():
+		names.append(key)
+		lengths.append(len(seqs[key])) #replace with a simplier solution - no need for this
+		#print key, len(seqs[key])	
+	# else:
+	# 	for key in seqs.keys():
+	# 		if key in taxalist:
+	# 			names.append(key)
+	# 			lengths.append(len(seqs[key])) #replace with a simplier solution - no need for this
+	# 			#print key, len(seqs[key])	
 	distlist = []
 	#forward trim
 	startpos = 0
@@ -150,8 +150,7 @@ for f in files:
 	if endpos-startpos > 0:
 		outfile = open(fn2, "w")
 		for seq, s in seqs.items():
-			print >> outfile, ">"+seq
-			print >> outfile, s[startpos:endpos]
+			print >> outfile, ">"+seq, "\n", s[startpos:endpos]
 		outfile.close()
 	warninglist.append(endpos-startpos)
 	#progress bar
