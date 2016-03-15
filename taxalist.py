@@ -51,12 +51,12 @@ for key, value in sorted(d.items()):
 	prog_c += 1
 	if wr:
 		print round(float(prog_c) / total_c *100, 2), "%"
-		if len(value)<partnum-1:
-			print "Warning, taxon", key, "has only", len(value), "partitions: ", value
-			rm = raw_input("Would you like to remove it?")
-			if rm == "y" or rm == "Y":
-				del d[key]
-				print key, "removed"
+		if len(value)<partnum:
+		#	print "Warning, taxon", key, "has only", len(value), "partitions: ", value
+		#	rm = raw_input("Would you like to remove it?")
+		#	if rm == "y" or rm == "Y":
+			del d[key]
+			print key, "removed"
 	else:
 		print key, len(value), value
 if wr:
