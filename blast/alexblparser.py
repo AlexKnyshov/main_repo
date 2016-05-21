@@ -48,34 +48,47 @@ else:
     shutil.rmtree("./modified/") #removing old files
     os.makedirs("./modified")
 
+#copy files
+print "copying files:"
+for x in glob.glob(ahefoldarg+"/*.fas"):
+    locusfname = x.split("/")[-1]
+    #print locusfname
+    if not os.path.exists ("./modified/"+locusfname):
+        prog = "copying "+str(locusfname)+"..."
+        sys.stdout.write(prog+"\r")
+        sys.stdout.flush()
+        shutil.copy2(ahefoldarg+locusfname, "./modified")
+print ""
 print "scanning the transcriptome..."
 #output2 = []
 inputf = SeqIO.parse(trif, "fasta")
 print "searching for contigs in:", trif
 c1 = 0
+extr_loci = []
 for seq in inputf:
     if seq.id in output.values(): #if contig is in ahe
         print "start"
         for x,y in output.items(): #checking all ahe
-            if seq.id == y:
-                locusfname = x
-                #print locusfname
-                # if not os.path.exists ("./modified/"+locusfname):
-                #     shutil.copy2(ahefoldarg+locusfname, "./modified")
+            locusfname = x
+            #print locusfname
+            if y == seq.id:
+                temp = seq.id
                 print "found", locusfname, y
+                extr_loci.append(locusfname)
                 fhandle = open("./modified/"+locusfname, "a")
-                seq.id = "ceratotrans"
+                seq.id = trif.split("/")[-1][:5]
                 seq.name =""
                 seq.description =""
-                #SeqIO.write(seq, fhandle, "fasta")
+                SeqIO.write(seq, fhandle, "fasta")
                 c1 += 1
-            else:
-                print x, y
+                seq.id = temp
+            # else:
+            #     print x, y
         count -= 1
     elif count == 0:
         print "search terminated"
         break
 print c1, "loci extracted"
 count = int(len(output))
-
+print "files written: ", len(extr_loci)
 print "done"
