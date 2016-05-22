@@ -4,6 +4,7 @@ echo "erasing the content of the blast output file..."
 # argv #
 #$1 folder with fastas# 
 #$2 path to query#
+#$3 threshold
 ########
 echo "blasting queries..."
 COUNT=0
@@ -35,7 +36,7 @@ do
  	echo -ne $zo"% blast $f against $2...\r"
  	CT2=$CT2+1
  	touch output.blast
- 	tblastx -db $2 -query fasextr.blast -out output.blast -outfmt 6 -num_threads 4 -num_alignments 1 -evalue 1e-40
+ 	tblastx -db $2 -query fasextr.blast -out output.blast -outfmt 6 -num_threads 4 -num_alignments 1 -evalue $3
  	cat output.blast | sort -k1,1 -k12,12nr -k11,11n | sort -u -k1,1 --merge >> blast.blast
 done
 echo -ne "                                                                          \r"
