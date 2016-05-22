@@ -47,7 +47,7 @@ for infile in files:
 		#if seq.id in trimlist:
 		if seq.id in translist:
 			locilist.add(infile)
-print locilist
+#print locilist
 print len(locilist)
 
 #copy files
