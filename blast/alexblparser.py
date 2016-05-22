@@ -4,10 +4,11 @@ import os
 import shutil
 import csv
 import sys
-if len(sys.argv) == 4:
+if len(sys.argv) == 5:
     blastfilearg = sys.argv[1]
     trif = sys.argv[2]
     ahefoldarg = sys.argv[3]
+    evalue = float(sys.argv[4])
 else:
     print "FORMAT: python blparser.py [blastfile] [asemblyfile] [ahefolder]"
     print "EXAMPLE: python blparser.py blast.tab trinity.fas ./fasta"
@@ -23,14 +24,14 @@ currentkey = ""
 for row in reader:
     for row in reader:
         if currentkey != row[0]: ##new query
-            if float(row[10]) <= 1e-40:
+            if float(row[10]) <= evalue:
                 if row[0].split("//")[-1] in output: ##query is present
                     print "warning: the key exists", row[0].split("//")[-1]
                 else:
                     output[row[0].split("//")[-1]] = row[1] ##standart output
                     print row[0].split("//")[-1], row[1], row[2], row[10], row[11]
         else: ##same query
-            if currentmatch != row[1] and float(row[10]) <= 1e-40:
+            if currentmatch != row[1] and float(row[10]) <= evalue:
                 print "warning: several matches detected", row[0].split("//")[-1].split(".tx_tm")[0], row[1], "delta is", currente-float(row[10])
         currentkey = row[0]
         currentmatch = row[1]
@@ -39,7 +40,7 @@ blastfile.close()
 count = int(len(output))
 print count, "targets found to be extracted"
 
-print output
+#print output
 
 #scanning the transcriptomes
 if not os.path.exists ("./modified/"):
