@@ -96,7 +96,7 @@ for f in files:
 			print >> pf2cfg, fn[:-4]+"_2 = "+str(start+1)+" - "+str(end+1)+"\\3;"
 			print >> pf2cfg, fn[:-4]+"_3 = "+str(start+2)+" - "+str(end+2)+"\\3;"
 		elif partnum == "-1":
-			print >> pf2cfg, fn[:-4]+" = "+str(start)+" - "+str(end)+"\\3;"
+			print >> pf2cfg, fn[:-4]+" = "+str(start)+" - "+str(end)+";"
  	if partnum == "-3":
 		print >> outputfile, "DNA, "+fn+"-1 = "+str(start)+" - "+str(end)+"\\3"
 		print >> outputfile, "DNA, "+fn+"-2 = "+str(start+1)+" - "+str(end)+"\\3"
