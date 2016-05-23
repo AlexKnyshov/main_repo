@@ -2,8 +2,8 @@ echo "erasing the content of the blast output file..."
 > blast.blast
 ########
 # argv #
-#$1 folder with fastas# 
-#$2 path to query#
+#$1 folder with fastas - AHE data# 
+#$2 path to database!#
 #$3 threshold
 ########
 echo "blasting queries..."
@@ -39,6 +39,6 @@ do
  	tblastx -db $2 -query fasextr.blast -out output.blast -outfmt 6 -num_threads 4 -num_alignments 1 -evalue $3
  	cat output.blast | sort -k1,1 -k12,12nr -k11,11n | sort -u -k1,1 --merge >> blast.blast
 done
-echo -ne "                                                                          \r"
-echo "100%..."
+#echo -ne "                                                                          \r"
+echo ""
 echo "done"
