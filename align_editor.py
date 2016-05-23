@@ -26,6 +26,6 @@ if q == "y" or q == "Y":
 		alignment = alignment[:, :crop_start]+alignment[:, crop_end:]
 		q = raw_input("More?")
 
-AlignIO.write(alignment, infile+".test", "fasta")
+AlignIO.write(alignment, infile+".edited", "fasta")
 
 print "done"
