@@ -20,10 +20,10 @@ elif len(sys.argv) == 6:
 else:
 	print "fconv.py script for converting aligned or unaligned sequence files"
 	print "-----------folder input------------"
-	print "FORMAT: python fconv.py [option: -a, -s] [inputfolder] [inputformat] [inputext] [outputfolder] [outputformat] [outputext]"
+	print "FORMAT: python fconv.py [option: -a, -s, -print] [inputfolder] [inputformat] [inputext] [outputfolder] [outputformat] [outputext]"
 	print "EXAMPLE: python fconv.py -a ./fasta fasta .fas ./phylip phylip-relaxed .phy"
 	print "------------file input-------------"
-	print "FORMAT: python fconv.py [option: -a, -s] [inputfile] [inputformat] [outputformat] [outputext]"
+	print "FORMAT: python fconv.py [option: -a, -s, -print] [inputfile] [inputformat] [outputformat] [outputext]"
 	print "EXAMPLE: python fconv.py -a ./test.fas fasta phylip-relaxed .phy"
 	print "--------some format options--------"
 	print "fasta - fasta format"
@@ -50,6 +50,10 @@ if len(sys.argv) == 8:
 		elif option == "-s":
 			sequences = SeqIO.parse(input_handle, inputformat)
 			SeqIO.write(sequences, output_handle, outputformat)
+		elif option == "-print" and outputformat == "fasta":
+			sequences = SeqIO.parse(input_handle, inputformat)
+			for seq in sequences:
+				print >> output_handle, ">"+seq.id, "\n", seq.seq
 		output_handle.close()
 		input_handle.close()
 		count += 1
@@ -65,6 +69,10 @@ elif len(sys.argv) == 6:
 	elif option == "-s":
 		sequences = SeqIO.parse(input_handle, inputformat)
 		SeqIO.write(sequences, output_handle, outputformat)
+	elif option == "-print" and outputformat == "fasta":
+		sequences = SeqIO.parse(input_handle, inputformat)
+		for seq in sequences:
+			print >> output_handle, ">"+seq.id, "\n", seq.seq
 	output_handle.close()
 	input_handle.close()	
 print "Done"
