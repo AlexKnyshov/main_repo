@@ -8,7 +8,7 @@ if len(sys.argv) == 3:
 	files = glob.glob(inputfolder+"/*.fas")
 	trimopt = sys.argv[2]
 else:
-	print "FORMAT: python customtrim.py [folder with fasta] [trimming option: -a, -1, -%]"
+	print "FORMAT: python customtrim.py [folder with fasta] [trimming option: -a, -1, -%, -refine]"
 	print "EXAMPLE: python customtrim.py ./fasta -1"
 	sys.exit()
 if len(files) == 0:
@@ -22,15 +22,17 @@ warninglist = []
 progbarc = 0
 print "creating log file and output folder..."
 outf = open("customtrim.out", "w")
+
 if not os.path.exists ("./trimmed"):
 	os.makedirs("./trimmed")
+
 print "parsing files:"
 for f in files:
 	fnew = f.split("/")
 	fn = fnew[len(fnew)-1]
 	fn2 = "./trimmed/"+fn.split(".")[0]+".fas"
-	#print "input:", f
-	#print "output:", fn2
+	print >> outf, "input:", f
+	print >> outf, "output:", fn2
 	infile = open(f, "r")
 	seqs = {}
 	for seq in AlignIO.read(infile, "fasta"):
@@ -96,6 +98,35 @@ for f in files:
 				break
 			#print misdata, "misdata", startpos, "startpos"
 			startpos += 1
+	if trimopt == "-refine":
+		datablock = 0
+		dataflag = False
+		potential_startpos = 0
+		for basenum in range(len(seqs[names[0]])):
+			baselist = []
+			misdata = 0
+			for name in names:
+				baselist.append(seqs[name][basenum])
+			for base in baselist:
+				if base == "-" or base == "N" or base == "?":
+					misdata += 1 #mis data in a position
+			if misdata <= 0: #full position
+				#print "done"
+				datablock += 1 #let's start counting...
+				dataflag = True #full block
+				if datablock == 1:
+					potential_startpos = startpos #only remember this when we entered the block
+			else: #gappy position
+				if dataflag == True: #already in block
+					if datablock > 20: #check how large was the block
+						print >> outf, "datablock (L to R): ", datablock
+						startpos = potential_startpos
+						break
+					else:
+						datablock = 0
+						dataflag = False
+			#print misdata, "misdata", startpos, "startpos"
+			startpos += 1
 	#print startpos, "startpos"
 	#reverse trim
 	if trimopt == "-a":
@@ -142,12 +173,41 @@ for f in files:
 				break
 			#print misdata, "misdata", startpos, "startpos"
 			endpos -= 1
+	if trimopt == "-refine":
+		datablock = 0
+		dataflag = False
+		potential_endpos = endpos
+		for basenum in range(len(seqs[names[0]])-1, -1, -1):
+			baselist = []
+			misdata = 0
+			for name in names:
+				baselist.append(seqs[name][basenum])
+			for base in baselist:
+				if base == "-" or base == "N" or base == "?":
+					misdata += 1
+			if misdata <= 0: #full position
+				#print "done"
+				datablock += 1 #let's start counting...
+				dataflag = True #full block
+				if datablock == 1:
+					potential_endpos = endpos #only remember this when we entered the block
+			else: #gappy position
+				if dataflag == True: #already in block
+					if datablock > 20: #check how large was the block
+						print >> outf, "datablock (R to L): ", datablock
+						endpos = potential_endpos
+						break
+					else:
+						datablock = 0
+						dataflag = False
+			#print misdata, "misdata", endpos, "endpos"
+			endpos -= 1
 	#print endpos, "endpos"
 	infile.close()
-	print >> outf, "input:", f
-	print >> outf, "output:", fn2
-	print >> outf, startpos
-	print >> outf, endpos
+	print >> outf, "startpos: ", startpos
+	print >> outf, "endpos: ", endpos
+
+	#writing to files
 	if endpos-startpos > 0:
 		outfile = open(fn2, "w")
 		for seq, s in seqs.items():
@@ -155,6 +215,8 @@ for f in files:
 		outfile.close()
 	else:
 		warninglist.append(f)
+	
+
 	#progress bar
 	progbarc +=1
 	progbar = int(round(float(progbarc)/len(files)*100, 0))
@@ -164,6 +226,9 @@ for f in files:
 	prog = str(progbar)+"% working on file "+str(f)+": starts "+str(startpos)+", ends "+str(endpos)
  	sys.stdout.write(prog+"\r")
  	sys.stdout.flush()
-print "\nwarning list:", sum(warninglist)
+print "\nwarning list:", len(warninglist)
+if len(warninglist)>0:
+	for x in warninglist:
+		print x
 outf.close()
 print "done"
