@@ -1,5 +1,6 @@
 from Bio import AlignIO
 from Bio.Alphabet import IUPAC, Gapped
+from Bio.Alphabet import generic_protein
 from Bio.Seq import Seq 
 from Bio.SeqRecord import SeqRecord 
 from Bio.Align import MultipleSeqAlignment
@@ -16,7 +17,7 @@ if len(sys.argv) >= 5:
 	if len(sys.argv) == 6:
 		exclusion_file = sys.argv[5]
 else:
-	print "FORMAT: python concat.py [folder with fasta] [split to codon positions: -3 (yes), -1 (no)] [partition_finder output: -pf2y, -pf2n] [phylip type: -i (interleaved), -s (sequential)] ([exclusion list])"
+	print "FORMAT: python concat.py [folder with fasta] [split to codon positions: -3 (yes), -1 (no), -prot] [phylip type: -i (interleaved), -s (sequential)] [partition_finder output: -pf2y, -pf2n] ([exclusion list])"
 	print "EXAMPLE: python concat.py ./fasta -1 -i -pf2n"
 	print "EXAMPLE: python concat.py ./fasta -1 -s -pf2y list.lst"
 	print "output is written to COMBINED.phy, partitions are written to partitions.prt"
@@ -38,7 +39,10 @@ files = glob.glob(inputfolder+"/*.fas")
 for f in files:
 	fnew = f.split("/")
 	fn = fnew[len(fnew)-1]
-	alignment = AlignIO.read(f, "fasta", alphabet=Gapped(IUPAC.ambiguous_dna))
+	if partnum == "-prot":
+		alignment = AlignIO.read(f, "fasta", alphabet = generic_protein)
+	else:
+		alignment = AlignIO.read(f, "fasta", alphabet=Gapped(IUPAC.ambiguous_dna))
 	length = alignment.get_alignment_length()
 	for seq in alignment:
 		if seq.id in d and seq.id not in exclusion_list:
@@ -51,9 +55,15 @@ print len(d), "taxa found in fasta alignments"
 print "concatenating..."
 oks = 0
 skips = 0
-align = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna)) # new ali
+if partnum == "-prot":
+	align = MultipleSeqAlignment([], alphabet = generic_protein) # new ali
+else:
+	align = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna)) # new ali
 for dx in d.keys():
-	align.append(SeqRecord(Seq("", Gapped(IUPAC.ambiguous_dna)), id=dx)) #add taxa
+	if partnum == "-prot":
+		align.append(SeqRecord(Seq("", alphabet = generic_protein), id=dx)) #add taxa
+	else:
+		align.append(SeqRecord(Seq("", Gapped(IUPAC.ambiguous_dna)), id=dx)) #add taxa
 #print align
 counter = 0
 outputfile = open("partitions.prt", "w")
@@ -65,10 +75,16 @@ if pf2opt == "-pf2y":
  	print >> pf2cfg, "model_selection = BIC;"
  	print >> pf2cfg, "[data_blocks]"
 for f in files:
-	temp = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna)) #temp ali
+	if partnum == "-prot":
+		temp = MultipleSeqAlignment([], alphabet = generic_protein) #temp ali
+	else:
+		temp = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna)) #temp ali
  	fnew = f.split("/")
  	fn = fnew[len(fnew)-1]
- 	alignment = AlignIO.read(f, "fasta", alphabet=Gapped(IUPAC.ambiguous_dna)) #read original
+ 	if partnum == "-prot":
+ 		alignment = AlignIO.read(f, "fasta", alphabet = generic_protein) #read original
+ 	else:
+ 		alignment = AlignIO.read(f, "fasta", alphabet=Gapped(IUPAC.ambiguous_dna)) #read original
  	length = alignment.get_alignment_length()
 	missed = list(d)
  	for seq in alignment:
@@ -76,9 +92,15 @@ for f in files:
  		if seq.id in missed:
  			missed.remove(seq.id)
  	for m in missed:
- 		temp.append(SeqRecord(Seq("?"*length, Gapped(IUPAC.ambiguous_dna)), id=m)) #add dummies
+ 		if partnum == "-prot":
+ 			temp.append(SeqRecord(Seq("X"*length, alphabet = generic_protein), id=m)) #add dummies
+ 		else:
+ 			temp.append(SeqRecord(Seq("?"*length, Gapped(IUPAC.ambiguous_dna)), id=m)) #add dummies
  	counter = 0
- 	temp2 = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna))
+ 	if partnum == "-prot":
+ 		temp2 = MultipleSeqAlignment([], alphabet = generic_protein)
+ 	else:
+ 		temp2 = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna))
  	for aliseq in align:
  		for tempseq in temp:
  			if aliseq.id == tempseq.id:
@@ -97,12 +119,16 @@ for f in files:
 			print >> pf2cfg, fn[:-4]+"_3 = "+str(start+2)+" - "+str(end+2)+"\\3;"
 		elif partnum == "-1":
 			print >> pf2cfg, fn[:-4]+" = "+str(start)+" - "+str(end)+";"
+		elif partnum == "-prot":
+			print >> pf2cfg, fn[:-4]+" = "+str(start)+" - "+str(end)+";"
  	if partnum == "-3":
 		print >> outputfile, "DNA, "+fn+"-1 = "+str(start)+" - "+str(end)+"\\3"
 		print >> outputfile, "DNA, "+fn+"-2 = "+str(start+1)+" - "+str(end)+"\\3"
 		print >> outputfile, "DNA, "+fn+"-3 = "+str(start+2)+" - "+str(end)+"\\3"
 	elif partnum == "-1":
 	 	print >> outputfile, "DNA, "+fn+" = "+str(start)+" - "+str(end)
+	elif partnum == "-prot":
+		print >> outputfile, "WAG, "+fn+" = "+str(start)+" - "+str(end)
 if pf2opt == "-pf2y":
 	print >> pf2cfg, "[schemes]"
 	print >> pf2cfg, "search = greedy;"
