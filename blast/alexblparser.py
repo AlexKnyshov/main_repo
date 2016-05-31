@@ -10,8 +10,8 @@ if len(sys.argv) == 5:
     ahefoldarg = sys.argv[3]
     evalue = float(sys.argv[4])
 else:
-    print "FORMAT: python blparser.py [blastfile] [asemblyfile] [ahefolder]"
-    print "EXAMPLE: python blparser.py blast.tab trinity.fas ./fasta"
+    print "FORMAT: python blparser.py [blastfile] [asemblyfile] [ahefolder] [evalue]"
+    print "EXAMPLE: python blparser.py blast.tab trinity.fas ./fasta 1e-40"
     sys.exit()
 
 output = {} #main dctionary
@@ -22,20 +22,19 @@ blastfile = open(blastfilearg, "rU")
 reader = csv.reader(blastfile, delimiter='\t')
 currentkey = ""
 for row in reader:
-    for row in reader:
-        if currentkey != row[0]: ##new query
-            if float(row[10]) <= evalue:
-                if row[0].split("//")[-1] in output: ##query is present
-                    print "warning: the key exists", row[0].split("//")[-1]
-                else:
-                    output[row[0].split("//")[-1]] = row[1] ##standart output
-                    print row[0].split("//")[-1], row[1], row[2], row[10], row[11]
-        else: ##same query
-            if currentmatch != row[1] and float(row[10]) <= evalue:
-                print "warning: several matches detected", row[0].split("//")[-1].split(".tx_tm")[0], row[1], "delta is", currente-float(row[10])
-        currentkey = row[0]
-        currentmatch = row[1]
-        currente = float(row[10])
+    if currentkey != row[0]: ##new query
+        if float(row[10]) <= evalue:
+            if row[0].split("//")[-1] in output: ##query is present
+                print "warning: the key exists", row[0].split("//")[-1]
+            else:
+                output[row[0].split("//")[-1]] = row[1] ##standart output
+                print row[0].split("//")[-1], row[1], row[2], row[10], row[11]
+    else: ##same query
+        if currentmatch != row[1] and float(row[10]) <= evalue:
+            print "warning: several matches detected", row[0].split("//")[-1].split(".tx_tm")[0], row[1], "delta is", currente-float(row[10])
+    currentkey = row[0]
+    currentmatch = row[1]
+    currente = float(row[10])
 blastfile.close()
 count = int(len(output))
 print count, "targets found to be extracted"
