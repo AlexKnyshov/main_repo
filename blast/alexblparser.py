@@ -66,7 +66,11 @@ print "searching for contigs in:", trif
 c1 = 0
 extr_loci = []
 for seq in inputf:
-    if seq.id in output.values(): #if contig is in ahe
+    #print count
+    if count == 0:
+        print "search terminated"
+        break
+    elif seq.id in output.values(): #if contig is in ahe
         print "start"
         for x,y in output.items(): #checking all ahe
             locusfname = x
@@ -82,12 +86,9 @@ for seq in inputf:
                 SeqIO.write(seq, fhandle, "fasta")
                 c1 += 1
                 seq.id = temp
+                count -= 1
             # else:
             #     print x, y
-        count -= 1
-    elif count == 0:
-        print "search terminated"
-        break
 print c1, "loci extracted"
 count = int(len(output))
 print "files written: ", len(extr_loci)
