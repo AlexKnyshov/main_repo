@@ -9,6 +9,9 @@ import sys
 import glob
 import os
 
+def most_common(lst):
+    return max(set(lst), key=lst.count)
+
 if len(sys.argv) >= 5:
 	inputfolder = sys.argv[1]
 	partnum = sys.argv[2]
@@ -17,7 +20,7 @@ if len(sys.argv) >= 5:
 	if len(sys.argv) == 6:
 		exclusion_file = sys.argv[5]
 else:
-	print "FORMAT: python concat.py [folder with fasta] [split to codon positions: -3 (yes), -1 (no), -prot] [phylip type: -i (interleaved), -s (sequential)] [partition_finder output: -pf2y, -pf2n] ([exclusion list])"
+	print "FORMAT: python concat.py [folder with fasta] [split to codon positions: -3 (yes), -1 (no), -prot, -orf] [phylip type: -i (interleaved), -s (sequential)] [partition_finder output: -pf2y, -pf2n] ([exclusion list])"
 	print "EXAMPLE: python concat.py ./fasta -1 -i -pf2n"
 	print "EXAMPLE: python concat.py ./fasta -1 -s -pf2y list.lst"
 	print "output is written to COMBINED.phy, partitions are written to partitions.prt"
@@ -87,15 +90,93 @@ for f in files:
  		alignment = AlignIO.read(f, "fasta", alphabet=Gapped(IUPAC.ambiguous_dna)) #read original
  	length = alignment.get_alignment_length()
 	missed = list(d)
+	goodcount = 0
+	badlocus = []
+	if partnum == "-orf":
+		count = 0
+		newframe = True
+		framelist = []
+		badframe = []
+		for seq in alignment:
+			t1 = str(seq.seq).replace("-", "N")
+			t2 = t1.replace("?", "N")
+			seq.seq = Seq(t2, alphabet=Gapped(IUPAC.ambiguous_dna))
+			if seq.seq[0:3] != "NNN":
+				nuclseq = seq.seq
+				#break
+				#test all seq trans
+				#check the reading frame
+				remainder = len(nuclseq) % 3
+				#print remainder
+				if remainder > 0:
+					nuclseq = nuclseq+Seq("N"*(3-remainder), Gapped(IUPAC.ambiguous_dna))
+				length = len(nuclseq)
+				#print length
+				if newframe == True: #new search
+					#print "new search"
+					transseq = nuclseq.translate() #frame1
+					#print "locus", f
+					#if "*" in transseq[:-1] or "X" in transseq[:-1]: #check frame 1
+					if transseq[:-1].count("*") > 1 or transseq[:-1].count("X") > 1: #check frame 1
+						#print "Nooo"
+						nuclseq = nuclseq[1:]+Seq("N", Gapped(IUPAC.ambiguous_dna))
+						transseq = nuclseq.translate() #frame2
+						#if "*" in transseq[:-1] or "X" in transseq[:-1]: #check frame 2
+						if transseq[:-1].count("*") > 1 or transseq[:-1].count("X") > 1:
+							nuclseq = nuclseq[1:]+Seq("N", Gapped(IUPAC.ambiguous_dna))
+							transseq = nuclseq.translate() #frame3
+							#if "*" in transseq[:-1] or "X" in transseq[:-1]: #check frame 3
+							if transseq[:-1].count("*") > 1 or transseq[:-1].count("X") > 1:
+								#print "bad seq"
+								#bad frame for this seq
+								newframe = True
+								badframe.append(1)
+								goodcount = 0
+							else:
+								goodcount = 2
+								newframe = False
+						else:
+							goodcount = 1
+							newframe = False
+					else:
+						goodcount = 0
+						newframe = False
+				elif newframe == False: #old search
+					#print "old search"
+					nuclseq = nuclseq[goodcount:]+Seq("N"*goodcount, Gapped(IUPAC.ambiguous_dna))
+					transseq = nuclseq.translate()
+					#if "*" in transseq[:-1] or "X" in transseq[:-1]: #check frame
+					if transseq[:-1].count("*") > 1 or transseq[:-1].count("X") > 1:
+						#print "bad seq, reset"
+						newframe = True
+						goodcount = 0
+					else:
+						newframe = False
+				framelist.append(goodcount)
+		goodcount = most_common(framelist)
+		#print "final frame", goodcount
+		if len(alignment) - len(badframe) < 1:
+			#print "bad locus", len(alignment), len(badframe)
+			badlocus.append(fn)
+	#length = alignment.get_alignment_length()
+	#remainder = length % 3
+	#print ""
+	#print "goodcount", goodcount, "length", length, "locus", fn, "remainder", remainder
  	for seq in alignment:
+ 		if length > len(seq.seq):
+ 			seq.seq = seq.seq+Seq("N"*(length - len(seq.seq)), Gapped(IUPAC.ambiguous_dna))
+ 		seq.seq = seq.seq[goodcount:]+Seq("N"*goodcount, Gapped(IUPAC.ambiguous_dna))
+ 		#print len(seq.seq)
+ 		#print seq.id
  		temp.append(seq) #add original to temp
  		if seq.id in missed:
  			missed.remove(seq.id)
+ 	#print length
  	for m in missed:
  		if partnum == "-prot":
  			temp.append(SeqRecord(Seq("X"*length, alphabet = generic_protein), id=m)) #add dummies
  		else:
- 			temp.append(SeqRecord(Seq("?"*length, Gapped(IUPAC.ambiguous_dna)), id=m)) #add dummies
+ 			temp.append(SeqRecord(Seq("?"*(length), Gapped(IUPAC.ambiguous_dna)), id=m)) #add dummies
  	counter = 0
  	if partnum == "-prot":
  		temp2 = MultipleSeqAlignment([], alphabet = generic_protein)
@@ -115,11 +196,13 @@ for f in files:
  	if pf2opt == "-pf2y":
  		if partnum == "-3":
 			print >> pf2cfg, fn[:-4]+"_1 = "+str(start)+" - "+str(end)+"\\3;"
-			print >> pf2cfg, fn[:-4]+"_2 = "+str(start+1)+" - "+str(end+1)+"\\3;"
-			print >> pf2cfg, fn[:-4]+"_3 = "+str(start+2)+" - "+str(end+2)+"\\3;"
+			print >> pf2cfg, fn[:-4]+"_2 = "+str(start+1)+" - "+str(end)+"\\3;"
+			print >> pf2cfg, fn[:-4]+"_3 = "+str(start+2)+" - "+str(end)+"\\3;"
 		elif partnum == "-1":
 			print >> pf2cfg, fn[:-4]+" = "+str(start)+" - "+str(end)+";"
 		elif partnum == "-prot":
+			print >> pf2cfg, fn[:-4]+" = "+str(start)+" - "+str(end)+";"
+		elif partnum == "-orf":
 			print >> pf2cfg, fn[:-4]+" = "+str(start)+" - "+str(end)+";"
  	if partnum == "-3":
 		print >> outputfile, "DNA, "+fn+"-1 = "+str(start)+" - "+str(end)+"\\3"
@@ -129,6 +212,12 @@ for f in files:
 	 	print >> outputfile, "DNA, "+fn+" = "+str(start)+" - "+str(end)
 	elif partnum == "-prot":
 		print >> outputfile, "WAG, "+fn+" = "+str(start)+" - "+str(end)
+	if partnum == "-orf":
+		if fn in badlocus:
+			print >> outputfile, "DNA, "+fn+" = "+str(start)+" - "+str(end)
+		else:
+			print >> outputfile, "DNA, "+fn+"-1 = "+str(start)+" - "+str(end)+"\\3, "+str(start+1)+" - "+str(end)+"\\3"
+			print >> outputfile, "DNA, "+fn+"-3 = "+str(start+2)+" - "+str(end)+"\\3"
 if pf2opt == "-pf2y":
 	print >> pf2cfg, "[schemes]"
 	print >> pf2cfg, "search = greedy;"
