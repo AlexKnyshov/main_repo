@@ -5,6 +5,19 @@ import os
 import shutil
 
 inputfolder = sys.argv[1]
+if len(sys.argv)>2:
+	exclusion_file = sys.argv[2]
+
+exclusion_list = []
+if len(sys.argv) == 3:
+	print "reading exclusion list..."
+	exfile = open(exclusion_file, "r")
+	for line in exfile:
+		l = line.strip()
+		exclusion_list.append(l)
+	exfile.close()
+	print "read", len(exclusion_list), "records"
+
 
 files = glob.glob(inputfolder+"/*.fas")
 count = 0
@@ -14,15 +27,20 @@ totaldata = 0
 locilist = []
 for f in files:
 	count +=1
+	if f.split("/")[-1] not in exclusion_list:
+		counter += 1
+		locilist.append(f)
 	#for seq_record in SeqIO.parse(f, "fasta"):
 	#	counter +=1
-	ali = AlignIO.read(f, "fasta")
-	print f, len(ali)
-	print f, len(ali)#counter
-	if len(ali) > 8:
-		counter += 1
-		print f, "good", len(ali)
-		locilist.append(f)
+
+	# ali = AlignIO.read(f, "fasta")
+	# print f, len(ali)
+	# print f, len(ali)#counter
+	# if len(ali) > 8:
+	# 	counter += 1
+	# 	print f, "good", len(ali)
+	# 	locilist.append(f)
+
 	# for seq in ali:
 	# 	if seq.id == "Cryptostemma_sp_Peru_249":
 	# 		counter += 1
