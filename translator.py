@@ -12,10 +12,9 @@ import os
 if len(sys.argv) > 1:
 	inputfolder = sys.argv[1]
 else:
-	print "FORMAT: python concat.py [folder with fasta] [split to codon positions: -3 (yes), -1 (no)] [partition_finder output: -pf2y, -pf2n] [phylip type: -i (interleaved), -s (sequential)]"
-	print "EXAMPLE: python concat.py ./fasta -1 -i -pf2n"
-	print "EXAMPLE: python concat.py ./fasta -1 -s -pf2y"
-	print "output is written to COMBINED.phy, partitions are written to partitions.prt"
+	print "FORMAT: python translator.py [folder with fasta]"
+	print "EXAMPLE: python translator.py ./fasta"
+	print "EXAMPLE: python translator.py ./fasta"
 	sys.exit()
 
 p1 = re.compile("---")
