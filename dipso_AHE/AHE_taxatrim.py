@@ -35,7 +35,7 @@ files = glob.glob(f+"/*"+ext)
 # 			print >> outhandle, seq.seq
 # print "done"
 
-translist = ["EnspE", "Lican", "CespC", "Beflu", "GAYI0"]
+translist = ["EnspE", "Lican", "CespC", "Beflu", "SRR92"]
 locilist = set()
 print "input"
 for infile in files:
