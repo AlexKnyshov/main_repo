@@ -1,7 +1,7 @@
 library (ape)
 library(phangorn)
-library(seqinr)
-
+library(seqinr) #read alignments instead of the default ape parser
+#####################################
 #reimplement image.AAbin to visualize more than three groups of AA
 #code was modified from APE 3.5
 image_alex.AAbin <- function(x, what, col, bg = "white", xlab = "", ylab = "",
@@ -69,7 +69,7 @@ image_alex.AAbin <- function(x, what, col, bg = "white", xlab = "", ylab = "",
   }
 }
 #image end
-
+#####################################
 #get file list
 files <- list.files(path=".", pattern="*.fas", full.names=T, recursive=FALSE)
 #read files
@@ -84,7 +84,7 @@ loci <- lapply(files, function(x)
 #set up plot parameters
 par(mfrow=c(5,5),mar=c(1,1,1,1))
 #plot alignments
-n <- c(26:50)
+n <- c(1:25)
 for (x in n){
   image_alex.AAbin(loci[[x]], main=files[x], show.labels = T, legend = F, cex.lab=0.4, cex.axis=0.6, mgp=c(3,.1,0))
 }
