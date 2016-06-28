@@ -4,17 +4,19 @@ import os
 import shutil
 import csv
 import sys
-if len(sys.argv) == 5:
+if len(sys.argv) == 6:
     blastfilearg = sys.argv[1]
     trif = sys.argv[2]
     ahefoldarg = sys.argv[3]
     evalue = float(sys.argv[4])
+    opt = sys.argv[5]
 else:
-    print "FORMAT: python blparser.py [blastfile] [asemblyfile] [ahefolder] [evalue]"
-    print "EXAMPLE: python blparser.py blast.tab trinity.fas ./fasta 1e-40"
+    print "FORMAT: python blparser.py [blastfile] [asemblyfile] [ahefolder] [evalue] [option: -n (normal), -s (extract only matched parts)]"
+    print "EXAMPLE: python blparser.py blast.tab trinity.fas ./fasta 1e-40 -n"
     sys.exit()
 
 output = {} #main dctionary
+trans_d = {} #ahe loci and corresponding start and end of trans locus
 
 #reading the blastfile
 print "reading blastfile...", blastfilearg
@@ -28,6 +30,12 @@ for row in reader:
                 print "warning: the key exists", row[0].split("//")[-1]
             else:
                 output[row[0].split("//")[-1]] = row[1] ##standart output
+                #output[AHE] = trans
+                #trans_d[AHE] = [start, finish] - for a given AHE, what was the start and end
+                if opt == "-s":
+                    start = min(int(row[8]), int(row[9])) #secret opt
+                    end = max(int(row[8]), int(row[9])) #secret opt
+                    trans_d[row[0].split("//")[-1]] = [start, end] #secret opt
                 print row[0].split("//")[-1], row[1], row[2], row[10], row[11]
     else: ##same query
         if currentmatch != row[1] and float(row[10]) <= evalue:
@@ -40,6 +48,7 @@ count = int(len(output))
 print count, "targets found to be extracted"
 
 #print output
+#print trans_d
 
 #scanning the transcriptomes
 if not os.path.exists ("./modified/"):
@@ -59,8 +68,10 @@ for x in glob.glob(ahefoldarg+"/*.fas"):
         sys.stdout.flush()
         shutil.copy2(ahefoldarg+locusfname, "./modified")
 print ""
+
 print "scanning the transcriptome..."
 #output2 = []
+warninglist = []
 inputf = SeqIO.parse(trif, "fasta")
 print "searching for contigs in:", trif
 c1 = 0
@@ -70,15 +81,30 @@ for seq in inputf:
     if count == 0:
         print "search terminated"
         break
-    elif seq.id in output.values(): #if contig is in ahe
+    elif seq.id in output.values(): #if contig is in ahe (was found as a blast hit)
         print "start"
-        for x,y in output.items(): #checking all ahe
-            locusfname = x
-            #print locusfname
+        for x,y in output.items(): #checking all ahe (seach which ahe has it)
+            locusfname = x #AHE name
+            #y - trans locus name
+            #seq.id = trans locus name as well
             if y == seq.id:
                 temp = seq.id
-                print "found", locusfname, y
+                tempseq = seq.seq #secret opt
+                if opt == "-s":
+                    seq.seq = seq.seq[trans_d[locusfname][0]:trans_d[locusfname][1]] #secret opt
+                    print "s:", trans_d[locusfname][0], "e:", trans_d[locusfname][1], "trans end:", len(tempseq)
+                    rhandle = open("./modified/"+locusfname, "r")
+                    ali = SeqIO.parse(rhandle, "fasta")
+                    for a in ali:
+                        print "lenght AHE:", len(a), "length blast hit", len(seq.seq)
+                        if float(len(seq.seq)) / len(a) < 0.8:
+                            print "Warning: blast hit is too short"
+                            warninglist.append(locusfname)
+                        break
+                    rhandle.close()
+                print "found", locusfname, y, "length:", len(seq.seq)
                 extr_loci.append(locusfname)
+                #print seq, len(seq) #debug
                 fhandle = open("./modified/"+locusfname, "a")
                 seq.id = trif.split("/")[-1][:5]
                 seq.name =""
@@ -86,10 +112,13 @@ for seq in inputf:
                 SeqIO.write(seq, fhandle, "fasta")
                 c1 += 1
                 seq.id = temp
+                seq.seq = tempseq #secret opt
                 count -= 1
+                fhandle.close()
             # else:
             #     print x, y
 print c1, "loci extracted"
 count = int(len(output))
 print "files written: ", len(extr_loci)
+print "warning list:", len(warninglist)
 print "done"
