@@ -21,7 +21,8 @@ else:
 	sys.exit()
 #inputformat = sys.argv[2]
 #query = sys.argv[2]
-partnum = len(files)
+#partnum = len(files)
+partnum = 3
 d = {}
 # for x in files:
 # 	d["{0}".format(x)]=[]
@@ -62,7 +63,7 @@ for key, value in sorted(d.items()):
 if wr:
 	for infile in files:
 		input_handle = open(infile, "rU")
-		outhandle = open(infile+".txt", "w")
+		outhandle = open(infile+".fas", "w")
 		alignments = SeqIO.parse(input_handle, "fasta")
 		for seq in alignments:
 			if seq.id in d:
