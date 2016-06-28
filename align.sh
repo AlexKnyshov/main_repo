@@ -2,6 +2,7 @@ echo "starting..."
 #module load mafft
 #$1 - folder with alignments
 #$2 - algorithm: linsi, ginsi, einsi
+#$3 - direction: adjust, noadjust, slow
 ALG=""
 if [[ $2 == einsi ]]
 then
@@ -14,6 +15,17 @@ then
 	ALG="--localpair --maxiterate 1000"
 fi
 #echo $ALG
+ADJ=""
+if [[ $3 == adjust ]]
+then
+	ADJ="--adjustdirection"
+elif [[ $3 == noadjust ]]
+then
+	ADJ=""
+elif [[ $3 == slow ]]
+then
+	ADJ="--adjustdirectionaccurately"
+fi
 
 for alf in $1*fas
 do
@@ -21,6 +33,6 @@ do
 	outf=$(echo $alf | cut -d"/" -f3 | cut -d"." -f1,2)
 	echo "./realigned/$outf.fas"
 	mkdir ./realigned
-	mafft --adjustdirection $ALG --inputorder "$alf" > "./realigned/$outf.fas"
+	mafft $ADJ $ALG --inputorder "$alf" > "./realigned/$outf.fas"
 	#mafft --genafpair --maxiterate 1000 --adjustdirection $alf
 done
