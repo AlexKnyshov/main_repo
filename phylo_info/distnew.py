@@ -5,13 +5,14 @@ import operator
 import socket
 from Bio import AlignIO
 #filepath input
-if len(sys.argv) == 3:
-	inputfolder = sys.argv[2]
-	files = glob.glob(inputfolder+"/*.phylip")
-	mode = sys.argv[1]
+if len(sys.argv) == 4:
+	ftype = sys.argv[1]
+	inputfolder = sys.argv[3]
+	files = glob.glob(inputfolder+"/*")
+	mode = sys.argv[2]
 else:
-	print "FORMAT: python distances.py [mode: -p, -115, -gtr] [folder with phylip]"
-	print "EXAMPLE: python distances.py -gtr ./phylip"
+	print "FORMAT: python distances.py [ftype: -fas, -phy] [mode: -p, -115, -gtr] [folder with phylip]"
+	print "EXAMPLE: python distances.py -phy -gtr ./phylip"
 	sys.exit()
 if len(files) == 0:
 	print "no phylip files in the directory"
@@ -20,14 +21,17 @@ if len(files) == 0:
 loci = {}
 progbarc = 0
 
-
+if ftype == "-phy":
+	format = "phylip-relaxed"
+elif ftype == "-fas":
+	format = "fasta"
 
 if mode == "-p" or mode == "-115":
 	for f in files:
 		print f
 		infile = open(f, "r")
 		seqs = {}
-		for seq in AlignIO.read(infile, "phylip-relaxed"):
+		for seq in AlignIO.read(infile, format):
 		    seqs[seq.id] = str(seq.seq).upper()
 		#pairwise
 		names =[]
