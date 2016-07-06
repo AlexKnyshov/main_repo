@@ -1,3 +1,10 @@
+if [ "$HOSTNAME" = pigeon ]; then
+    echo "loading modules"
+    module load ncbi-blast
+elif [ -z "$PBS_ENVIRONMENT" ]; then
+	echo "loading modules"
+    module load ncbi-blast
+fi
 echo "erasing the content of the blast output file..."
 #> blast.blast
 rm *.blast
