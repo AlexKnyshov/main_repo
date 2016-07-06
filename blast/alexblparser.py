@@ -52,7 +52,7 @@ if opt == "-mn" or "-ms":
                         output[row[0].split("//")[-1]] = row[1] ##standart output
                         #output[AHE] = trans
                         #trans_d[AHE] = [start, finish] - for a given AHE, what was the start and end
-                        if opt == "-s":
+                        if opt == "-ms":
                             start = min(int(row[8]), int(row[9])) #secret opt
                             end = max(int(row[8]), int(row[9])) #secret opt
                             trans_d[row[0].split("//")[-1]] = [start, end] #secret opt
@@ -88,7 +88,7 @@ if opt == "-mn" or "-ms":
                     if y == seq.id:
                         temp = seq.id
                         tempseq = seq.seq #secret opt
-                        if opt == "-s":
+                        if opt == "-ms":
                             seq.seq = seq.seq[trans_d[locusfname][0]:trans_d[locusfname][1]] #secret opt
                             print "s:", trans_d[locusfname][0], "e:", trans_d[locusfname][1], "trans end:", len(tempseq)
                             rhandle = open("./modified/"+locusfname, "r")
