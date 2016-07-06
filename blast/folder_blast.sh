@@ -7,9 +7,10 @@ rm *.blast
 #$2 path to database or folder with dbs#
 #$3 threshold                          #
 #$4 method: tblastx, blastn            #
-#$5 list (optional) 				   #
+#$5 cpu: 4					           #
+#$6 list (optional) 				   #
 ########################################
-if [ -z "$5" ]
+if [ -z "$6" ]
   then
     echo "single db blast option selected"
     echo "blasting queries:"
@@ -44,7 +45,7 @@ if [ -z "$5" ]
 	 	echo -ne "                                                                          \r"
 	 	echo -ne $zo"% blast $name against $2...\r"
 	 	touch output.blast
-	 	$4 -db $2 -query fasextr.blast -out output.blast -outfmt 6 -num_threads 4 -num_alignments 1 -evalue $3
+	 	$4 -db $2 -query fasextr.blast -out output.blast -outfmt 6 -num_threads $5 -num_alignments 1 -evalue $3
 	 	cat output.blast | sort -k1,1 -k12,12nr -k11,11n | sort -u -k2,2 --merge >> blast.blast
 	done
   else
@@ -85,9 +86,9 @@ if [ -z "$5" ]
 	 		echo -ne $zo"% blast $name against $fdb...\r"
 	 		zo=$(( CT2*100 / TOTAL ))
 	 		touch output.blast
-	 		$4 -db $2/$fdb -query fasextr.blast -out output.blast -outfmt 6 -num_threads 4 -num_alignments 1 -evalue $3
+	 		$4 -db $2/$fdb -query fasextr.blast -out output.blast -outfmt 6 -num_threads $5 -num_alignments 1 -evalue $3
 	 		cat output.blast | sort -k1,1 -k12,12nr -k11,11n | sort -u -k2,2 --merge >> $fdb.blast
-	 	done < $5
+	 	done < $6
 	done
 fi
 echo ""
