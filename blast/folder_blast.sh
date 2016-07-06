@@ -49,11 +49,11 @@ if [ -z "$6" ]
 	 	cat output.blast | sort -k1,1 -k12,12nr -k11,11n | sort -u -k2,2 --merge >> blast.blast
 	done
   else
-  	echo "multiple db blast option selected, number of dbs: $(cat $5 | wc -l)"
+  	echo "multiple db blast option selected, number of dbs: $(cat $6 | wc -l)"
   	echo "blasting queries:"
 	COUNT=0
 	declare -i CT2=0
-	declare -i TOTAL=$(ls $1/*.fas | cat | wc -l)*$(cat $5 | wc -l) #number of files
+	declare -i TOTAL=$(ls $1/*.fas | cat | wc -l)*$(cat $6 | wc -l) #number of files
 	zo=$(( CT2*100 / TOTAL ))
 	for f in $(ls $1/*.fas)
 	do
