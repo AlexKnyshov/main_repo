@@ -1,5 +1,13 @@
 echo "starting..."
-#module load mafft
+if [ "$HOSTNAME" = pigeon ]; then
+    echo "loading modules"
+    module load mafft
+elif [ -z "$PBS_ENVIRONMENT" ]; then
+	echo "no modules loaded"
+else 
+	echo "loading modules"
+    module load mafft
+fi
 #$1 - folder with alignments
 #$2 - algorithm: linsi, ginsi, einsi
 #$3 - direction: adjust, noadjust, slow
