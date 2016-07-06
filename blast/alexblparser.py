@@ -15,9 +15,6 @@ else:
     print "EXAMPLE: python blparser.py blast.tab trinity.fas ./fasta 1e-40 -n"
     sys.exit()
 
-output = {} #main dctionary
-trans_d = {} #ahe loci and corresponding start and end of trans locus
-
 #multi db option
 if opt == "-mn" or "-ms":
     #prep
@@ -41,6 +38,8 @@ if opt == "-mn" or "-ms":
     #reading the blastfile
     blastlist = glob.glob(blastfilearg+"/*.blast")
     for b in blastlist:
+        output = {} #main dctionary
+        trans_d = {} #ahe loci and corresponding start and end of trans locus
         blastfile = open(b, "rU")
         reader = csv.reader(blastfile, delimiter='\t')
         currentkey = ""
@@ -126,6 +125,8 @@ if opt == "-mn" or "-ms":
         print "warning list:", len(warninglist)
 
 else:
+    output = {} #main dctionary
+    trans_d = {} #ahe loci and corresponding start and end of trans locus
     #reading blast file
     print "reading blastfile...", blastfilearg
     blastfile = open(blastfilearg, "rU")
