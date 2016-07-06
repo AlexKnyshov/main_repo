@@ -2,6 +2,8 @@ if [ "$HOSTNAME" = pigeon ]; then
     echo "loading modules"
     module load ncbi-blast
 elif [ -z "$PBS_ENVIRONMENT" ]; then
+	echo "no modules loaded"
+else 
 	echo "loading modules"
     module load ncbi-blast
 fi
