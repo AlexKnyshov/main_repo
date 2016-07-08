@@ -17,7 +17,7 @@ rm *.blast
 #$3 threshold                          #
 #$4 method: tblastx, blastn            #
 #$5 cpu: 4					           #
-#$6 list (optional) 				   #
+#$6 list (for multiple dbs)			   #
 ########################################
 if [ -z "$6" ]
   then
@@ -54,8 +54,8 @@ if [ -z "$6" ]
 	 	echo -ne "                                                                          \r"
 	 	echo -ne $zo"% blast $name against $2...\r"
 	 	touch output.blast
-	 	$4 -db $2 -query fasextr.blast -out output.blast -outfmt 6 -num_threads $5 -num_alignments 1 -evalue $3
-	 	cat output.blast | sort -k1,1 -k12,12nr -k11,11n | sort -u -k2,2 --merge >> blast.blast
+	 	$4 -db $2 -query fasextr.blast -out output.blast -outfmt 6 -num_threads $5 -evalue $3
+	 	cat output.blast | sort -k1,1 -k2,2 -k11,11g -k12,12nr | sort -u -k2,2 --merge | sort -k1,1 -k11,11g -k12,12nr >> blast.blast
 	done
   else
   	echo "multiple db blast option selected, number of dbs: $(cat $6 | wc -l)"
@@ -95,8 +95,8 @@ if [ -z "$6" ]
 	 		echo -ne $zo"% blast $name against $fdb...\r"
 	 		zo=$(( CT2*100 / TOTAL ))
 	 		touch output.blast
-	 		$4 -db $2/$fdb -query fasextr.blast -out output.blast -outfmt 6 -num_threads $5 -num_alignments 1 -evalue $3
-	 		cat output.blast | sort -k1,1 -k12,12nr -k11,11n | sort -u -k2,2 --merge >> $fdb.blast
+	 		$4 -db $2/$fdb -query fasextr.blast -out output.blast -outfmt 6 -num_threads $5 -evalue $3
+	 		cat output.blast | sort -k1,1 -k2,2 -k11,11g -k12,12nr | sort -u -k2,2 --merge | sort -k1,1 -k11,11g -k12,12nr >> $fdb.blast
 	 	done < $6
 	done
 fi
