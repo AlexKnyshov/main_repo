@@ -77,6 +77,8 @@ if pf2opt == "-pf2y":
  	print >> pf2cfg, "models = all;"
  	print >> pf2cfg, "model_selection = BIC;"
  	print >> pf2cfg, "[data_blocks]"
+#debug = open("debug.log", "w")
+badlocus = []
 for f in files:
 	if partnum == "-prot":
 		temp = MultipleSeqAlignment([], alphabet = generic_protein) #temp ali
@@ -91,7 +93,9 @@ for f in files:
  	length = alignment.get_alignment_length()
 	missed = list(d)
 	goodcount = 0
-	badlocus = []
+	
+	#print >> debug, "---------------------------------------------------------"
+	#print >> debug, f
 	if partnum == "-orf":
 		count = 0
 		newframe = True
@@ -117,16 +121,16 @@ for f in files:
 					transseq = nuclseq.translate() #frame1
 					#print "locus", f
 					#if "*" in transseq[:-1] or "X" in transseq[:-1]: #check frame 1
-					if transseq[:-1].count("*") > 1 or transseq[:-1].count("X") > 1: #check frame 1
+					if transseq[:-1].count("*") > 1: #or transseq[:-1].count("X") > 1: #check frame 1
 						#print "Nooo"
 						nuclseq = nuclseq[1:]+Seq("N", Gapped(IUPAC.ambiguous_dna))
 						transseq = nuclseq.translate() #frame2
 						#if "*" in transseq[:-1] or "X" in transseq[:-1]: #check frame 2
-						if transseq[:-1].count("*") > 1 or transseq[:-1].count("X") > 1:
+						if transseq[:-1].count("*") > 1: #or transseq[:-1].count("X") > 1:
 							nuclseq = nuclseq[1:]+Seq("N", Gapped(IUPAC.ambiguous_dna))
 							transseq = nuclseq.translate() #frame3
 							#if "*" in transseq[:-1] or "X" in transseq[:-1]: #check frame 3
-							if transseq[:-1].count("*") > 1 or transseq[:-1].count("X") > 1:
+							if transseq[:-1].count("*") > 1: #or transseq[:-1].count("X") > 1:
 								#print "bad seq"
 								#bad frame for this seq
 								newframe = True
@@ -146,17 +150,23 @@ for f in files:
 					nuclseq = nuclseq[goodcount:]+Seq("N"*goodcount, Gapped(IUPAC.ambiguous_dna))
 					transseq = nuclseq.translate()
 					#if "*" in transseq[:-1] or "X" in transseq[:-1]: #check frame
-					if transseq[:-1].count("*") > 1 or transseq[:-1].count("X") > 1:
+					if transseq[:-1].count("*") > 1: #or transseq[:-1].count("X") > 1:
 						#print "bad seq, reset"
 						newframe = True
 						goodcount = 0
 					else:
 						newframe = False
 				framelist.append(goodcount)
+			# 	print >> debug, seq.id, goodcount
+			# else:
+			# 	print >> debug, seq.id, "NNN seq"
 		goodcount = most_common(framelist)
 		#print "final frame", goodcount
-		if len(alignment) - len(badframe) < 1:
+		# print >> debug, "final frame", goodcount
+		# print >> debug, "normal seqs:", len(alignment), "bad seqs:", len(badframe)
+		if float(len(badframe))/len(alignment) > 0.5:
 			#print "bad locus", len(alignment), len(badframe)
+			# print >> debug, "BAD LOCUS"
 			badlocus.append(fn)
 	#length = alignment.get_alignment_length()
 	#remainder = length % 3
@@ -216,8 +226,12 @@ for f in files:
 		if fn in badlocus:
 			print >> outputfile, "DNA, "+fn+" = "+str(start)+" - "+str(end)
 		else:
-			print >> outputfile, "DNA, "+fn+"-1 = "+str(start)+" - "+str(end)+"\\3, "+str(start+1)+" - "+str(end)+"\\3"
+			print >> outputfile, "DNA, "+fn+"-1-2 = "+str(start)+" - "+str(end)+"\\3, "+str(start+1)+" - "+str(end)+"\\3"
 			print >> outputfile, "DNA, "+fn+"-3 = "+str(start+2)+" - "+str(end)+"\\3"
+# print >> debug, "---------------------------------------------------------"
+# print >> debug, "total bad loci:", len(badlocus)
+# for x in badlocus:
+# 	print >> debug, x
 if pf2opt == "-pf2y":
 	print >> pf2cfg, "[schemes]"
 	print >> pf2cfg, "search = greedy;"
