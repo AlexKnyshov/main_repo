@@ -22,7 +22,9 @@ loci = {}
 progbarc = 0
 
 for f in files:
-	print f
+	prog = "working on file "+f
+ 	sys.stdout.write(prog+"\r")
+ 	sys.stdout.flush()
 	infile = open(f, "r")
 	alignment = AlignIO.read(infile, "fasta")
 	seqlist = []
