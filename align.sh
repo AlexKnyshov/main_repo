@@ -11,6 +11,7 @@ fi
 #$1 - folder with alignments
 #$2 - algorithm: linsi, ginsi, einsi
 #$3 - direction: adjust, noadjust, slow
+#$4 - number of processers
 ALG=""
 if [[ $2 == einsi ]]
 then
@@ -41,6 +42,6 @@ do
 	outf=$(echo $alf | cut -d"/" -f3 | cut -d"." -f1,2)
 	echo "./realigned/$outf.fas"
 	mkdir ./realigned
-	mafft $ADJ $ALG --inputorder "$alf" > "./realigned/$outf.fas"
+	mafft $ADJ $ALG --thread $4 --inputorder "$alf" > "./realigned/$outf.fas"
 	#mafft --genafpair --maxiterate 1000 --adjustdirection $alf
 done
