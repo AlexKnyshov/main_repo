@@ -12,13 +12,13 @@ if len(sys.argv) == 6:
     evalue = float(sys.argv[4])
     opt = sys.argv[5]
 else:
-    print "FORMAT: python alexblparser.py [blastfile or folder] [asemblyfile or folder] [ahefolder] [evalue] [option: -n (normal), -s (extract only matched parts), -mn (multiple normal), -ms (multiple selected)]"
+    print "FORMAT: python alexblparser.py [blastfile or folder] [asemblyfile or folder] [ahefolder] [evalue] [option: -n (normal), -s (extract only matched parts), -s (short are discarded), -mn (multiple normal), -ms (multiple selected), -mss(short are discarded), -me (extended ms option)]"
     print "EXAMPLE: python alexblparser.py blast.tab trinity.fas ./fasta 1e-40 -n"
     sys.exit()
 
+print "option", opt, "selected"
 #multi db option
-if opt == "-mn" or opt == "-ms":
-    print "-m option"
+if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me":
     #prep
     if not os.path.exists ("./modified/"):
         os.makedirs("./modified") #creating folder if necessary
@@ -48,6 +48,8 @@ if opt == "-mn" or opt == "-ms":
         print "processing", b
         output = {} #main dctionary
         trans_d = {} #ahe loci and corresponding start and end of trans locus
+        e_opt = {} #for a ahe (assuming the first hit is extracted), store trans and ahe data
+        #e_opt[AHE] = [transf, transr, transb, ahef, aher, aheb]
         blastfile = open(b, "rU")
         reader = csv.reader(blastfile, delimiter='\t')
         currentkey = ""
@@ -64,10 +66,36 @@ if opt == "-mn" or opt == "-ms":
                         best_hit = float(row[11])
                         #output[AHE] = trans
                         #trans_d[AHE] = [start, finish] - for a given AHE, what was the start and end
-                        if opt == "-ms":
+                        if opt == "-ms" or opt == "-mss" or opt == "-me":
                             start = min(int(row[8]), int(row[9])) #secret opt
                             end = max(int(row[8]), int(row[9])) #secret opt
                             trans_d[row[0].split("//")[-1]] = [start, end] #secret opt
+                            #check trans
+                            if int(row[8]) < int(row[9]):
+                                print int(row[8]), int(row[9]), "forward"
+                                transb = True
+                                #transf = int(row[8])
+                                #transr = int(row[9])
+                                #print "AHE f:", int(row[6]), int(row[9]), "forward"
+                            else:
+                                print int(row[8]), int(row[9]), "reverse"
+                                transb = False
+                            transf = int(row[8])
+                            transr = int(row[9])
+                            #check query
+                            if int(row[6]) < int(row[7]):
+                                print int(row[6]), int(row[7]), "forward"
+                                aheb = True
+                                #transf = int(row[8])
+                                #transr = int(row[9])
+                                #print "AHE f:", int(row[6]), int(row[9]), "forward"
+                            else:
+                                print int(row[7]), int(row[6]), "reverse"
+                                aheb = False
+                            ahef = int(row[6])
+                            aher = int(row[7])
+                            #store the data:
+                            e_opt[row[0].split("//")[-1]] = [transf, transr, transb, ahef, aher, aheb]
                         print "--------------------------------------------------------"
                         print row[0].split("//")[-1], row[1], row[2], row[10], row[11]
             else: ##same query
@@ -112,10 +140,91 @@ if opt == "-mn" or opt == "-ms":
                     if y == seq.id:
                         temp = seq.id
                         tempseq = seq.seq #secret opt
-                        if opt == "-ms":
-                            seq.seq = seq.seq[trans_d[locusfname][0]:trans_d[locusfname][1]] #secret opt
-                            print "s:", trans_d[locusfname][0], "e:", trans_d[locusfname][1], "trans end:", len(tempseq)
+                        if opt == "-ms" or opt == "-mss" or opt == "-me":
                             rhandle = open("./modified/"+locusfname, "r")
+                            ali = SeqIO.parse(rhandle, "fasta")
+                            recs = list(ali)
+                            #e option:
+                            #e_opt[AHE] = [transf, transr, transb, ahef, aher, aheb]
+                            #forward ahe:
+                            #print "E opt"
+                            if e_opt[locusfname][5]:#aheb: #ahe is forward
+                                #print "AHE forw"
+                                gap = e_opt[locusfname][3]#ahef #ahe start gap
+                                if e_opt[locusfname][2]:#transb: #trans is forward
+                                    ##need to check if trans has start - OK
+                                    if e_opt[locusfname][0] - gap >= 0:
+                                        gapt = e_opt[locusfname][0] - gap#transf - gap #this is the corrected trans start
+                                    else:
+                                        gapt = 0 # otherwise start from start
+                                else:
+                                    ##need to check if trans is long enough - OK
+                                    if e_opt[locusfname][0] + gap <= len(tempseq):
+                                        gapt = e_opt[locusfname][0] + gap#transf + gap #this is the corrected trans start
+                                    else:
+                                        gapt = len(tempseq) # otherwise start from the end
+                                #check the ahe end:
+                                gaprev = len(recs[0].seq) - e_opt[locusfname][4]#ali.get_alignment_length() - e_opt[locusfname][0][4]
+                                if gaprev >= 0:#aher #some AHE left
+                                    if e_opt[locusfname][2]:#transb: #trans is forward
+                                        #check the trans end
+                                        if e_opt[locusfname][1] + gaprev <= len(tempseq): #check that trans is long enough
+                                            gaptrev = e_opt[locusfname][1] + gaprev#transf - gap #this is the corrected trans start
+                                        else:
+                                            gaptrev = len(tempseq)
+                                    else:
+                                        ##need to check if trans has start
+                                        if e_opt[locusfname][1] - gaprev >= 0:
+                                            gaptrev = e_opt[locusfname][1] - gaprev#transf + gap #this is the corrected trans start
+                                        else:
+                                            gaptrev = 0
+                            #reverse AHE:
+                            else: #ahe is reverse
+                                #print "AHE rev"
+                                gap = len(recs[0].seq) - e_opt[locusfname][3]#ali.get_alignment_length() - e_opt[locusfname][0][3]#ahef #ahe start gap
+                                if e_opt[locusfname][2]:#transb: #trans is forward
+                                    ##need to check if trans has start - OK
+                                    if e_opt[locusfname][0] - gap >= 0:
+                                        gapt = e_opt[locusfname][0] - gap#transf - gap #this is the corrected trans start
+                                    else:
+                                        gapt = 0
+                                else:
+                                    ##need to check if trans is long enough - OK
+                                    if e_opt[locusfname][0] + gap <= len(tempseq):
+                                        gapt = e_opt[locusfname][0] + gap#transf + gap #this is the corrected trans start
+                                    else:
+                                        gapt = len(tempseq)
+                                #check the ahe end:
+                                gaprev = e_opt[locusfname][4] # ahe end gap
+                                if gaprev >= 0:#aher #some AHE left
+                                    if e_opt[locusfname][2]:#transb: #trans is forward
+                                        #check the trans end
+                                        if e_opt[locusfname][1] + gaprev <= len(tempseq): #check that trans is long enough
+                                            gaptrev = e_opt[locusfname][1] + gaprev#transf - gap #this is the corrected trans start
+                                        else:
+                                            gaptrev = len(tempseq)
+                                    else:
+                                        ##need to check if trans has start
+                                        if e_opt[locusfname][1] - gaprev >= 0:
+                                            gaptrev = e_opt[locusfname][1] - gaprev#transf + gap #this is the corrected trans start
+                                        else:
+                                            gaptrev = 0
+                            print "BLAST:", "transf:",e_opt[locusfname][0], "transr:",e_opt[locusfname][1], "transb:",e_opt[locusfname][2], "ahef:",e_opt[locusfname][3], "aher:",e_opt[locusfname][4], "aheb:",e_opt[locusfname][5]
+                            print "LOCUS", "ahe:", len(recs[0].seq), "trans:", len(seq.seq)
+                            if opt == "-me":
+                                #TEST
+                                if e_opt[locusfname][2]:
+                                    print "STATS:", e_opt[locusfname][2], "start:", gapt,"stop",  gaptrev
+                                    seq.seq = seq.seq[gapt:gaptrev]
+                                else:
+                                    print "STATS:", e_opt[locusfname][2], "start:", gaptrev,"stop",  gapt
+                                    seq.seq = seq.seq[gaptrev:gapt]
+                                    seq = seq.reverse_complement()
+                            elif opt == "-ms" or opt == "-mss":
+                                #old option
+                                seq.seq = seq.seq[trans_d[locusfname][0]:trans_d[locusfname][1]] #secret opt
+                                print "s:", trans_d[locusfname][0], "e:", trans_d[locusfname][1], "trans end:", len(tempseq)
+                            rhandle.seek(0)
                             ali = SeqIO.parse(rhandle, "fasta")
                             for a in ali:
                                 print "lenght AHE:", len(a), "length blast hit", len(seq.seq)
@@ -131,7 +240,10 @@ if opt == "-mn" or opt == "-ms":
                         seq.id = b[:-6].split("/")[-1][:5]
                         seq.name =""
                         seq.description =""
-                        if opt == "-ms" and locusfname not in warninglist:
+                        if opt == "-mss" and locusfname not in warninglist:
+                            SeqIO.write(seq, fhandle, "fasta")
+                            c1 += 1
+                        elif opt == "-ms" or opt == "-me":
                             SeqIO.write(seq, fhandle, "fasta")
                             c1 += 1
                         elif opt == "-mn":
@@ -154,7 +266,6 @@ if opt == "-mn" or opt == "-ms":
     print "number of loci with >90% close suboptimal hits", len(numberset)
     print "total number of loci found", totalloci
 else:
-    print "normal option"
     output = {} #main dctionary
     trans_d = {} #ahe loci and corresponding start and end of trans locus
     #reading blast file
@@ -181,7 +292,7 @@ else:
                     # debug_c = 1
                     #output[AHE] = trans
                     #trans_d[AHE] = [start, finish] - for a given AHE, what was the start and end
-                    if opt == "-s":
+                    if opt == "-s" or opt == "-ss":
                         start = min(int(row[8]), int(row[9])) #secret opt
                         end = max(int(row[8]), int(row[9])) #secret opt
                         trans_d[row[0].split("/")[-1]] = [start, end] #secret opt
@@ -255,7 +366,7 @@ else:
                 if y == seq.id:
                     temp = seq.id
                     tempseq = seq.seq #secret opt
-                    if opt == "-s":
+                    if opt == "-s" or opt == "-ss":
                         seq.seq = seq.seq[trans_d[locusfname][0]:trans_d[locusfname][1]] #secret opt
                         print "s:", trans_d[locusfname][0], "e:", trans_d[locusfname][1], "trans end:", len(tempseq)
                         rhandle = open("./modified/"+locusfname, "r")
@@ -274,7 +385,10 @@ else:
                     seq.id = trif.split("/")[-1][:5]
                     seq.name =""
                     seq.description =""
-                    if opt == "-s" and locusfname not in warninglist:
+                    if opt == "-ss" and locusfname not in warninglist:
+                        SeqIO.write(seq, fhandle, "fasta")
+                        c1 += 1
+                    elif opt == "-s":
                         SeqIO.write(seq, fhandle, "fasta")
                         c1 += 1
                     elif opt == "-n":
