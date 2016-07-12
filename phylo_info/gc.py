@@ -2,17 +2,19 @@ import os
 import sys
 import glob
 import numpy
+import csv
 #import operator
 #import socket
 from Bio import AlignIO
 from Bio.SeqUtils import GC
 #filepath input
-if len(sys.argv) == 2:
+if len(sys.argv) == 3:
 	inputfolder = sys.argv[1]
 	files = glob.glob(inputfolder+"/*")
+	framefile = sys.argv[2]
 else:
-	print "FORMAT: python gc.py [folder with files]"
-	print "EXAMPLE: python gc.py ./folder"
+	print "FORMAT: python gc.py [folder with files] [tab file with frames]"
+	print "EXAMPLE: python gc.py ./folder frames.tab"
 	sys.exit()
 if len(files) == 0:
 	print "no files in the directory"
@@ -21,18 +23,33 @@ if len(files) == 0:
 loci = {}
 progbarc = 0
 
+with open(framefile, "rb") as csvfile:
+	reader = csv.reader(csvfile, delimiter='\t')
+	for row in reader:
+		#print row[0], row[1]
+		loci[row[0].strip()] = int(row[1])
+
+
 for f in files:
-	prog = "working on file "+f
- 	sys.stdout.write(prog+"\r")
- 	sys.stdout.flush()
 	infile = open(f, "r")
 	alignment = AlignIO.read(infile, "fasta")
 	seqlist = []
-	for seq in alignment:
-		seqlist.append(GC(seq.seq))
-	loci[f] = numpy.mean(seqlist)
+	if f in loci:
+		print "file", f, "frame", loci[f]
+		for seq in alignment:
+			stringseq = str(seq.seq)[2+loci[f]::3]
+			#print "orig",seq.seq
+			seq.seq = stringseq
+			#print "3rd",seq.seq
+			seqlist.append(GC(seq.seq))
+		loci[f] = numpy.mean(seqlist)
+		print "gc content:", loci[f]
+	else:
+		print "file", f, "not in the tab file, skipping..."
 
-outf = "locigc.tab"
+outf = "locigc3.tab"
 with open(outf, "w") as outfile:
 	for lc, lcv in loci.items():
 		print >> outfile, lc, "\t", lcv
+print "output is written to", outf
+print "done"
