@@ -14,14 +14,14 @@ else:
     sys.exit()
 
 translist = []
-if len(sys.argv) == 6:
-    print "reading exclusion list..."
-    lfile = open(listfile, "r")
-    for line in lfile:
-        l = line.strip()
-        translist.append(l)
-    lfile.close()
-    print "read", len(translist), "records"
+
+print "reading exclusion list..."
+lfile = open(listfile, "r")
+for line in lfile:
+    l = line.strip()
+    translist.append(l)
+lfile.close()
+print "read", len(translist), "records"
 
 locilist = set()
 print "input"
@@ -52,5 +52,5 @@ for x in locilist:
         prog = "copying "+str(locusfname)+"..."
         sys.stdout.write(prog+"\r")
         sys.stdout.flush()
-        shutil.copy2(f+locusfname, "./subset")
+        shutil.copy2(f+"/"+locusfname, "./subset")
 print "done"
