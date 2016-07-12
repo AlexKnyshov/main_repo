@@ -7,23 +7,24 @@ from Bio import AlignIO
 #from Bio.Alphabet import IUPAC, Gapped
 from Bio import Phylo
 
-if sys.argv[1] == "-tree":
-	print "tree mode"
-	treefile = sys.argv[3]
-	tree = Phylo.read(treefile, "newick")
-	tree.ladderize()
-	order = tree.get_terminals()
-	count = 0
-	d = {}
-	for x in order:
-		print x.name
-		d[x.name] = count
-		count+=1
-elif sys.argv[1] == "-seqlen":
-	print "seqlen mode"
+if len(sys.argv) >= 3:
+	if sys.argv[1] == "-tree":
+		print "tree mode"
+		treefile = sys.argv[3]
+		tree = Phylo.read(treefile, "newick")
+		tree.ladderize()
+		order = tree.get_terminals()
+		count = 0
+		d = {}
+		for x in order:
+			print x.name
+			d[x.name] = count
+			count+=1
+	elif sys.argv[1] == "-seqlen":
+		print "seqlen mode"
 else:
-	print "FORMAT: python taxon_regroup.py [option: -tree (regroup based on tree topology), -seqlen (regroup based on seqlen)] [folder]"
-	print "EXAMPLE: python removeTaxa.py -tree ./fasta"
+	print "FORMAT: python taxon_regroup.py [option: -tree (regroup based on tree topology), -seqlen (regroup based on seqlen)] [folder] ([tree file])"
+	print "EXAMPLE: python removeTaxa.py -tree ./fasta tree.tre"
 	print "EXAMPLE: python removeTaxa.py -seqlen ./fasta"
 	sys.exit()
 
