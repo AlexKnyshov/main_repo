@@ -8,6 +8,7 @@ from Bio import AlignIO
 from Bio import Phylo
 
 if sys.argv[1] == "-tree":
+	print "tree mode"
 	treefile = sys.argv[3]
 	tree = Phylo.read(treefile, "newick")
 	tree.ladderize()
@@ -18,6 +19,13 @@ if sys.argv[1] == "-tree":
 		print x.name
 		d[x.name] = count
 		count+=1
+elif sys.argv[1] == "-seqlen":
+	print "seqlen mode"
+else:
+	print "FORMAT: python taxon_regroup.py [option: -tree (regroup based on tree topology), -seqlen (regroup based on seqlen)] [folder]"
+	print "EXAMPLE: python removeTaxa.py -tree ./fasta"
+	print "EXAMPLE: python removeTaxa.py -seqlen ./fasta"
+	sys.exit()
 
 #csvname = sys.argv[1]
 inputfolder = sys.argv[2]
