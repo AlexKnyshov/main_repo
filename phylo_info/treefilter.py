@@ -53,5 +53,5 @@ upper = float(raw_input("enter upper boundary:"))
 outfile = open("filteredloci.tab", "w")
 for x, y in loci.items():
 	if lower < y < upper:
-		print >> outfile, x+".phylip"
+		print >> outfile, x
 outfile.close()
