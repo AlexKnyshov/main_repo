@@ -14,7 +14,11 @@ AHE + transcriptome pipeline:
 		python removeTaxa.py ./FASTA_FOLDER -a LIST #list must contain old and new names separated with comma (oldname,newname)
 	- to make the top sequence the longest one (which is good for blast searches):
 	python taxon_regroup.py -seqlen ./FASTA_FOLDER
+
+
 2) prepare transcriptomes - they need to be in one folder, with databases created in the same folder
+
+
 3) run blast searches
 	- against a single database:
 	bash folder_blast.sh ./AHE_FOLDER ./TRANSCRIPTOME_FILENAME threshold METHOD[i.e., tblastx] CPU[i.e. 4]
@@ -22,13 +26,14 @@ AHE + transcriptome pipeline:
 	bash folder_blast.sh ./AHE_FOLDER ./TRANSCRIPTOME_FOLDER threshold METHOD[i.e., tblastx] CPU[i.e. 4] LIST
 	list must specify transcriptome filenames in the folder indicated. if all files in a certain folder shoudl be used,
 	this list can be obtained by ls * > list.txt
+
+
 4) extract found contigs:
 	- to extract from a single transcriptome:
 	python alexblparser.py BLAST_OUTPUT_FILE TRANSCRIPTOME_FILENAME ./AHE_FOLDER threshold OPTION
 	- to extract from a group of transcriptomes:
 	python alexblparser.py BLAST_OUTPUT_FOLDER TRANSCRIPTOME_FOLDER ./AHE_FOLDER threshold OPTION
 	note that the script will search for all *.blast files in the indicated blast folder
-	
 	loci are exported to "modified" folder
 
 	OPTIONs available are:
@@ -39,14 +44,20 @@ AHE + transcriptome pipeline:
 	-ms (extracts the hit region of a contig, group of transcriptomes mode)
 	-mss (extracts the hit region of a contig, hits shorter than 80% length of query are discarded, group of transcriptomes mode)
 	-me (extracts the region of a conting that matches the length of the query, group of transcriptomes mode)
+
+
 5) realign the loci
 	bash align.sh ./FASTA_FOLDER ALGORITHM DIRECTION_OPTION CPU(number)
 	algorithm options are: ginsi einsi linsi
 	direction options are: adjust, noadjust, slow
 	files output to "realigned" folder
+
+
 6) if adjustment of sequence direction was performed (options adjust or slow), remove R_ prefixes:
 	python removeR.py ./FASTA_FOLDER -m
 	existing files are modified
+
+
 7) if trimming is necessary
 	python customtrim.py ./FASTA_FOLDER OPTION
 	files output to "trimmed"
@@ -56,7 +67,21 @@ AHE + transcriptome pipeline:
 	-% (trim external gaps until 90% of sequences have no missing data)
 	-refine (trim external gaps until all sequences have no missing data for more than 20 bases)
 	-d (trim all positions with missing data)
+
+
 8) if subsetting based on taxa presence is necessary
 	python AHE_taxatrim.py ./FASTA_FOLDER LIST
 	a locus will be removed if no listed taxa are present
 	files ouput to "subset" folder
+
+
+9) concatenate loci into one dataset
+	python concat.py ./FASTA_FOLDER [partition option] [-s (sequential) or -i (interleaved)] [-pf2n or pf2y (generate partition finder 2 config file)]
+	ex: python concat.py ./fasta/ -i -pf2n
+	output concatenated file is written to COMBINED.phy
+	partition file is written to partitions.prt
+	partition options are:
+	-1 (each locus is a separate partition)
+	-3 (each locus is a separate partition and split to codon positions)
+	-prot (each locus is translated)
+	-orf (reading frame is determined and each locus is partitioned to 1+2 and 3 positions)
