@@ -77,7 +77,7 @@ AHE + transcriptome pipeline:
 
 9) concatenate loci into one dataset
 	python concat.py ./FASTA_FOLDER [partition option] [-s (sequential) or -i (interleaved)] [-pf2n or pf2y (generate partition finder 2 config file)]
-	ex: python concat.py ./fasta/ -i -pf2n
+	ex: python concat.py ./fasta/ -1 -i -pf2n
 	output concatenated file is written to COMBINED.phy
 	partition file is written to partitions.prt
 	partition options are:
