@@ -26,7 +26,7 @@ print "initializing..."
 loci = {}
 #taxalist=["I13432_ED_4993_Hemiptera_Dipsocoridae_Cryptostemma_sp_seq1", "I13433_ED_2045_Hemiptera_Ceratocombidae_Kvamula_sp_seq1", "I13434_ED_2660_Hemiptera_Schizopteridae_Williamsocoris_sp_seq1", "I13435_ED_4258_Hemiptera_Schizopteridae_Nannocoris_sp_seq1", "I13436_ED_1692_Hemiptera_Schizopteridae_Kokeshia_sp_seq1", "I13437_ED_4257_Hemiptera_Schizopteridae_Chinannus_sp_seq1", "I13438_ED_2192_Hemiptera_Schizopteridae_Dundonannus_sp_seq1", "I13439_ED_6303_Hemiptera_Schizopteridae_Schizoptera_sp_seq1", "I13440_P14_RCW_1261_Hemiptera_Reduviinae_Opisthacidius_sp_seq1", "I13442_UCRC_ENT_00092725_Hemiptera_Tribelocephalinae_Afrodecius_sp_seq1", "I13443_RCW_4586_Hemiptera_Vesciinae_Vescia_sp_seq1", "I13444_RCW_4525_Hemiptera_Reduviinae_Rulandus_phaedrus_seq1", "I13445_RCW_4101_Hemiptera_Phymatinae_Phymata_pacifica_seq1"]
 #taxalist=["Chinannus_monteverdensis_4257", "Schizoptera_sp_6303", "cf_Kvamula_or_Seychellesanus_sp_Madagascar_2043", "Williamsocoris_sp_Trinidad_2660", "Nannocoris_sp_4258", "Dundonannus_sp_2190", "Cryptostemma_sp_Peru_249", "Kokeshia_sp_Thailand_1409"]
-if sys.argv[2] == "-a" or sys.argv[2] == "-e":
+if sys.argv[2] == "-a" or sys.argv[2] == "-1":
 	print "reading taxalist..."
 	taxalist = []
 	exfile = open(exclusion_file, "r")
