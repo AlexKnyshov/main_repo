@@ -19,17 +19,16 @@ else:
 	print "EXAMPLE: python removeHyphen.py ./test.fas -1"
 	sys.exit()
 
+if not os.path.exists ("./dealigned"):
+	os.makedirs("./dealigned")
+
 for f in files:
 	inputf = SeqIO.parse(f, "fasta")
-	fnew = f.split("/")
+	fnew = f.split("/")[-1]
 	print "processing file", f
-	d = {}
+	outupf = open("./dealigned/"+fnew, "w")
 	for seq in inputf:
-		line = str(seq.seq).replace("-", "").upper().replace("N", "")
-		seq.seq = line
-		d[seq.id] = seq.seq
-	outupf = open(f, "w")
-	for key, value in d.items():
-		print >> outupf, ">"+key, "\n", value
+		line = str(seq.seq).replace("-", "").upper().replace("N", "")	
+		print >> outupf, ">"+seq.id, "\n", line
 	outupf.close()
 print "done"
