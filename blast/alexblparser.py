@@ -12,7 +12,7 @@ if len(sys.argv) == 6:
     evalue = float(sys.argv[4])
     opt = sys.argv[5]
 else:
-    print "FORMAT: python alexblparser.py [blastfile or folder] [asemblyfile or folder] [ahefolder] [evalue] [option: -n (normal), -s (extract only matched parts), -s (short are discarded), -mn (multiple normal), -ms (multiple selected), -mss(short are discarded), -me (extended ms option)]"
+    print "FORMAT: python alexblparser.py [blastfile or folder] [asemblyfile or folder] [ahefolder] [evalue] [option: -n (normal), -s (extract only matched parts), -ss (short are discarded), -mn (multiple normal), -ms (multiple selected), -mss(short are discarded), -me (extended ms option)]"
     print "EXAMPLE: python alexblparser.py blast.tab trinity.fas ./fasta 1e-40 -n"
     sys.exit()
 
@@ -305,9 +305,13 @@ else:
                     if row[1].split("_c")[0] == output[row[0].split("/")[-1]].split("_c")[0]:
                         print "warning: several isoforms detected", row[1], row[10], row[11]
                     else:
-                        print "warning: several matches detected", row[1], row[10], row[11], "; ratio with best_eval is", round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
+                        #print "warning: several matches detected", row[1], row[10], row[11], "; ratio with best_eval is", round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
                         # print >> debug_file, row[0].split("/")[-1], row[1].split("_c")[0], math.log(float(row[10]))/math.log(best_eval)*100, float(row[11])/best_hit*100
                         # debug_c +=1
+                        print "warning: several matches detected", row[1], row[10], row[11]#, "; ratio with best_eval is", round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
+                        if round(float(row[11])/best_hit*100) > 90: #round(math.log(float(row[10]))/math.log(best_eval)*100) > 90 or 
+                            number += 1
+                            numberset.add(row[0])
                 else:
                     output[row[0].split("/")[-1]] = row[1] ##standart output
                     print "ADDITION"
@@ -382,7 +386,7 @@ else:
                     extr_loci.append(locusfname)
                     #print seq, len(seq) #debug
                     fhandle = open("./modified/"+locusfname, "a")
-                    seq.id = trif.split("/")[-1][:5]
+                    seq.id = trif.split("/")[-1][:-4]#[:5]
                     seq.name =""
                     seq.description =""
                     if opt == "-ss" and locusfname not in warninglist:
