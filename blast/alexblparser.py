@@ -105,8 +105,8 @@ if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me":
                         if row[1].split("_c")[0] == output[row[0].split("/")[-1]].split("_c")[0]:
                             print "warning: several isoforms detected", row[1], row[10], row[11]
                         else:
-                            print "warning: several matches detected", row[1], row[10], row[11], "; ratio with best_eval is", round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
-                            if round(math.log(float(row[10]))/math.log(best_eval)*100) > 90 or round(float(row[11])/best_hit*100) > 90:
+                            print "warning: several matches detected", row[1], row[10], row[11], "hit is", round(float(row[11])/best_hit*100), "%"#"; ratio with best_eval is"#, round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
+                            if round(float(row[11])/best_hit*100) > 90:#round(math.log(float(row[10]))/math.log(best_eval)*100) > 90 or :
                                 number += 1
                                 numberset.add(row[0])
                     else:
