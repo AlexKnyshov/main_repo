@@ -4,7 +4,7 @@ from Bio.Alphabet import generic_protein
 from Bio.Seq import Seq 
 from Bio.SeqRecord import SeqRecord 
 from Bio.Align import MultipleSeqAlignment
-
+import csv
 import sys
 import glob
 import os
@@ -17,8 +17,8 @@ if len(sys.argv) >= 5:
 	partnum = sys.argv[2]
 	phyliptype = sys.argv[3]
 	pf2opt = sys.argv[4]
-	if len(sys.argv) == 6:
-		exclusion_file = sys.argv[5]
+	if partnum == "-orf":
+		framefile = sys.argv[5]
 else:
 	print "FORMAT: python concat.py [folder with fasta] [split to codon positions: -3 (yes), -1 (no), -prot, -orf] [phylip type: -i (interleaved), -s (sequential)] [partition_finder output: -pf2y, -pf2n] ([exclusion list])"
 	print "EXAMPLE: python concat.py ./fasta -1 -i -pf2n"
@@ -26,15 +26,14 @@ else:
 	print "output is written to COMBINED.phy, partitions are written to partitions.prt"
 	sys.exit()
 
-exclusion_list = []
-if len(sys.argv) == 6:
-	print "reading exclusion list..."
-	exfile = open(exclusion_file, "r")
-	for line in exfile:
-		l = line.strip()
-		exclusion_list.append(l)
-	exfile.close()
-	print "read", len(exclusion_list), "records"
+if partnum == "-orf":
+	print "reading framefile..."
+	loci = {}
+	with open(framefile, "rb") as csvfile:
+		reader = csv.reader(csvfile, delimiter='\t')
+		for row in reader:
+			#print row[0], row[1]
+			loci[row[0].strip()] = int(row[1])
 
 print "creating a list of taxa..."
 d = {}
@@ -48,9 +47,9 @@ for f in files:
 		alignment = AlignIO.read(f, "fasta", alphabet=Gapped(IUPAC.ambiguous_dna))
 	length = alignment.get_alignment_length()
 	for seq in alignment:
-		if seq.id in d and seq.id not in exclusion_list:
+		if seq.id in d:
 			d[seq.id].append(fn)
-		elif seq.id not in exclusion_list:
+		else:
 			d[seq.id] = []
 			d[seq.id].append(fn)
 print len(d), "taxa found in fasta alignments"
@@ -91,91 +90,25 @@ for f in files:
  	else:
  		alignment = AlignIO.read(f, "fasta", alphabet=Gapped(IUPAC.ambiguous_dna)) #read original
  	length = alignment.get_alignment_length()
+ 	if partnum == "-orf":
+	 	remainder = length % 3
+		if remainder > 0:
+			length = length + (3-remainder)
 	missed = list(d)
 	goodcount = 0
 	
 	#print >> debug, "---------------------------------------------------------"
 	#print >> debug, f
 	if partnum == "-orf":
-		count = 0
-		newframe = True
-		framelist = []
-		badframe = []
-		for seq in alignment:
-			t1 = str(seq.seq).replace("-", "N")
-			t2 = t1.replace("?", "N")
-			seq.seq = Seq(t2, alphabet=Gapped(IUPAC.ambiguous_dna))
-			if seq.seq[0:3] != "NNN":
-				nuclseq = seq.seq
-				#break
-				#test all seq trans
-				#check the reading frame
-				remainder = len(nuclseq) % 3
-				#print remainder
-				if remainder > 0:
-					nuclseq = nuclseq+Seq("N"*(3-remainder), Gapped(IUPAC.ambiguous_dna))
-				length = len(nuclseq)
-				#print length
-				if newframe == True: #new search
-					#print "new search"
-					transseq = nuclseq.translate() #frame1
-					#print "locus", f
-					#if "*" in transseq[:-1] or "X" in transseq[:-1]: #check frame 1
-					if transseq[:-1].count("*") > 1: #or transseq[:-1].count("X") > 1: #check frame 1
-						#print "Nooo"
-						nuclseq = nuclseq[1:]+Seq("N", Gapped(IUPAC.ambiguous_dna))
-						transseq = nuclseq.translate() #frame2
-						#if "*" in transseq[:-1] or "X" in transseq[:-1]: #check frame 2
-						if transseq[:-1].count("*") > 1: #or transseq[:-1].count("X") > 1:
-							nuclseq = nuclseq[1:]+Seq("N", Gapped(IUPAC.ambiguous_dna))
-							transseq = nuclseq.translate() #frame3
-							#if "*" in transseq[:-1] or "X" in transseq[:-1]: #check frame 3
-							if transseq[:-1].count("*") > 1: #or transseq[:-1].count("X") > 1:
-								#print "bad seq"
-								#bad frame for this seq
-								newframe = True
-								badframe.append(1)
-								goodcount = 0
-							else:
-								goodcount = 2
-								newframe = False
-						else:
-							goodcount = 1
-							newframe = False
-					else:
-						goodcount = 0
-						newframe = False
-				elif newframe == False: #old search
-					#print "old search"
-					nuclseq = nuclseq[goodcount:]+Seq("N"*goodcount, Gapped(IUPAC.ambiguous_dna))
-					transseq = nuclseq.translate()
-					#if "*" in transseq[:-1] or "X" in transseq[:-1]: #check frame
-					if transseq[:-1].count("*") > 1: #or transseq[:-1].count("X") > 1:
-						#print "bad seq, reset"
-						newframe = True
-						goodcount = 0
-					else:
-						newframe = False
-				framelist.append(goodcount)
-			# 	print >> debug, seq.id, goodcount
-			# else:
-			# 	print >> debug, seq.id, "NNN seq"
-		goodcount = most_common(framelist)
-		#print "final frame", goodcount
-		# print >> debug, "final frame", goodcount
-		# print >> debug, "normal seqs:", len(alignment), "bad seqs:", len(badframe)
-		if float(len(badframe))/len(alignment) > 0.5:
-			#print "bad locus", len(alignment), len(badframe)
-			# print >> debug, "BAD LOCUS"
-			badlocus.append(fn)
-	#length = alignment.get_alignment_length()
-	#remainder = length % 3
-	#print ""
-	#print "goodcount", goodcount, "length", length, "locus", fn, "remainder", remainder
+		if f in loci.keys():
+			frame = loci[f]
+		else:
+			frame = 0
  	for seq in alignment:
- 		if length > len(seq.seq):
- 			seq.seq = seq.seq+Seq("N"*(length - len(seq.seq)), Gapped(IUPAC.ambiguous_dna))
- 		seq.seq = seq.seq[goodcount:]+Seq("N"*goodcount, Gapped(IUPAC.ambiguous_dna))
+ 		if partnum == "-orf":
+	 		seq.seq = seq.seq[frame:]+Seq("N"*((length - len(seq.seq))+frame), Gapped(IUPAC.ambiguous_dna))
+	 	else:
+	 		seq.seq = seq.seq
  		#print len(seq.seq)
  		#print seq.id
  		temp.append(seq) #add original to temp
@@ -223,7 +156,7 @@ for f in files:
 	elif partnum == "-prot":
 		print >> outputfile, "WAG, "+fn+" = "+str(start)+" - "+str(end)
 	if partnum == "-orf":
-		if fn in badlocus:
+		if f not in loci.keys():
 			print >> outputfile, "DNA, "+fn+" = "+str(start)+" - "+str(end)
 		else:
 			print >> outputfile, "DNA, "+fn+"-1-2 = "+str(start)+" - "+str(end)+"\\3, "+str(start+1)+" - "+str(end)+"\\3"
