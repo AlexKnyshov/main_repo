@@ -1,5 +1,4 @@
 from Bio import SeqIO
-import re
 import glob
 import sys
 import os
@@ -26,8 +25,7 @@ for f in files:
 	print "processing file", f
 	d = {}
 	for seq in inputf:
-		line = str(seq.seq)
-		line = re.sub('[-]', '', line)
+		line = str(seq.seq).replace("-", "").upper().replace("N", "")
 		seq.seq = line
 		d[seq.id] = seq.seq
 	outupf = open(f, "w")
