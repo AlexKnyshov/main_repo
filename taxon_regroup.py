@@ -39,7 +39,7 @@ for f in files:
 	if sys.argv[1] == "-tree":
 		alignment.sort(key = lambda r: d[r.id])
 	elif sys.argv[1] == "-seqlen":
-		alignment.sort(key = lambda r: len(str(r.seq).replace("-", "").upper().replace("N", "")),  reverse=True)
+		alignment.sort(key = lambda r: len(str(r.seq).replace("-", "").upper().replace("N", "")))#,  reverse=True)
 	#alignment.sort()
 	# for seq in alignment:
 	# 	print lambda r: d[seq.id]
