@@ -165,19 +165,19 @@ if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me":
                                         gapt = len(tempseq) # otherwise start from the end
                                 #check the ahe end:
                                 gaprev = len(recs[0].seq) - e_opt[locusfname][4]#ali.get_alignment_length() - e_opt[locusfname][0][4]
-                                if gaprev >= 0:#aher #some AHE left
-                                    if e_opt[locusfname][2]:#transb: #trans is forward
-                                        #check the trans end
-                                        if e_opt[locusfname][1] + gaprev <= len(tempseq): #check that trans is long enough
-                                            gaptrev = e_opt[locusfname][1] + gaprev#transf - gap #this is the corrected trans start
-                                        else:
-                                            gaptrev = len(tempseq)
+                                #if gaprev >= 0:#aher #some AHE left
+                                if e_opt[locusfname][2]:#transb: #trans is forward
+                                    #check the trans end
+                                    if e_opt[locusfname][1] + gaprev <= len(tempseq): #check that trans is long enough
+                                        gaptrev = e_opt[locusfname][1] + gaprev#transf - gap #this is the corrected trans start
                                     else:
-                                        ##need to check if trans has start
-                                        if e_opt[locusfname][1] - gaprev >= 0:
-                                            gaptrev = e_opt[locusfname][1] - gaprev#transf + gap #this is the corrected trans start
-                                        else:
-                                            gaptrev = 0
+                                        gaptrev = len(tempseq)
+                                else:
+                                    ##need to check if trans has start
+                                    if e_opt[locusfname][1] - gaprev >= 0:
+                                        gaptrev = e_opt[locusfname][1] - gaprev#transf + gap #this is the corrected trans start
+                                    else:
+                                        gaptrev = 0
                             #reverse AHE:
                             else: #ahe is reverse
                                 #print "AHE rev"
@@ -196,19 +196,19 @@ if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me":
                                         gapt = len(tempseq)
                                 #check the ahe end:
                                 gaprev = e_opt[locusfname][4] # ahe end gap
-                                if gaprev >= 0:#aher #some AHE left
-                                    if e_opt[locusfname][2]:#transb: #trans is forward
-                                        #check the trans end
-                                        if e_opt[locusfname][1] + gaprev <= len(tempseq): #check that trans is long enough
-                                            gaptrev = e_opt[locusfname][1] + gaprev#transf - gap #this is the corrected trans start
-                                        else:
-                                            gaptrev = len(tempseq)
+                                #if gaprev >= 0:#aher #some AHE left
+                                if e_opt[locusfname][2]:#transb: #trans is forward
+                                    #check the trans end
+                                    if e_opt[locusfname][1] + gaprev <= len(tempseq): #check that trans is long enough
+                                        gaptrev = e_opt[locusfname][1] + gaprev#transf - gap #this is the corrected trans start
                                     else:
-                                        ##need to check if trans has start
-                                        if e_opt[locusfname][1] - gaprev >= 0:
-                                            gaptrev = e_opt[locusfname][1] - gaprev#transf + gap #this is the corrected trans start
-                                        else:
-                                            gaptrev = 0
+                                        gaptrev = len(tempseq)
+                                else:
+                                    ##need to check if trans has start
+                                    if e_opt[locusfname][1] - gaprev >= 0:
+                                        gaptrev = e_opt[locusfname][1] - gaprev#transf + gap #this is the corrected trans start
+                                    else:
+                                        gaptrev = 0
                             print "BLAST:", "transf:",e_opt[locusfname][0], "transr:",e_opt[locusfname][1], "transb:",e_opt[locusfname][2], "ahef:",e_opt[locusfname][3], "aher:",e_opt[locusfname][4], "aheb:",e_opt[locusfname][5]
                             print "LOCUS", "ahe:", len(recs[0].seq), "trans:", len(seq.seq)
                             if opt == "-me":
