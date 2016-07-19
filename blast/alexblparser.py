@@ -237,7 +237,7 @@ if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me":
                         extr_loci.append(locusfname)
                         #print seq, len(seq) #debug
                         fhandle = open("./modified/"+locusfname, "a")
-                        seq.id = b[:-6].split("/")[-1][:5]
+                        seq.id = b[:-6].split("/")[-1][:-4]#[:5]
                         seq.name =""
                         seq.description =""
                         if opt == "-mss" and locusfname not in warninglist:
