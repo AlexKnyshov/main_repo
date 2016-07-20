@@ -61,6 +61,7 @@ if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me":
                     if row[0].split("//")[-1] in output: ##query is present
                         print "warning: the key exists", row[0].split("//")[-1]
                     else:
+                        print "--------------------------------------------------------"
                         output[row[0].split("//")[-1]] = row[1] ##standart output
                         best_eval = float(row[10])
                         best_hit = float(row[11])
@@ -96,7 +97,6 @@ if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me":
                             aher = int(row[7])
                             #store the data:
                             e_opt[row[0].split("//")[-1]] = [transf, transr, transb, ahef, aher, aheb]
-                        print "--------------------------------------------------------"
                         print row[0].split("//")[-1], row[1], row[2], row[10], row[11]
             else: ##same query
                 if currentmatch != row[1] and float(row[10]) <= evalue:
@@ -132,6 +132,7 @@ if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me":
                 print "search terminated"
                 break
             elif seq.id in output.values(): #if contig is in ahe (was found as a blast hit)
+                print "--------------------------------------------------------"
                 print "start"
                 for x,y in output.items(): #checking all ahe (seach which ahe has it)
                     locusfname = x #AHE name
@@ -284,6 +285,7 @@ else:
                 if row[0].split("/")[-1] in output: ##query is present - normaly never happens
                     print "warning: the key exists", row[0].split("/")[-1]
                 else:
+                    print "--------------------------------------------------------"
                     # debug_c = 0
                     output[row[0].split("/")[-1]] = row[1] ##standart output
                     #print "NORMAL"
@@ -296,7 +298,6 @@ else:
                         start = min(int(row[8]), int(row[9])) #secret opt
                         end = max(int(row[8]), int(row[9])) #secret opt
                         trans_d[row[0].split("/")[-1]] = [start, end] #secret opt
-                    print "--------------------------------------------------------"
                     print row[0].split("/")[-1], row[1], row[2], row[10], row[11]
         else: ##same query
             if currentmatch != row[1] and float(row[10]) <= evalue:
@@ -362,6 +363,7 @@ else:
             print "search terminated"
             break
         elif seq.id in output.values(): #if contig is in ahe (was found as a blast hit)
+            print "--------------------------------------------------------"
             print "start"
             for x,y in output.items(): #checking all ahe (seach which ahe has it)
                 locusfname = x #AHE name
