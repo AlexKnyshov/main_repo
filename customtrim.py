@@ -248,8 +248,8 @@ for f in files:
 
 	#writing to files
 	if endpos-startpos > 0 or trimopt == "-d":
-		outfile = open(fn2, "w")
-		if trimopt == "-d":
+		if trimopt == "-d" and len(positions) > 0:
+			outfile = open(fn2, "w")
 			align = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna)) # new ali
 			for tempseq in inputalignment:
 				seqrec = SeqRecord(Seq("", Gapped(IUPAC.ambiguous_dna)), id=tempseq.id) #add taxa
@@ -259,10 +259,15 @@ for f in files:
 			#AlignIO.write(align, outfile, "fasta")
 			for aliseq in align:
 				print >> outfile, ">"+aliseq.id, "\n", aliseq.seq
+			outfile.close()
+		elif trimopt == "-d" and len(positions) == 0:
+			print >> outf, len(positions), "good positions, skipping the locus..."
+			warninglist.append(f)
 		else:
+			outfile = open(fn2, "w")
 			for seq, s in seqs.items():
 				print >> outfile, ">"+seq, "\n", s[startpos:endpos]
-		outfile.close()
+			outfile.close()
 	else:
 		warninglist.append(f)
 	
