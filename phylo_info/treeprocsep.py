@@ -80,16 +80,29 @@ for f in files:
 		#	tpar = tree.collapse(term)
 			#print tree.depths()
 			#print tpar, tree.distance(tpar)
-		for x in tree.find_elements(terminal=True):
-			if tree.distance(x) / tree.total_branch_length() > 0.7:
-				result[f] = x.name
-				trimlist.add(x.name)
+		# for x in tree.find_elements(terminal=True):
+		# 	if tree.distance(x) / tree.total_branch_length() > 0.7:
+		# 		result[f] = x.name
+		# 		trimlist.add(x.name)
+		excludelist = []
+		for clade in tree.find_clades():
+			if tree.distance(clade) / tree.total_branch_length() > 0.7:
+				#print clade#.get_terminals()[0]
+				excludelist.append(clade)#.get_terminals()[0])
+				#result[f] = clade.get_terminals()
+				#trimlist.add(clade.get_terminals())
+		if len(excludelist)>0:
+			print excludelist[0].get_terminals()
+			names = []
+			for name in excludelist[0].get_terminals():
+				names.append(name.name)
+			result[f] = names
 			#print term, tree.distance(tree.find_clades(term, terminal=True))
 			#print trimlist
 		#for z in trimlist:
 		#	print z
-		if len(trimlist)>0:
-			print trimlist
+		# if len(trimlist)>0:
+		# 	print trimlist
 			fname = locusname.match(f)
 			aliout = open("./reduced/"+fname.group(1), "w")
 			#print trimlist
@@ -104,9 +117,9 @@ for f in files:
 				#print >> aliout, trimlist
 				# if f in result:
 				# 	print result[f], "2"
-				if seq.id not in trimlist:
+				if seq.id not in names:
 					#SeqIO.write(seq, aliout, "fasta")
-				 	print seq.id, "NO", trimlist
+				 	# print seq.id, "NO"#, trimlist
 				 	print >> aliout, ">"+seq.id, "\n", seq.seq
 				else:
 				 	print seq.id, "YES"
