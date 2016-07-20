@@ -4,24 +4,30 @@ import glob
 import os
 import shutil
 
-if len(sys.argv) == 3:
-    f = sys.argv[1]
+if len(sys.argv) == 4:
+    option = sys.argv[1]
+    f = sys.argv[2]
     files = glob.glob(f+"/*")
-    listfile = sys.argv[2]
+    if option == "-t":
+        listfile = sys.argv[3]
+    elif option == "-l":
+        threshold = int(sys.argv[3])
 else:
-    print "FORMAT: python AHE_taxatrim.py [folder with fasta] [trimlist]"
-    print "EXAMPLE: python AHE_taxatrim.py ./fasta list.lst"
+    print "FORMAT: python AHE_taxatrim.py [option: -t (taxa), -l (length)] [folder with fasta] [trimlist or threshold]"
+    print "EXAMPLE: python AHE_taxatrim.py -t ./fasta list.lst"
+    print "EXAMPLE: python AHE_taxatrim.py -l ./fasta 100"
     sys.exit()
 
 translist = []
 
-print "reading exclusion list..."
-lfile = open(listfile, "r")
-for line in lfile:
-    l = line.strip()
-    translist.append(l)
-lfile.close()
-print "read", len(translist), "records"
+if option == "-t":
+    print "reading exclusion list..."
+    lfile = open(listfile, "r")
+    for line in lfile:
+        l = line.strip()
+        translist.append(l)
+    lfile.close()
+    print "read", len(translist), "records"
 
 locilist = set()
 print "input"
@@ -31,9 +37,24 @@ for infile in files:
 	print "read", infile
 	#outhandle = open(infile+".tx_tm.fas", "w")
 	for seq in alignments:
-		#if seq.id in trimlist:
-		if seq.id in translist:
-			locilist.add(infile)
+            if option == "-t":
+                if seq.id in translist:
+                    locilist.add(infile)
+                    break
+            elif option == "-l":
+                if len(seq.seq) > threshold:
+                    locilist.add(infile)
+                    break
+            else:
+                print "test"
+        # if option == "-t":
+        # 	if seq.id in translist:
+        # 		locilist.add(infile)
+        #         break
+        # elif option == "-l":
+        #     if len(seq.seq) > threshold:
+        #         locilist.add(infile)
+        #         break
 #print locilist
 print len(locilist)
 
