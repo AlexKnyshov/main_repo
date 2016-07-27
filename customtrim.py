@@ -11,22 +11,27 @@ if len(sys.argv) >= 3:
 	inputfolder = sys.argv[1]
 	files = glob.glob(inputfolder+"/*.fas")
 	trimopt = sys.argv[2]
-	if trimopt == "-a" or trimopt == "-1":
+	if trimopt == "-a" or trimopt == "-1" or trimopt[:3] == "-d%":
 		exclusion_file = sys.argv[3]
 else:
-	print "FORMAT: python customtrim.py [folder with fasta] [trimming option: -a, -1, -%, -refine, -d] ([trimlist])"
+	print "FORMAT: python customtrim.py [folder with fasta] [trimming option: -a, -1, -%, -refine, -d, -d%] ([trimlist])"
 	print "EXAMPLE: python customtrim.py ./fasta -%"
 	print "EXAMPLE: python customtrim.py ./fasta -1 trimlist.txt"
 	sys.exit()
 if len(files) == 0:
 	print "no fasta files in the directory"
 
+print "the option", trimopt, "set up"
+if trimopt[:2] == "-%":
+	print "the cutoff is set to", trimopt[2:]
+elif trimopt[:3] == "-d%":
+	print "the cutoff is set to", trimopt[3:]
 #starting to process files
 print "initializing..."
 loci = {}
 #taxalist=["I13432_ED_4993_Hemiptera_Dipsocoridae_Cryptostemma_sp_seq1", "I13433_ED_2045_Hemiptera_Ceratocombidae_Kvamula_sp_seq1", "I13434_ED_2660_Hemiptera_Schizopteridae_Williamsocoris_sp_seq1", "I13435_ED_4258_Hemiptera_Schizopteridae_Nannocoris_sp_seq1", "I13436_ED_1692_Hemiptera_Schizopteridae_Kokeshia_sp_seq1", "I13437_ED_4257_Hemiptera_Schizopteridae_Chinannus_sp_seq1", "I13438_ED_2192_Hemiptera_Schizopteridae_Dundonannus_sp_seq1", "I13439_ED_6303_Hemiptera_Schizopteridae_Schizoptera_sp_seq1", "I13440_P14_RCW_1261_Hemiptera_Reduviinae_Opisthacidius_sp_seq1", "I13442_UCRC_ENT_00092725_Hemiptera_Tribelocephalinae_Afrodecius_sp_seq1", "I13443_RCW_4586_Hemiptera_Vesciinae_Vescia_sp_seq1", "I13444_RCW_4525_Hemiptera_Reduviinae_Rulandus_phaedrus_seq1", "I13445_RCW_4101_Hemiptera_Phymatinae_Phymata_pacifica_seq1"]
 #taxalist=["Chinannus_monteverdensis_4257", "Schizoptera_sp_6303", "cf_Kvamula_or_Seychellesanus_sp_Madagascar_2043", "Williamsocoris_sp_Trinidad_2660", "Nannocoris_sp_4258", "Dundonannus_sp_2190", "Cryptostemma_sp_Peru_249", "Kokeshia_sp_Thailand_1409"]
-if sys.argv[2] == "-a" or sys.argv[2] == "-1":
+if trimopt == "-a" or trimopt == "-1" or trimopt[:3] == "-d%":
 	print "reading taxalist..."
 	taxalist = []
 	exfile = open(exclusion_file, "r")
@@ -58,7 +63,7 @@ for f in files:
 	#pairwise
 	names =[]
 	lengths = []
-	if trimopt == "-%" or trimopt == "-refine" or trimopt == "-d": #trim counting all taxa
+	if trimopt[:2] == "-%" or trimopt == "-refine" or trimopt == "-d": #trim counting all taxa
 		for key in seqs.keys():
 			names.append(key)
 			lengths.append(len(seqs[key]))
@@ -103,7 +108,7 @@ for f in files:
 				break
 			#print misdata, "misdata", startpos, "startpos"
 			startpos += 1
-	elif trimopt == "-%":
+	elif trimopt[:2] == "-%":
 		for basenum in range(len(seqs[names[0]])):
 			baselist = []
 			misdata = 0
@@ -112,7 +117,7 @@ for f in files:
 			for base in baselist:
 				if base == "-" or base == "N" or base == "?":
 					misdata += 1
-			if misdata < (len(names)*0.1):
+			if misdata < (len(names)*float(trimopt[2:])):
 				break
 			#print misdata, "misdata", startpos, "startpos"
 			startpos += 1
@@ -157,9 +162,23 @@ for f in files:
 			for base in baselist:
 				if base == "-" or base == "N" or base == "?":
 					misdata += 1
-				if misdata > 1:
+				if misdata > (len(names)*0.4):
 					break
-			if misdata <= 1:
+			if misdata <= (len(names)*0.4):
+				positions.append(basenum)
+	elif trimopt[:3] == "-d%":
+		positions = []
+		for basenum in range(len(seqs[names[0]])):
+			baselist = []
+			misdata = 0
+			for name in names:
+				baselist.append(seqs[name][basenum])
+			for base in baselist:
+				if base == "-" or base == "N" or base == "?":
+					misdata += 1
+				if misdata > (len(names)*float(trimopt[3:])):
+					break
+			if misdata <= (len(names)*float(trimopt[3:])):
 				positions.append(basenum)
 	#print startpos, "startpos"
 	#reverse trim
@@ -194,7 +213,7 @@ for f in files:
 				break
 			#print misdata, "misdata", endpos, "endpos"
 			endpos -= 1
-	elif trimopt == "-%":
+	elif trimopt[:2] == "-%":
 		for basenum in range(len(seqs[names[0]])-1, -1, -1):
 			baselist = []
 			misdata = 0
@@ -203,7 +222,7 @@ for f in files:
 			for base in baselist:
 				if base == "-" or base == "N" or base == "?":
 					misdata += 1
-			if misdata < (len(names)*0.1):
+			if misdata < (len(names)*float(trimopt[2:])):
 				break
 			#print misdata, "misdata", startpos, "startpos"
 			endpos -= 1
@@ -240,15 +259,15 @@ for f in files:
 		endpos = potential_endpos
 	#print endpos, "endpos"
 	infile.close()
-	if trimopt == "-d":
+	if trimopt == "-d" or trimopt[:3] == "-d%":
 		print >> outf, len(positions),"good positions:", positions
 	else:
 		print >> outf, "startpos: ", startpos
 		print >> outf, "endpos: ", endpos
 
 	#writing to files
-	if endpos-startpos > 0 or trimopt == "-d":
-		if trimopt == "-d" and len(positions) > 0:
+	if endpos-startpos > 0 or trimopt == "-d" or trimopt[:3] == "-d%":
+		if (trimopt == "-d" or trimopt[:3] == "-d%") and len(positions) > 0:
 			outfile = open(fn2, "w")
 			align = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna)) # new ali
 			for tempseq in inputalignment:
@@ -260,7 +279,7 @@ for f in files:
 			for aliseq in align:
 				print >> outfile, ">"+aliseq.id, "\n", aliseq.seq
 			outfile.close()
-		elif trimopt == "-d" and len(positions) == 0:
+		elif (trimopt == "-d" or trimopt[:3] == "-d%") and len(positions) == 0:
 			print >> outf, len(positions), "good positions, skipping the locus..."
 			warninglist.append(f)
 		else:
@@ -278,7 +297,7 @@ for f in files:
 	#hashes = '#' * int(progbar * 0.2)
 	#spaces = ' ' * (20 - len(hashes))
 	#print "\rProgress: [{0}] {1}%".format(hashes + spaces, progbar)
-	if trimopt == "-d":
+	if trimopt == "-d" or trimopt[:3] == "-d%":
 		prog = str(progbar)+"% working on file "+str(f)+": "+str(len(positions))+" good positions"
 	else:
 		prog = str(progbar)+"% working on file "+str(f)+": starts "+str(startpos)+", ends "+str(endpos)
