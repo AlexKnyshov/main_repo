@@ -6,10 +6,14 @@ import sys
 import glob
 import re
 
+def get_parent(tree, child_clade):
+    node_path = tree.get_path(child_clade)
+    return node_path[-2]
+
 locusname = re.compile(".*(T.{1,3}_L.{1,4}fas).*")
 
 if len(sys.argv) >= 3:
-	files = glob.glob(sys.argv[2]+"/*")
+	files = glob.glob(sys.argv[2]+"/RAxML*")
 	opt = sys.argv[1]
 	if opt == "-lb":
 		alifiles = sys.argv[3]
@@ -31,7 +35,7 @@ progbarc = 0
 result = {}
 #test
 for f in files:
-	print f
+	# print f
 	tree = Phylo.read(f, "newick")
 	#tree = Phylo.read("./../testtree.tre", "newick")
 	if opt == "-75" or opt == "-avg":
@@ -71,71 +75,43 @@ for f in files:
 			result[tr] = float(sum(conflist)/len(conflist))
 	elif opt == "-lb":
 		trimlist = set()
-		print "total tree length", tree.total_branch_length()
-		#result[f] = tree.total_branch_length()
-		#terms = tree.get_terminals()
-		#print terminal_neighbor_dists(tree)
-		#for term in terms:
-		#	print trimlist
-		#	tpar = tree.collapse(term)
-			#print tree.depths()
-			#print tpar, tree.distance(tpar)
-		# for x in tree.find_elements(terminal=True):
-		# 	if tree.distance(x) / tree.total_branch_length() > 0.7:
-		# 		result[f] = x.name
-		# 		trimlist.add(x.name)
+		treeavg = tree.total_branch_length()/len(tree.get_terminals())
 		excludelist = []
+		count = 0
 		for clade in tree.find_clades():
-			if tree.distance(clade) / tree.total_branch_length() > 0.7:
-				#print clade#.get_terminals()[0]
-				excludelist.append(clade)#.get_terminals()[0])
-				#result[f] = clade.get_terminals()
-				#trimlist.add(clade.get_terminals())
+			if len(tree.get_path(clade)) > 1:
+				parent = get_parent(tree, clade)
+				if tree.distance(clade, parent) / treeavg > 6:
+					excludelist.append(clade)#.get_terminals()[0])
+			else:
+				if tree.distance(clade) / treeavg > 6:
+					excludelist.append(clade)#.get_terminals()[0])
+
 		if len(excludelist)>0:
-			print excludelist[0].get_terminals()
-			names = []
-			for name in excludelist[0].get_terminals():
-				names.append(name.name)
+			for item in excludelist:
+				for term in item.get_terminals():
+					trimlist.add(term.name)
+			names = list(trimlist)
 			result[f] = names
-			#print term, tree.distance(tree.find_clades(term, terminal=True))
-			#print trimlist
-		#for z in trimlist:
-		#	print z
-		# if len(trimlist)>0:
-		# 	print trimlist
 			fname = locusname.match(f)
 			aliout = open("./reduced/"+fname.group(1), "w")
-			#print trimlist
 			aliin = open(alifiles+"/"+fname.group(1), "rU")
-			#alignments = SeqIO.parse(aliin, "fasta")
-			#print trimlist
-			#if f in result:
-			#	print result[f], "1"
-			#trimlist.
 			for seq in SeqIO.parse(aliin, "fasta"):
-			#for seq in alignments:
-				#print >> aliout, trimlist
-				# if f in result:
-				# 	print result[f], "2"
 				if seq.id not in names:
-					#SeqIO.write(seq, aliout, "fasta")
-				 	# print seq.id, "NO"#, trimlist
 				 	print >> aliout, ">"+seq.id, "\n", seq.seq
-				else:
-				 	print seq.id, "YES"
-				 	#print >> aliout, seq.id, "YES"
+		 	status = "long branches detected"
 			aliout.close()
 			aliin.close()
 		else:
-			print "GOOD LOCUS"
+			status = "no long branches detected"
 	#progress bar
 	progbarc +=1
 	progbar = int(round(float(progbarc)/len(files)*100, 0))
 	hashes = '#' * int(progbar * 0.2)
 	spaces = ' ' * (20 - len(hashes))
-	print "-------------------------------------"
-	print "\rProgress: [{0}] {1}%".format(hashes + spaces, progbar)
-	print "-------------------------------------"
+	prog = "Progress: ["+str(hashes)+str(spaces)+"] "+str(progbar)+" %  "+str(status)+", total tree length: "+str(tree.total_branch_length())
+ 	sys.stdout.write(prog+"\r")
+ 	sys.stdout.flush()
 #output the final table
 with open("treesfilter.tab", "w") as outfile:
 	for tc, tcv in result.items():
