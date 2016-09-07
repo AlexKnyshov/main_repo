@@ -58,11 +58,11 @@ if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me":
         for row in reader:
             if currentkey != row[0]: ##new query
                 if float(row[10]) <= evalue:
-                    if row[0].split("//")[-1] in output: ##query is present
-                        print "warning: the key exists", row[0].split("//")[-1]
+                    if row[0].split("/")[-1] in output: ##query is present
+                        print "warning: the key exists", row[0].split("/")[-1]
                     else:
                         print "--------------------------------------------------------"
-                        output[row[0].split("//")[-1]] = row[1] ##standart output
+                        output[row[0].split("/")[-1]] = row[1] ##standart output
                         best_eval = float(row[10])
                         best_hit = float(row[11])
                         #output[AHE] = trans
@@ -70,7 +70,7 @@ if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me":
                         if opt == "-ms" or opt == "-mss" or opt == "-me":
                             start = min(int(row[8]), int(row[9])) #secret opt
                             end = max(int(row[8]), int(row[9])) #secret opt
-                            trans_d[row[0].split("//")[-1]] = [start, end] #secret opt
+                            trans_d[row[0].split("/")[-1]] = [start, end] #secret opt
                             #check trans
                             if int(row[8]) < int(row[9]):
                                 print int(row[8]), int(row[9]), "forward"
@@ -96,11 +96,11 @@ if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me":
                             ahef = int(row[6])
                             aher = int(row[7])
                             #store the data:
-                            e_opt[row[0].split("//")[-1]] = [transf, transr, transb, ahef, aher, aheb]
-                        print row[0].split("//")[-1], row[1], row[2], row[10], row[11]
+                            e_opt[row[0].split("/")[-1]] = [transf, transr, transb, ahef, aher, aheb]
+                        print row[0].split("/")[-1], row[1], row[2], row[10], row[11]
             else: ##same query
                 if currentmatch != row[1] and float(row[10]) <= evalue:
-                    if row[0].split("//")[-1] in output: 
+                    if row[0].split("/")[-1] in output: 
                         #adopted for trinity assemblies
                         if row[1].split("_c")[0] == output[row[0].split("/")[-1]].split("_c")[0]:
                             print "warning: several isoforms detected", row[1], row[10], row[11]
@@ -301,7 +301,7 @@ else:
                     print row[0].split("/")[-1], row[1], row[2], row[10], row[11]
         else: ##same query
             if currentmatch != row[1] and float(row[10]) <= evalue:
-                if row[0].split("//")[-1] in output: 
+                if row[0].split("/")[-1] in output: 
                     #adopted for trinity assemblies
                     if row[1].split("_c")[0] == output[row[0].split("/")[-1]].split("_c")[0]:
                         print "warning: several isoforms detected", row[1], row[10], row[11]
