@@ -12,21 +12,24 @@ if len(sys.argv) == 6:
     evalue = float(sys.argv[4])
     opt = sys.argv[5]
 else:
-    print "FORMAT: python alexblparser.py [blastfile or folder] [asemblyfile or folder] [ahefolder] [evalue] [option: -n (normal), -s (extract only matched parts), -ss (short are discarded), -mn (multiple normal), -ms (multiple selected), -mss(short are discarded), -me (extended ms option)]"
-    print "EXAMPLE: python alexblparser.py blast.tab trinity.fas ./fasta 1e-40 -n"
+    print "FORMAT: python alexblparser.py [blastfile or folder] [asemblyfile or folder] [ahefolder] [evalue] [option: -n (normal), -s (extract only matched parts), -ss (short are discarded), -e (extended s option), -mn (multiple normal), -ms (multiple selected), -mss(short are discarded), -me (extended ms option)]"
+    print "EXAMPLE: python alexblparser.py ./blast_outputs/ /transcriptomes/ ./fasta 1e-40 -mn"
+    print "EXAMPLE: python alexblparser.py blast.tab trinity.fas ./fasta/ 1e-40 -n"
     sys.exit()
 
-print "option", opt, "selected"
-#multi db option
-if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me":
-    #prep
+dash = "--------------------------------------------------------"
+
+#function for creating an output folder. old stuff will be deleted
+def mkdirfunc():
     if not os.path.exists ("./modified/"):
         os.makedirs("./modified") #creating folder if necessary
     else:
         shutil.rmtree("./modified/") #removing old files
         os.makedirs("./modified")
 
-    #copy files
+#function for copying alignment files before changing them
+#all alignments are copied regardless of whether they will be modified or not
+def copyfunc():
     print "copying files:"
     for x in glob.glob(ahefoldarg+"/*.fas"):
         locusfname = x.split("/")[-1]
@@ -37,379 +40,335 @@ if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me":
             sys.stdout.flush()
             shutil.copy2(ahefoldarg+locusfname, "./modified")
     print ""
-    #reading the blastfile
-    blastlist = glob.glob(blastfilearg+"/*.blast")
-    #debug vars
-    number = 0
-    numberset = set()
-    totalloci = 0
-    #parsing blast files
-    for b in blastlist:
-        print "processing", b
-        output = {} #main dctionary
-        trans_d = {} #ahe loci and corresponding start and end of trans locus
-        e_opt = {} #for a ahe (assuming the first hit is extracted), store trans and ahe data
-        #e_opt[AHE] = [transf, transr, transb, ahef, aher, aheb]
-        blastfile = open(b, "rU")
-        reader = csv.reader(blastfile, delimiter='\t')
-        currentkey = ""
-        best_eval = 0.0
-        best_hit = 0
-        for row in reader:
-            if currentkey != row[0]: ##new query
-                if float(row[10]) <= evalue:
-                    if row[0].split("/")[-1] in output: ##query is present
-                        print "warning: the key exists", row[0].split("/")[-1]
-                    else:
-                        print "--------------------------------------------------------"
-                        output[row[0].split("/")[-1]] = row[1] ##standart output
-                        best_eval = float(row[10])
-                        best_hit = float(row[11])
-                        #output[AHE] = trans
-                        #trans_d[AHE] = [start, finish] - for a given AHE, what was the start and end
-                        if opt == "-ms" or opt == "-mss" or opt == "-me":
-                            start = min(int(row[8]), int(row[9])) #secret opt
-                            end = max(int(row[8]), int(row[9])) #secret opt
-                            trans_d[row[0].split("/")[-1]] = [start, end] #secret opt
-                            #check trans
-                            if int(row[8]) < int(row[9]):
-                                print int(row[8]), int(row[9]), "forward"
-                                transb = True
-                                #transf = int(row[8])
-                                #transr = int(row[9])
-                                #print "AHE f:", int(row[6]), int(row[9]), "forward"
-                            else:
-                                print int(row[8]), int(row[9]), "reverse"
-                                transb = False
-                            transf = int(row[8])
-                            transr = int(row[9])
-                            #check query
-                            if int(row[6]) < int(row[7]):
-                                print int(row[6]), int(row[7]), "forward"
-                                aheb = True
-                                #transf = int(row[8])
-                                #transr = int(row[9])
-                                #print "AHE f:", int(row[6]), int(row[9]), "forward"
-                            else:
-                                print int(row[7]), int(row[6]), "reverse"
-                                aheb = False
-                            ahef = int(row[6])
-                            aher = int(row[7])
-                            #store the data:
-                            e_opt[row[0].split("/")[-1]] = [transf, transr, transb, ahef, aher, aheb]
-                        print row[0].split("/")[-1], row[1], row[2], row[10], row[11]
-            else: ##same query
-                if currentmatch != row[1] and float(row[10]) <= evalue:
-                    if row[0].split("/")[-1] in output: 
-                        #adopted for trinity assemblies
-                        if row[1].split("_c")[0] == output[row[0].split("/")[-1]].split("_c")[0]:
-                            print "warning: several isoforms detected", row[1], row[10], row[11]
-                        else:
-                            print "warning: several matches detected", row[1], row[10], row[11], "hit is", round(float(row[11])/best_hit*100), "%"#"; ratio with best_eval is"#, round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
-                            if round(float(row[11])/best_hit*100) > 90:#round(math.log(float(row[10]))/math.log(best_eval)*100) > 90 or :
-                                number += 1
-                                numberset.add(row[0])
-                    else:
-                        output[row[0].split("/")[-1]] = row[1] ##standart output
-                        print "ADDITION"
-            currentkey = row[0]
-            currentmatch = row[1]
-            currente = float(row[10])
-        blastfile.close()
-        count = int(len(output))
-        print count, "targets found to be extracted"
 
-        print "scanning the transcriptome..."
-        #output2 = []
-        warninglist = []
-        inputf = SeqIO.parse(trif+"/"+b[:-6].split("/")[-1], "fasta")
-        print "searching for contigs in:", b[:-6].split("/")[-1]
-        c1 = 0
-        extr_loci = []
-        for seq in inputf:
-            #print count
-            if count == 0:
-                print "search terminated"
-                break
-            elif seq.id in output.values(): #if contig is in ahe (was found as a blast hit)
-                print "--------------------------------------------------------"
-                print "start"
-                for x,y in output.items(): #checking all ahe (seach which ahe has it)
-                    locusfname = x #AHE name
-                    #y - trans locus name
-                    #seq.id = trans locus name as well
-                    if y == seq.id:
-                        temp = seq.id
-                        tempseq = seq.seq #secret opt
-                        if opt == "-ms" or opt == "-mss" or opt == "-me":
-                            rhandle = open("./modified/"+locusfname, "r")
-                            ali = SeqIO.parse(rhandle, "fasta")
-                            recs = list(ali)
-                            #e option:
-                            #e_opt[AHE] = [transf, transr, transb, ahef, aher, aheb]
-                            #forward ahe:
-                            #print "E opt"
-                            if e_opt[locusfname][5]:#aheb: #ahe is forward
-                                #print "AHE forw"
-                                gap = e_opt[locusfname][3]#ahef #ahe start gap
-                                if e_opt[locusfname][2]:#transb: #trans is forward
-                                    ##need to check if trans has start - OK
-                                    if e_opt[locusfname][0] - gap >= 0:
-                                        gapt = e_opt[locusfname][0] - gap#transf - gap #this is the corrected trans start
-                                    else:
-                                        gapt = 0 # otherwise start from start
-                                else:
-                                    ##need to check if trans is long enough - OK
-                                    if e_opt[locusfname][0] + gap <= len(tempseq):
-                                        gapt = e_opt[locusfname][0] + gap#transf + gap #this is the corrected trans start
-                                    else:
-                                        gapt = len(tempseq) # otherwise start from the end
-                                #check the ahe end:
-                                gaprev = len(recs[0].seq) - e_opt[locusfname][4]#ali.get_alignment_length() - e_opt[locusfname][0][4]
-                                #if gaprev >= 0:#aher #some AHE left
-                                if e_opt[locusfname][2]:#transb: #trans is forward
-                                    #check the trans end
-                                    if e_opt[locusfname][1] + gaprev <= len(tempseq): #check that trans is long enough
-                                        gaptrev = e_opt[locusfname][1] + gaprev#transf - gap #this is the corrected trans start
-                                    else:
-                                        gaptrev = len(tempseq)
-                                else:
-                                    ##need to check if trans has start
-                                    if e_opt[locusfname][1] - gaprev >= 0:
-                                        gaptrev = e_opt[locusfname][1] - gaprev#transf + gap #this is the corrected trans start
-                                    else:
-                                        gaptrev = 0
-                            #reverse AHE:
-                            else: #ahe is reverse
-                                #print "AHE rev"
-                                gap = len(recs[0].seq) - e_opt[locusfname][3]#ali.get_alignment_length() - e_opt[locusfname][0][3]#ahef #ahe start gap
-                                if e_opt[locusfname][2]:#transb: #trans is forward
-                                    ##need to check if trans has start - OK
-                                    if e_opt[locusfname][0] - gap >= 0:
-                                        gapt = e_opt[locusfname][0] - gap#transf - gap #this is the corrected trans start
-                                    else:
-                                        gapt = 0
-                                else:
-                                    ##need to check if trans is long enough - OK
-                                    if e_opt[locusfname][0] + gap <= len(tempseq):
-                                        gapt = e_opt[locusfname][0] + gap#transf + gap #this is the corrected trans start
-                                    else:
-                                        gapt = len(tempseq)
-                                #check the ahe end:
-                                gaprev = e_opt[locusfname][4] # ahe end gap
-                                #if gaprev >= 0:#aher #some AHE left
-                                if e_opt[locusfname][2]:#transb: #trans is forward
-                                    #check the trans end
-                                    if e_opt[locusfname][1] + gaprev <= len(tempseq): #check that trans is long enough
-                                        gaptrev = e_opt[locusfname][1] + gaprev#transf - gap #this is the corrected trans start
-                                    else:
-                                        gaptrev = len(tempseq)
-                                else:
-                                    ##need to check if trans has start
-                                    if e_opt[locusfname][1] - gaprev >= 0:
-                                        gaptrev = e_opt[locusfname][1] - gaprev#transf + gap #this is the corrected trans start
-                                    else:
-                                        gaptrev = 0
-                            print "BLAST:", "transf:",e_opt[locusfname][0], "transr:",e_opt[locusfname][1], "transb:",e_opt[locusfname][2], "ahef:",e_opt[locusfname][3], "aher:",e_opt[locusfname][4], "aheb:",e_opt[locusfname][5]
-                            print "LOCUS", "ahe:", len(recs[0].seq), "trans:", len(seq.seq)
-                            if opt == "-me":
-                                #TEST
-                                if e_opt[locusfname][2]:
-                                    print "STATS:", e_opt[locusfname][2], "start:", gapt,"stop",  gaptrev
-                                    seq.seq = seq.seq[gapt:gaptrev]
-                                else:
-                                    print "STATS:", e_opt[locusfname][2], "start:", gaptrev,"stop",  gapt
-                                    seq.seq = seq.seq[gaptrev:gapt]
-                                    seq = seq.reverse_complement()
-                            elif opt == "-ms" or opt == "-mss":
-                                #old option
-                                seq.seq = seq.seq[trans_d[locusfname][0]:trans_d[locusfname][1]] #secret opt
-                                print "s:", trans_d[locusfname][0], "e:", trans_d[locusfname][1], "trans end:", len(tempseq)
-                            rhandle.seek(0)
-                            ali = SeqIO.parse(rhandle, "fasta")
-                            for a in ali:
-                                print "lenght AHE:", len(a), "length blast hit", len(seq.seq)
-                                if float(len(seq.seq)) / len(a) < 0.8:
-                                    print "Warning: blast hit is too short"
-                                    warninglist.append(locusfname)
-                                break
-                            rhandle.close()
-                        print "found", locusfname, y, "length:", len(seq.seq)
-                        extr_loci.append(locusfname)
-                        #print seq, len(seq) #debug
-                        fhandle = open("./modified/"+locusfname, "a")
-                        seq.id = b[:-6].split("/")[-1][:-4]#[:5]
-                        seq.name =""
-                        seq.description =""
-                        if opt == "-mss" and locusfname not in warninglist:
-                            SeqIO.write(seq, fhandle, "fasta")
-                            c1 += 1
-                        elif opt == "-ms" or opt == "-me":
-                            SeqIO.write(seq, fhandle, "fasta")
-                            c1 += 1
-                        elif opt == "-mn":
-                            SeqIO.write(seq, fhandle, "fasta")
-                            c1 += 1
-                        seq.id = temp
-                        seq.seq = tempseq #secret opt
-                        count -= 1
-                        fhandle.close()
-                    # else:
-                    #     print x, y
-        print c1, "loci extracted"
-        count = int(len(output))
-        print "files written: ", len(extr_loci)
-        print "warning list:", len(warninglist)
-        for wle in warninglist:
-            print wle
-        totalloci += c1
-    print "number of >90% close suboptimal hits", number
-    print "number of loci with >90% close suboptimal hits", len(numberset)
-    print "total number of loci found", totalloci
-else:
-    output = {} #main dctionary
-    trans_d = {} #ahe loci and corresponding start and end of trans locus
-    #reading blast file
-    print "reading blastfile...", blastfilearg
-    blastfile = open(blastfilearg, "rU")
+#function for parsing a blast output file
+#returns a dictionary like this:
+#output2[AHE] = [transf, transr, transb, ahef, aher, aheb, trans]
+#AHE - query name, transf - target start pos, transr - target end, transb - forward or reverse target direction
+#ahef - query start, aher - query end, aheb - query direction, trans - target name
+#each query is allowed to have only 1 target
+def readblastfilefunc(b, debugfile):
+    print "processing", b
+    print >> debugfile, "processing blastfile", b
+    output2 = {}
+    blastfile = open(b, "rU")
     reader = csv.reader(blastfile, delimiter='\t')
     currentkey = ""
     best_eval = 0.0
     best_hit = 0
-    # debug_file = open("debug.tab", "w")
-    # debug_dict = {}
-    # debug_c = 0
     for row in reader:
         if currentkey != row[0]: ##new query
             if float(row[10]) <= evalue:
-                if row[0].split("/")[-1] in output: ##query is present - normaly never happens
+                if row[0].split("/")[-1] in output2: ##query is present
                     print "warning: the key exists", row[0].split("/")[-1]
+                    print >> debugfile, "warning: the key exists", row[0].split("/")[-1]
                 else:
-                    print "--------------------------------------------------------"
-                    # debug_c = 0
-                    output[row[0].split("/")[-1]] = row[1] ##standart output
-                    #print "NORMAL"
+                    print dash
+                    print >> debugfile, dash
                     best_eval = float(row[10])
                     best_hit = float(row[11])
-                    # debug_c = 1
-                    #output[AHE] = trans
-                    #trans_d[AHE] = [start, finish] - for a given AHE, what was the start and end
-                    if opt == "-s" or opt == "-ss":
-                        start = min(int(row[8]), int(row[9])) #secret opt
-                        end = max(int(row[8]), int(row[9])) #secret opt
-                        trans_d[row[0].split("/")[-1]] = [start, end] #secret opt
-                    print row[0].split("/")[-1], row[1], row[2], row[10], row[11]
+                    #check trans
+                    if int(row[8]) < int(row[9]):
+                        transb = True
+                    else:
+                        transb = False
+                    transf = int(row[8])
+                    transr = int(row[9])
+                    #check query
+                    if int(row[6]) < int(row[7]):
+                        aheb = True
+                    else:
+                        aheb = False
+                    ahef = int(row[6])
+                    aher = int(row[7])
+                    #store the data:
+                    output2[row[0].split("/")[-1]] = [transf, transr, transb, ahef, aher, aheb, row[1]]
+
+                    print "query", row[0].split("/")[-1], ", direction:", aheb, "; target", row[1], ", direction: ", transb
+                    print >> debugfile, "query", row[0].split("/")[-1], ", direction:", aheb, "; target", row[1], ", direction: ", transb
+                    print "identity:", row[2], ", eval:", row[10], ", bitscore", row[11]
+                    print >> debugfile, "identity:", row[2], ", eval:", row[10], ", bitscore", row[11]
         else: ##same query
             if currentmatch != row[1] and float(row[10]) <= evalue:
-                if row[0].split("/")[-1] in output: 
+                if row[0].split("/")[-1] in output2: 
                     #adopted for trinity assemblies
-                    if row[1].split("_c")[0] == output[row[0].split("/")[-1]].split("_c")[0]:
+                    if row[1].split("_c")[0] == output2[row[0].split("/")[-1]][6].split("_c")[0]:
                         print "warning: several isoforms detected", row[1], row[10], row[11]
+                        print >> debugfile, "warning: several isoforms detected", row[1], row[10], row[11]
                     else:
-                        #print "warning: several matches detected", row[1], row[10], row[11], "; ratio with best_eval is", round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
-                        # print >> debug_file, row[0].split("/")[-1], row[1].split("_c")[0], math.log(float(row[10]))/math.log(best_eval)*100, float(row[11])/best_hit*100
-                        # debug_c +=1
-                        print "warning: several matches detected", row[1], row[10], row[11]#, "; ratio with best_eval is", round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
-                        if round(float(row[11])/best_hit*100) > 90: #round(math.log(float(row[10]))/math.log(best_eval)*100) > 90 or 
+                        print "warning: several matches detected", row[1], row[10], row[11], "hit is", round(float(row[11])/best_hit*100), "%"#"; ratio with best_eval is"#, round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
+                        print >> debugfile, "warning: several matches detected", row[1], row[10], row[11], "hit is", round(float(row[11])/best_hit*100), "%"#"; ratio with best_eval is"#, round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
+                        if round(float(row[11])/best_hit*100) > 90:#round(math.log(float(row[10]))/math.log(best_eval)*100) > 90 or :
                             number += 1
                             numberset.add(row[0])
                 else:
-                    output[row[0].split("/")[-1]] = row[1] ##standart output
-                    print "ADDITION"
+                    #output[row[0].split("/")[-1]] = row[1] ##standart output
+                    output2[row[0].split("/")[-1]] = [transf, transr, transb, ahef, aher, aheb, row[1]]
+                    print >> debugfile, "ADDITION"
         currentkey = row[0]
         currentmatch = row[1]
         currente = float(row[10])
-        # debug_dict[currentkey.split("/")[-1]] = debug_c
     blastfile.close()
-    # debug_file.close()
+    return output2
+
+#function for determining the offsets of blast hit in a query and a target
+#returns the list of four elements:
+#gap - query hit start offset, gaprev - query hit end offset
+#gapt - target hit start offset, gaptrev - target hit end offset
+def gapfunc(output, locusfname, recs):
+    if output[locusfname][5]:#aheb: #ahe is forward
+        #print "AHE forw"
+        gap = output[locusfname][3]#ahef #ahe start gap
+        if output[locusfname][2]:#transb: #trans is forward
+            ##need to check if trans has start - OK
+            if output[locusfname][0] - gap >= 0:
+                gapt = output[locusfname][0] - gap#transf - gap #this is the corrected trans start
+            else:
+                gapt = 0 # otherwise start from start
+        else:
+            ##need to check if trans is long enough - OK
+            if output[locusfname][0] + gap <= len(tempseq):
+                gapt = output[locusfname][0] + gap#transf + gap #this is the corrected trans start
+            else:
+                gapt = len(tempseq) # otherwise start from the end
+        #check the ahe end:
+        gaprev = len(recs[0].seq) - output[locusfname][4]#ali.get_alignment_length() - output[locusfname][0][4]
+        #if gaprev >= 0:#aher #some AHE left
+        if output[locusfname][2]:#transb: #trans is forward
+            #check the trans end
+            if output[locusfname][1] + gaprev <= len(tempseq): #check that trans is long enough
+                gaptrev = output[locusfname][1] + gaprev#transf - gap #this is the corrected trans start
+            else:
+                gaptrev = len(tempseq)
+        else:
+            ##need to check if trans has start
+            if output[locusfname][1] - gaprev >= 0:
+                gaptrev = output[locusfname][1] - gaprev#transf + gap #this is the corrected trans start
+            else:
+                gaptrev = 0
+    #reverse AHE:
+    else: #ahe is reverse
+        #print "AHE rev"
+        gap = len(recs[0].seq) - output[locusfname][3]#ali.get_alignment_length() - output[locusfname][0][3]#ahef #ahe start gap
+        if output[locusfname][2]:#transb: #trans is forward
+            ##need to check if trans has start - OK
+            if output[locusfname][0] - gap >= 0:
+                gapt = output[locusfname][0] - gap#transf - gap #this is the corrected trans start
+            else:
+                gapt = 0
+        else:
+            ##need to check if trans is long enough - OK
+            if output[locusfname][0] + gap <= len(tempseq):
+                gapt = output[locusfname][0] + gap#transf + gap #this is the corrected trans start
+            else:
+                gapt = len(tempseq)
+        #check the ahe end:
+        gaprev = output[locusfname][4] # ahe end gap
+        #if gaprev >= 0:#aher #some AHE left
+        if output[locusfname][2]:#transb: #trans is forward
+            #check the trans end
+            if output[locusfname][1] + gaprev <= len(tempseq): #check that trans is long enough
+                gaptrev = output[locusfname][1] + gaprev#transf - gap #this is the corrected trans start
+            else:
+                gaptrev = len(tempseq)
+        else:
+            ##need to check if trans has start
+            if output[locusfname][1] - gaprev >= 0:
+                gaptrev = output[locusfname][1] - gaprev#transf + gap #this is the corrected trans start
+            else:
+                gaptrev = 0
+    return [gap, gaprev, gapt, gaptrev]
+
+#function for preparing found target sequence for appending
+#returns prepared sequence
+def seqprepfunc(output, locusfname, opt, seq):
+    rhandle = open("./modified/"+locusfname, "r")
+    ali = SeqIO.parse(rhandle, "fasta")
+    recs = list(ali)
+    # identify gaps
+    gaps = gapfunc(output, locusfname, recs)
+    # print out trans and AHE stats...
+    #print "BLAST:", "transf:",output[locusfname][0], "transr:",output[locusfname][1], "transb:",output[locusfname][2], "ahef:",output[locusfname][3], "aher:",output[locusfname][4], "aheb:",output[locusfname][5]
+    #print "LOCUS", "ahe:", len(recs[0].seq), "trans:", len(seq.seq)
+    #print gaps
+    if opt == "-me" or opt == "-e":
+        #TEST
+        if output[locusfname][2]:
+            #print "STATS:", output[locusfname][2], "start:", gaps[2],"stop:",  gaps[3]
+            seq.seq = seq.seq[gaps[2]:gaps[3]]
+        else:
+            #print "STATS:", output[locusfname][2], "start:", gaps[3],"stop:",  gaps[2]
+            seq.seq = seq.seq[gaps[3]:gaps[2]]
+            seq = seq.reverse_complement()
+    elif opt == "-ms" or opt == "-mss" or opt == "-s" or opt == "-ss":
+        if output[locusfname][2] and output[locusfname][5]:
+            seq.seq = seq.seq[output[locusfname][0]:output[locusfname][1]] #secret opt
+        else:
+            seq.seq = seq.seq[output[locusfname][1]:output[locusfname][0]]
+            seq = seq.reverse_complement()
+    elif opt == "-mn" or opt == "-n":
+        if not output[locusfname][2] and not output[locusfname][5]:
+            seq = seq.reverse_complement()
+    rhandle.close()
+    return seq
+
+#function for appending the seqeunce to the alignemnt
+#returns 1 if success, 0 otherwise
+def seqwritefunc(seq, opt, locusfname, seqname):
+    fhandle = open("./modified/"+locusfname, "a")
+    seq.id = seqname
+    seq.name =""
+    seq.description =""
+    if (opt == "-mss" or opt == "-ss") and (float(len(seq.seq)) / loclenfunc(locusfname) > 0.8):
+        SeqIO.write(seq, fhandle, "fasta")
+        return 1
+    elif opt == "-ms" or opt == "-me" or opt == "-s" or opt == "-e":
+        SeqIO.write(seq, fhandle, "fasta")
+        return 1
+    elif opt == "-mn" or opt == "-n":
+        SeqIO.write(seq, fhandle, "fasta")
+        return 1
+    else:
+        return 0
+    fhandle.close()
+
+#function for determining the length of the query alignment
+#returns length (int)
+def loclenfunc(locusfname):
+    rhandle = open("./modified/"+locusfname, "r")
+    ali = list(SeqIO.parse(rhandle, "fasta"))
+    return len(ali[0])
+    rhandle.close()
+#---------------------------------------------------------------------
+
+print "alexblparser run with option", opt, "selected"
+debugfile = open("alexblparser.log", "w")
+print >> debugfile, "debug file start"
+print >> debugfile, "command line parameters:", sys.argv
+#make modified dir
+print >> debugfile, "make modified dir..."
+mkdirfunc()
+
+#copy files
+print >> debugfile, "copy files..."
+copyfunc()
+
+#multi db option
+if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me":
+    #reading the blastfile
+    blastlist = glob.glob(blastfilearg+"/*.blast")
+    translist = glob.glob(trif+"/*.fasta")
+else:
+    blastlist = [blastfilearg]
+    translist = [trif]
+
+print "list of transcriptomes:"
+print >> debugfile, "list of transcriptomes:"
+for l in translist:
+    print l
+    print >> debugfile, l
+#debug vars
+number = 0
+numberset = set()
+totalloci = 0
+#parsing blast files
+print "parsing blast files..."
+print >> debugfile, "parsing blast files..."
+for b in blastlist:
+    #obtain a dictionary with blast results
+    output = readblastfilefunc(b, debugfile)
+    print dash
+    print >> debugfile, dash
     count = int(len(output))
     print count, "targets found to be extracted"
-    # debug_file2 = open("debug2.tab", "w")
-    # for k, v in debug_dict.items():
-    #     print >> debug_file2, k, v
-    # debug_file2.close()
-    #print output
-    #print trans_d
-
-    #scanning the transcriptomes
-    if not os.path.exists ("./modified/"):
-        os.makedirs("./modified") #creating folder if necessary
-    else:
-        shutil.rmtree("./modified/") #removing old files
-        os.makedirs("./modified")
-
-    #copy files
-    print "copying files:"
-    for x in glob.glob(ahefoldarg+"/*.fas"):
-        locusfname = x.split("/")[-1]
-        #print locusfname
-        if not os.path.exists ("./modified/"+locusfname):
-            prog = "copying "+str(locusfname)+"..."
-            sys.stdout.write(prog+"\r")
-            sys.stdout.flush()
-            shutil.copy2(ahefoldarg+locusfname, "./modified")
-    print ""
-
+    print >> debugfile, count, "targets found to be extracted"
+    
     print "scanning the transcriptome..."
-    #output2 = []
+    print >> debugfile, "scanning the transcriptome..."
     warninglist = []
-    inputf = SeqIO.parse(trif, "fasta")
-    print "searching for contigs in:", trif
+    #get the transcriptome filename, matching blast filename
+    for t_file in translist:
+        if b[:-6].split("/")[-1] in t_file:
+            #print >> debugfile, b[:-6].split("/")[-1], t_file
+            inputf = SeqIO.parse(t_file, "fasta")
+            seqname = b[:-6].split("/")[-1]
+            transname = t_file.split("/")[-1]
+            break
+    print >> debugfile, "target:", transname, "; target name:", seqname
+    if not inputf:
+        print "error, transcriptome file is not found"
+        print >> debugfile, "error, transcriptome file is not found"
+        break
+    print "searching for contigs in:", transname
+    print >> debugfile, "searching for contigs in:", transname
     c1 = 0
-    extr_loci = []
+    extr_loci = []                                                  
     for seq in inputf:
         #print count
         if count == 0:
+            print dash
+            print >> debugfile, dash
             print "search terminated"
+            print >> debugfile, "search terminated"
             break
-        elif seq.id in output.values(): #if contig is in ahe (was found as a blast hit)
-            print "--------------------------------------------------------"
-            print "start"
-            for x,y in output.items(): #checking all ahe (seach which ahe has it)
-                locusfname = x #AHE name
+        else:
+            # for val in output.values():
+            #     if seq.id in val: #if contig is in ahe (was found as a blast hit)
+            #         print dash
+            #         print >> debugfile, dash
+            #         print "target", seq.id, "found as a blast hit, looking up the locus..."
+            #         print >> debugfile, "target", seq.id, "found as a blast hit, looking up the locus..."
+            for locusfname,y in output.items(): #checking all ahe (seach which ahe has it)
+                #locusfname - AHE name
                 #y - trans locus name
                 #seq.id = trans locus name as well
-                if y == seq.id:
+                if y[6] == seq.id and locusfname not in extr_loci:
+                    print dash
+                    print >> debugfile, dash
+                    print "target", seq.id, "found as a blast hit, matched the locus", locusfname
+                    print >> debugfile, "target", seq.id, "found as a blast hit, matched the locus",locusfname
+                    #print "locus", locusfname
+                    #print >> debugfile, "locus", locusfname
                     temp = seq.id
                     tempseq = seq.seq #secret opt
-                    if opt == "-s" or opt == "-ss":
-                        seq.seq = seq.seq[trans_d[locusfname][0]:trans_d[locusfname][1]] #secret opt
-                        print "s:", trans_d[locusfname][0], "e:", trans_d[locusfname][1], "trans end:", len(tempseq)
-                        rhandle = open("./modified/"+locusfname, "r")
-                        ali = SeqIO.parse(rhandle, "fasta")
-                        for a in ali:
-                            print "lenght AHE:", len(a), "length blast hit", len(seq.seq)
-                            if float(len(seq.seq)) / len(a) < 0.8:
-                                print "Warning: blast hit is too short"
-                                warninglist.append(locusfname)
-                            break
-                        rhandle.close()
-                    print "found", locusfname, y, "length:", len(seq.seq)
+                    
+                    #check direction and length
+                    seq = seqprepfunc(output, locusfname, opt, seq)
+                    print "extracted length:", len(seq.seq)
+                    print >> debugfile, "extracted length:", len(seq.seq)
+                    #append sequence
+                    if seqwritefunc(seq, opt, locusfname, seqname) == 1:
+                        c1 += 1
+                    elif opt == "-mss" or opt == "-ss":
+                        print "Warning: blast hit is too short"
+                        print >> debugfile, "Warning: blast hit is too short"
+                        warninglist.append(locusfname)
                     extr_loci.append(locusfname)
-                    #print seq, len(seq) #debug
-                    fhandle = open("./modified/"+locusfname, "a")
-                    seq.id = trif.split("/")[-1][:-4]#[:5]
-                    seq.name =""
-                    seq.description =""
-                    if opt == "-ss" and locusfname not in warninglist:
-                        SeqIO.write(seq, fhandle, "fasta")
-                        c1 += 1
-                    elif opt == "-s":
-                        SeqIO.write(seq, fhandle, "fasta")
-                        c1 += 1
-                    elif opt == "-n":
-                        SeqIO.write(seq, fhandle, "fasta")
-                        c1 += 1
                     seq.id = temp
                     seq.seq = tempseq #secret opt
                     count -= 1
-                    fhandle.close()
-                # else:
-                #     print x, y
-    print c1, "loci extracted"
+                # if y[6] == seq.id and locusfname in extr_loci:
+                #     print >> debugfile, "locus is already extracted"
+                #     print "locus is already extracted"
     count = int(len(output))
-    print "files written: ", len(extr_loci)
+    print "queries found:", len(extr_loci)
+    print >> debugfile, "queries found:", len(extr_loci)
+    print c1, "sequences extracted"
+    print >> debugfile, c1, "seqeunces extracted"
     print "warning list:", len(warninglist)
+    print >> debugfile, "warning list:", len(warninglist)
     for wle in warninglist:
         print wle
+        print >> debugfile, wle
+    totalloci += c1
+
+print "number of >90% close suboptimal hits", number
+print "number of queries with >90% close suboptimal hits", len(numberset)
+print "total number of queries extracted", totalloci, ", in average", totalloci/float(len(translist)), "per database"
+
+print >> debugfile, "number of >90% close suboptimal hits", number
+print >> debugfile, "number of queries with >90% close suboptimal hits", len(numberset)
+print >> debugfile, "total number of queries extracted", totalloci, ", in average", totalloci/float(len(translist)), "per database"
+print >> debugfile, "done"
+debugfile.close()
 print "done"
