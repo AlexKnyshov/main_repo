@@ -99,8 +99,9 @@ def readblastfilefunc(b, debugfile):
                         print "warning: several matches detected", row[1], row[10], row[11], "hit is", round(float(row[11])/best_hit*100), "%"#"; ratio with best_eval is"#, round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
                         print >> debugfile, "warning: several matches detected", row[1], row[10], row[11], "hit is", round(float(row[11])/best_hit*100), "%"#"; ratio with best_eval is"#, round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
                         if round(float(row[11])/best_hit*100) > 90:#round(math.log(float(row[10]))/math.log(best_eval)*100) > 90 or :
-                            number += 1
-                            numberset.add(row[0])
+                            #number += 1
+                            #numberset.add(row[0])
+                            print >> debugfile, "number += 1"
                 else:
                     #output[row[0].split("/")[-1]] = row[1] ##standart output
                     output2[row[0].split("/")[-1]] = [transf, transr, transb, ahef, aher, aheb, row[1]]
