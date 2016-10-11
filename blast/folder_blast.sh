@@ -55,7 +55,9 @@ if [ -z "$6" ]
 	 	echo -ne $zo"% blast $name against $2...\r"
 	 	touch output.blast
 	 	$4 -db $2 -query fasextr.blast -out output.blast -outfmt 6 -num_threads $5 -evalue $3
-	 	cat output.blast | sort -k1,1 -k2,2 -k11,11g -k12,12nr | sort -u -k2,2 --merge | sort -k1,1 -k11,11g -k12,12nr >> blast.blast
+	 	blname=$(echo $2 | rev | cut -d'/' -f-1 | rev | cut -d'.' -f1)
+	 	#echo "$blname testtest"
+	 	cat output.blast | sort -k1,1 -k2,2 -k11,11g -k12,12nr | sort -u -k2,2 --merge | sort -k1,1 -k11,11g -k12,12nr >> $blname.blast
 	done
   else
   	echo "multiple db blast option selected, number of dbs: $(cat $6 | wc -l)"
