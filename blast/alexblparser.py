@@ -56,8 +56,10 @@ def readblastfilefunc(b, debugfile):
     currentkey = ""
     best_eval = 0.0
     best_hit = 0
+    query_counter = 0
     for row in reader:
         if currentkey != row[0]: ##new query
+            query_counter = 0
             if float(row[10]) <= evalue:
                 if row[0].split("/")[-1] in output2: ##query is present
                     print "warning: the key exists", row[0].split("/")[-1]
@@ -67,50 +69,57 @@ def readblastfilefunc(b, debugfile):
                     print >> debugfile, dash
                     best_eval = float(row[10])
                     best_hit = float(row[11])
-                    #check trans
-                    if int(row[8]) < int(row[9]):
-                        transb = True
-                    else:
-                        transb = False
-                    transf = int(row[8])
-                    transr = int(row[9])
-                    #check query
-                    if int(row[6]) < int(row[7]):
-                        aheb = True
-                    else:
-                        aheb = False
-                    ahef = int(row[6])
-                    aher = int(row[7])
-                    #store the data:
-                    output2[row[0].split("/")[-1]] = [transf, transr, transb, ahef, aher, aheb, row[1]]
-
-                    print "query", row[0].split("/")[-1], ", direction:", aheb, "; target", row[1], ", direction: ", transb
-                    print >> debugfile, "query", row[0].split("/")[-1], ", direction:", aheb, "; target", row[1], ", direction: ", transb
+                    query_counter += 1
+                    output2[row[0].split("/")[-1]+"-"+str(query_counter)] = rowfunc(row)
+                    print "query", row[0].split("/")[-1], ", direction:", output2[row[0].split("/")[-1]+"-"+str(query_counter)][5], "; target", row[1], ", direction: ", output2[row[0].split("/")[-1]+"-"+str(query_counter)][2]
+                    print >> debugfile, "query", row[0].split("/")[-1], ", direction:", output2[row[0].split("/")[-1]+"-"+str(query_counter)][5], "; target", row[1], ", direction: ", output2[row[0].split("/")[-1]+"-"+str(query_counter)][2]
                     print "identity:", row[2], ", eval:", row[10], ", bitscore", row[11]
                     print >> debugfile, "identity:", row[2], ", eval:", row[10], ", bitscore", row[11]
         else: ##same query
             if currentmatch != row[1] and float(row[10]) <= evalue:
-                if row[0].split("/")[-1] in output2: 
+                if row[0].split("/")[-1]+"-1" in output2: 
                     #adopted for trinity assemblies
-                    if row[1].split("_c")[0] == output2[row[0].split("/")[-1]][6].split("_c")[0]:
+                    if row[1].split("_c")[0] == output2[row[0].split("/")[-1]+"-1"][6].split("_c")[0]:
                         print "warning: several isoforms detected", row[1], row[10], row[11]
                         print >> debugfile, "warning: several isoforms detected", row[1], row[10], row[11]
                     else:
                         print "warning: several matches detected", row[1], row[10], row[11], "hit is", round(float(row[11])/best_hit*100), "%"#"; ratio with best_eval is"#, round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
                         print >> debugfile, "warning: several matches detected", row[1], row[10], row[11], "hit is", round(float(row[11])/best_hit*100), "%"#"; ratio with best_eval is"#, round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
-                        if round(float(row[11])/best_hit*100) > 90:#round(math.log(float(row[10]))/math.log(best_eval)*100) > 90 or :
+                        if round(float(row[11])/best_hit*100) > 70 and query_counter < 9:#round(math.log(float(row[10]))/math.log(best_eval)*100) > 90 or :
                             #number += 1
                             #numberset.add(row[0])
-                            print >> debugfile, "number += 1"
+                            print >> debugfile, "paralog added"
+                            #store the additional data:
+                            query_counter += 1
+                            output2[row[0].split("/")[-1]+"-"+str(query_counter)] = rowfunc(row)
+                            print "locus", row[0].split("/")[-1]+"-"+str(query_counter)
                 else:
                     #output[row[0].split("/")[-1]] = row[1] ##standart output
-                    output2[row[0].split("/")[-1]] = [transf, transr, transb, ahef, aher, aheb, row[1]]
+                    output2[row[0].split("/")[-1]+"-"+str(query_counter)] = rowfunc(row)
                     print >> debugfile, "ADDITION"
         currentkey = row[0]
         currentmatch = row[1]
         currente = float(row[10])
     blastfile.close()
     return output2
+
+#function to return a list for dict
+#must return this -- [transf, transr, transb, ahef, aher, aheb, row[1]]
+def rowfunc(row):
+    if int(row[8]) < int(row[9]):
+        transb = True
+    else:
+        transb = False
+    transf = int(row[8])
+    transr = int(row[9])
+    #check query
+    if int(row[6]) < int(row[7]):
+        aheb = True
+    else:
+        aheb = False
+    ahef = int(row[6])
+    aher = int(row[7])
+    return [transf, transr, transb, ahef, aher, aheb, row[1]]
 
 #function for determining the offsets of blast hit in a query and a target
 #returns the list of four elements:
@@ -183,7 +192,7 @@ def gapfunc(output, locusfname, recs):
 #function for preparing found target sequence for appending
 #returns prepared sequence
 def seqprepfunc(output, locusfname, opt, seq):
-    rhandle = open("./modified/"+locusfname, "r")
+    rhandle = open("./modified/"+locusfname.split("-")[0], "r")
     ali = SeqIO.parse(rhandle, "fasta")
     recs = list(ali)
     # identify gaps
@@ -201,7 +210,7 @@ def seqprepfunc(output, locusfname, opt, seq):
             #print "STATS:", output[locusfname][2], "start:", gaps[3],"stop:",  gaps[2]
             seq.seq = seq.seq[gaps[3]:gaps[2]]
             seq = seq.reverse_complement()
-    elif opt == "-ms" or opt == "-mss" or opt == "-s" or opt == "-ss":
+    elif opt == "-ms" or opt == "-mss" or opt == "-s" or opt == "-ss" or opt == "-msl" or opt == "-sl":
         if output[locusfname][2] and output[locusfname][5]:
             seq.seq = seq.seq[output[locusfname][0]:output[locusfname][1]] #secret opt
         else:
@@ -216,8 +225,8 @@ def seqprepfunc(output, locusfname, opt, seq):
 #function for appending the seqeunce to the alignemnt
 #returns 1 if success, 0 otherwise
 def seqwritefunc(seq, opt, locusfname, seqname):
-    fhandle = open("./modified/"+locusfname, "a")
-    seq.id = seqname
+    fhandle = open("./modified/"+locusfname.split("-")[0], "a")
+    seq.id = seqname+"."+locusfname.split("-")[1]
     seq.name =""
     seq.description =""
     if (opt == "-mss" or opt == "-ss") and (float(len(seq.seq)) / loclenfunc(locusfname) > 0.8):
@@ -233,10 +242,21 @@ def seqwritefunc(seq, opt, locusfname, seqname):
         return 0
     fhandle.close()
 
+#alternative function for writing, all in 1 file
+def altwritefunc(seq, opt, locusfname, seqname):
+    fhandle = open("./"+seqname+"_conSeqs.fasta", "a")
+    seq.id = locusfname.split("_")[-1].split(".")[0]+"."+locusfname.split("-")[1]
+    seq.name =""
+    seq.description =""
+    print >> fhandle, ">"+seq.id
+    print >> fhandle, seq.seq
+    return 1
+    fhandle.close()
+
 #function for determining the length of the query alignment
 #returns length (int)
 def loclenfunc(locusfname):
-    rhandle = open("./modified/"+locusfname, "r")
+    rhandle = open("./modified/"+locusfname.split("-")[0], "r")
     ali = list(SeqIO.parse(rhandle, "fasta"))
     return len(ali[0])
     rhandle.close()
@@ -255,7 +275,7 @@ print >> debugfile, "copy files..."
 copyfunc()
 
 #multi db option
-if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me":
+if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me" or opt == "-msl":
     #reading the blastfile
     blastlist = glob.glob(blastfilearg+"/*.blast")
     translist = glob.glob(trif+"/*.fasta")
@@ -303,7 +323,9 @@ for b in blastlist:
     print "searching for contigs in:", transname
     print >> debugfile, "searching for contigs in:", transname
     c1 = 0
-    extr_loci = []                                                  
+    extr_loci = []
+    if opt == "-msl" and os.path.exists("./"+seqname+"_conSeqs.fasta"):
+        os.remove("./"+seqname+"_conSeqs.fasta")
     for seq in inputf:
         #print count
         if count == 0:
@@ -338,12 +360,16 @@ for b in blastlist:
                     print "extracted length:", len(seq.seq)
                     print >> debugfile, "extracted length:", len(seq.seq)
                     #append sequence
-                    if seqwritefunc(seq, opt, locusfname, seqname) == 1:
+                    if opt == "-msl" or opt == "-sl":
+                        altwritefunc(seq, opt, locusfname, seqname)
                         c1 += 1
-                    elif opt == "-mss" or opt == "-ss":
-                        print "Warning: blast hit is too short"
-                        print >> debugfile, "Warning: blast hit is too short"
-                        warninglist.append(locusfname)
+                    else:
+                        if seqwritefunc(seq, opt, locusfname, seqname) == 1:
+                           c1 += 1
+                        elif opt == "-mss" or opt == "-ss":
+                            print "Warning: blast hit is too short"
+                            print >> debugfile, "Warning: blast hit is too short"
+                            warninglist.append(locusfname)
                     extr_loci.append(locusfname)
                     seq.id = temp
                     seq.seq = tempseq #secret opt
@@ -351,6 +377,18 @@ for b in blastlist:
                 # if y[6] == seq.id and locusfname in extr_loci:
                 #     print >> debugfile, "locus is already extracted"
                 #     print "locus is already extracted"
+    if opt == "-msl" or opt == "-sl":
+        print "sorting file....."
+        fhandle = open("./"+seqname+"_conSeqs.fasta", "r")
+        transdict = {}
+        for seq in SeqIO.parse(fhandle, "fasta"):
+            transdict[float(seq.id[1:])] = seq.seq
+        fhandle.close()
+        fhandle2 = open("./"+seqname+"_conSeqs.fasta", "w")
+        for key, value in sorted(transdict.items()):
+            print >> fhandle2, ">L"+str(key)
+            print >> fhandle2, value
+        fhandle2.close()
     count = int(len(output))
     print "queries found:", len(extr_loci)
     print >> debugfile, "queries found:", len(extr_loci)
@@ -362,6 +400,8 @@ for b in blastlist:
         print wle
         print >> debugfile, wle
     totalloci += c1
+
+
 
 print "number of >90% close suboptimal hits", number
 print "number of queries with >90% close suboptimal hits", len(numberset)
