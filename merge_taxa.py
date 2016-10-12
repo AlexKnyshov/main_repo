@@ -3,11 +3,12 @@ import glob
 import os
 import shutil
 import sys
-if len(sys.argv) == 2:
-    folder = sys.argv[1]
+if len(sys.argv) == 3:
+    opt = sys.argv[1]
+    folder = sys.argv[2]
 else:
-    print "FORMAT: python merge_taxa.py [folder]"
-    print "EXAMPLE: python merge_taxa.py ./fasta"
+    print "FORMAT: python merge_taxa.py [opt: -n (normal), -l (ARLemmon pipeline)] [folder]"
+    print "EXAMPLE: python merge_taxa.py -n ./fasta"
     sys.exit()
 
 # print "creating a list of taxa..."
@@ -33,8 +34,10 @@ else:
 #         sys.stdout.flush()
 #         shutil.copy2(x, "./modified/"+locusfname)
 # print ""
-
-files = glob.glob(folder+"/*.fas")
+if opt  == "-l":
+    files = glob.glob(folder+"/*.fasta")
+else:
+    files = glob.glob(folder+"/*.fas")
 
 for f in files: #checking folder2
     fnew = f.split("/")[-1] #filename of folder2
@@ -44,8 +47,13 @@ for f in files: #checking folder2
     sys.stdout.write(prog+"\r")
     sys.stdout.flush()
     for seq in align1:
-        fhandle = open("./merged/"+seq.id+".fas", "a")
-        print >> fhandle, ">"+locusfname, "\n", str(seq.seq ).replace("-", "").upper()
+        if opt == "-l":
+            fhandle = open("./merged/"+seq.id+".fasta", "a")
+            print >> fhandle, ">"+locusfname+".1"
+            print >> fhandle, str(seq.seq).replace("-", "").upper()
+        else:
+            fhandle = open("./merged/"+seq.id+".fas", "a")
+            print >> fhandle, ">"+locusfname, "\n", str(seq.seq ).replace("-", "").upper()
         #seq.id = locusfname
         #SeqIO.write(seq, fhandle, "fasta")
         fhandle.close()
