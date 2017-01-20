@@ -61,7 +61,7 @@ for row in reader:
 	print row[0], row[8], row[9]
 	if int(row[8])>int(row[9]):
 		q = re.search(str(ugapsubject)[int(row[9])-1:int(row[8])], str(subject.seq))
-		new9 = q.start()
+		new9 = q.start()-int(row[6])+1
 		new8 = q.end()
 		revcom = revcomfunc(primerdict[row[0]])
 		primerseqct = 0
@@ -76,7 +76,7 @@ for row in reader:
 				tempseq += "-"
 	else:
 		q = re.search(str(ugapsubject)[int(row[8])-1:int(row[9])], str(subject.seq))
-		new8 = q.start()
+		new8 = q.start()-int(row[6])+1
 		new9 = q.end()
 		primerseqct = 0
 		print "forward"
