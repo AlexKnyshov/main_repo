@@ -12,7 +12,7 @@ import re
 
 def revcomfunc(seq):
 	revcom = ""
-	reverse = seq[::-1]
+	reverse = seq.upper()[::-1]
 	for y in reverse:
 		if y == "A":
 			revcom+="T"
