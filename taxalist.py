@@ -3,12 +3,13 @@ import sys
 import glob
 import os
 import operator
+import csv
 if len(sys.argv) >= 3:
 	f = sys.argv[1]
 	ext = sys.argv[2]
 	files = glob.glob(f+"/*"+ext)
 	print "multiple file processing"
-	if len(sys.argv) == 4:
+	if len(sys.argv) >= 4:
 		wr = True
 	else:
 		wr = False
@@ -51,26 +52,48 @@ for key, value in sorted(d.items()):
 	result[key] = len(value)
 	prog_c += 1
 	if wr:
-		print round(float(prog_c) / total_c *100, 2), "%"
-		if len(value)<partnum:
-		#	print "Warning, taxon", key, "has only", len(value), "partitions: ", value
-		#	rm = raw_input("Would you like to remove it?")
-		#	if rm == "y" or rm == "Y":
-			del d[key]
-			print key, "removed"
+		#new part
+		if sys.argv[3] == "-csv":
+			if sys.argv[4]:
+				dcsv = set()
+				csvfilename = sys.argv[4]
+				csvhandle = open(csvfilename, "r")
+				reader = csv.reader(csvhandle)
+				for row in reader:
+					dcsv.add(str(int(row[0].strip().split("_")[-1])))
+				csvhandle.close()
+			else:
+				print "error -csv"
+				sys.exit()
+		else:
+			print round(float(prog_c) / total_c *100, 2), "%"
+			if len(value)<partnum:
+			#	print "Warning, taxon", key, "has only", len(value), "partitions: ", value
+			#	rm = raw_input("Would you like to remove it?")
+			#	if rm == "y" or rm == "Y":
+				del d[key]
+				print key, "removed"
 	else:
 		print key, len(value), value
+#print dcsv
 if wr:
 	for infile in files:
 		input_handle = open(infile, "rU")
 		outhandle = open(infile+".fas", "w")
 		alignments = SeqIO.parse(input_handle, "fasta")
+		checkcsv = list(dcsv)
 		for seq in alignments:
-			if seq.id in d:
+			#print seq.id.split("_")[-1]
+			if sys.argv[3] == "-csv" and seq.id.split("_")[-1] in dcsv:
 				print >> outhandle, ">"+seq.id
 				print >> outhandle, seq.seq
+				checkcsv.remove(seq.id.split("_")[-1])
+			# elif seq.id in d:
+			# 	print >> outhandle, ">"+seq.id
+			# 	print >> outhandle, seq.seq
 		input_handle.close()
 		outhandle.close()
+		print infile, checkcsv, len(checkcsv)#, dcsv
 # for key, value in sorted(result.items(), key=operator.itemgetter(0)):
 # 	print key, value
 # 	for x in value:
