@@ -52,7 +52,7 @@ print "parsing files:"
 for f in files:
 	fnew = f.split("/")
 	fn = fnew[len(fnew)-1]
-	fn2 = "./trimmed/"+fn.split(".")[0]+".fas"
+	fn2 = "./trimmed/"+fnew[-1]#fn.split(".")[0]+".fas"
 	print >> outf, "input:", f
 	print >> outf, "output:", fn2
 	infile = open(f, "r")
