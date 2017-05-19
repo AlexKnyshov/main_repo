@@ -1,6 +1,6 @@
 from Bio import AlignIO
 from Bio.Alphabet import IUPAC, Gapped
-from Bio.Alphabet import Gapped(ExtendedIUPACProtein(), '-')
+#from Bio.Alphabet import Gapped(ExtendedIUPACProtein(), '-')
 from Bio.Seq import Seq 
 from Bio.SeqRecord import SeqRecord 
 from Bio.Align import MultipleSeqAlignment
