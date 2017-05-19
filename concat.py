@@ -1,6 +1,5 @@
 from Bio import AlignIO
 from Bio.Alphabet import IUPAC, Gapped
-#from Bio.Alphabet import generic_protein
 from Bio.Seq import Seq 
 from Bio.SeqRecord import SeqRecord 
 from Bio.Align import MultipleSeqAlignment
@@ -63,7 +62,7 @@ else:
 	align = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna)) # new ali
 for dx in d.keys():
 	if partnum == "-prot":
-		align.append(SeqRecord(Seq("", alphabet = Gapped(IUPAC.protein, '-'), id=dx))) #add taxa
+		align.append(SeqRecord(Seq("", alphabet = Gapped(IUPAC.protein, '-')), id=dx)) #add taxa
 	else:
 		align.append(SeqRecord(Seq("", Gapped(IUPAC.ambiguous_dna)), id=dx)) #add taxa
 #print align
@@ -117,7 +116,7 @@ for f in files:
  	#print length
  	for m in missed:
  		if partnum == "-prot":
- 			temp.append(SeqRecord(Seq("X"*length, alphabet = Gapped(IUPAC.protein, '-'), id=m))) #add dummies
+ 			temp.append(SeqRecord(Seq("-"*length, alphabet = Gapped(IUPAC.protein, '-')), id=m)) #add dummies
  		else:
  			temp.append(SeqRecord(Seq("?"*(length), Gapped(IUPAC.ambiguous_dna)), id=m)) #add dummies
  	counter = 0
