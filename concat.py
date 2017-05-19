@@ -1,6 +1,6 @@
 from Bio import AlignIO
 from Bio.Alphabet import IUPAC, Gapped
-#from Bio.Alphabet import Gapped(ExtendedIUPACProtein(), '-')
+#from Bio.Alphabet import generic_protein
 from Bio.Seq import Seq 
 from Bio.SeqRecord import SeqRecord 
 from Bio.Align import MultipleSeqAlignment
@@ -42,7 +42,7 @@ for f in files:
 	fnew = f.split("/")
 	fn = fnew[len(fnew)-1]
 	if partnum == "-prot":
-		alignment = AlignIO.read(f, "fasta", alphabet = Gapped(ExtendedIUPACProtein(), '-'))
+		alignment = AlignIO.read(f, "fasta", alphabet = Gapped(IUPAC.protein, '-')
 	else:
 		alignment = AlignIO.read(f, "fasta", alphabet=Gapped(IUPAC.ambiguous_dna))
 	length = alignment.get_alignment_length()
@@ -58,12 +58,12 @@ print "concatenating..."
 oks = 0
 skips = 0
 if partnum == "-prot":
-	align = MultipleSeqAlignment([], alphabet = Gapped(ExtendedIUPACProtein(), '-')) # new ali
+	align = MultipleSeqAlignment([], alphabet = Gapped(IUPAC.protein, '-') # new ali
 else:
 	align = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna)) # new ali
 for dx in d.keys():
 	if partnum == "-prot":
-		align.append(SeqRecord(Seq("", alphabet = Gapped(ExtendedIUPACProtein(), '-')), id=dx)) #add taxa
+		align.append(SeqRecord(Seq("", alphabet = Gapped(IUPAC.protein, '-'), id=dx)) #add taxa
 	else:
 		align.append(SeqRecord(Seq("", Gapped(IUPAC.ambiguous_dna)), id=dx)) #add taxa
 #print align
@@ -80,13 +80,13 @@ if pf2opt == "-pf2y":
 badlocus = []
 for f in files:
 	if partnum == "-prot":
-		temp = MultipleSeqAlignment([], alphabet = Gapped(ExtendedIUPACProtein(), '-')) #temp ali
+		temp = MultipleSeqAlignment([], alphabet = Gapped(IUPAC.protein, '-') #temp ali
 	else:
 		temp = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna)) #temp ali
  	fnew = f.split("/")
  	fn = fnew[len(fnew)-1]
  	if partnum == "-prot":
- 		alignment = AlignIO.read(f, "fasta", alphabet = Gapped(ExtendedIUPACProtein(), '-')) #read original
+ 		alignment = AlignIO.read(f, "fasta", alphabet = Gapped(IUPAC.protein, '-') #read original
  	else:
  		alignment = AlignIO.read(f, "fasta", alphabet=Gapped(IUPAC.ambiguous_dna)) #read original
  	length = alignment.get_alignment_length()
@@ -117,12 +117,12 @@ for f in files:
  	#print length
  	for m in missed:
  		if partnum == "-prot":
- 			temp.append(SeqRecord(Seq("X"*length, alphabet = Gapped(ExtendedIUPACProtein(), '-')), id=m)) #add dummies
+ 			temp.append(SeqRecord(Seq("X"*length, alphabet = Gapped(IUPAC.protein, '-'), id=m)) #add dummies
  		else:
  			temp.append(SeqRecord(Seq("?"*(length), Gapped(IUPAC.ambiguous_dna)), id=m)) #add dummies
  	counter = 0
  	if partnum == "-prot":
- 		temp2 = MultipleSeqAlignment([], alphabet = Gapped(ExtendedIUPACProtein(), '-'))
+ 		temp2 = MultipleSeqAlignment([], alphabet = Gapped(IUPAC.protein, '-')
  	else:
  		temp2 = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna))
  	for aliseq in align:
