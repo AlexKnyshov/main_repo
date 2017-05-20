@@ -10,6 +10,7 @@ import os
 
 concat_name = sys.argv[1]
 partname = sys.argv[2]
+opt = sys.argv[3]
 
 ######
 concat_handle = open(concat_name, "rU")
@@ -28,7 +29,10 @@ for line in partition_handle:
 		for record in alignment:
 			#print start, end
 			#print record.id, record.seq[start:end]
-			print >> outfile, ">"+record.id, "\n",record.seq[start:end]
+			if opt == "-uniq":
+				print >> outfile, ">"+record.id+"_"+fname+"-"+str(i), "\n",record.seq[start:end]
+			else:
+				print >> outfile, ">"+record.id, "\n",record.seq[start:end]
 		#outfile
 		i += 1
 
