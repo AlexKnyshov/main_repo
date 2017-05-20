@@ -1,5 +1,5 @@
 echo "starting..."
-if [[ $5 == y ]]
+if [[ $7 == y ]]
 then
 	echo "loading modules"
 	module load ncbi-blast
