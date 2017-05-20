@@ -1,5 +1,6 @@
 echo "starting..."
 if [[ $5 == y ]]
+then
 	echo "loading modules"
 	module load mafft
 else 
