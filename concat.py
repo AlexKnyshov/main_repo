@@ -147,19 +147,19 @@ for f in files:
 		elif partnum == "-orf":
 			print >> pf2cfg, fn[:-4]+" = "+str(start)+" - "+str(end)+";"
  	if partnum == "-3":
-		print >> outputfile, "DNA, "+fn+"-1 = "+str(start)+" - "+str(end)+"\\3"
-		print >> outputfile, "DNA, "+fn+"-2 = "+str(start+1)+" - "+str(end)+"\\3"
-		print >> outputfile, "DNA, "+fn+"-3 = "+str(start+2)+" - "+str(end)+"\\3"
+		print >> outputfile, "DNA, "+fn+"-1="+str(start)+"-"+str(end)+"\\3"
+		print >> outputfile, "DNA, "+fn+"-2="+str(start+1)+"-"+str(end)+"\\3"
+		print >> outputfile, "DNA, "+fn+"-3="+str(start+2)+"-"+str(end)+"\\3"
 	elif partnum == "-1":
-	 	print >> outputfile, "DNA, "+fn+" = "+str(start)+" - "+str(end)
+	 	print >> outputfile, "DNA, "+fn+"="+str(start)+"-"+str(end)
 	elif partnum == "-prot":
-		print >> outputfile, "WAG, "+fn+" = "+str(start)+" - "+str(end)
+		print >> outputfile, "WAG, "+fn+"="+str(start)+"-"+str(end)
 	if partnum == "-orf":
 		if f not in loci.keys():
-			print >> outputfile, "DNA, "+fn+" = "+str(start)+" - "+str(end)
+			print >> outputfile, "DNA, "+fn+"="+str(start)+"-"+str(end)
 		else:
-			print >> outputfile, "DNA, "+fn+"-1-2 = "+str(start)+" - "+str(end)+"\\3, "+str(start+1)+" - "+str(end)+"\\3"
-			print >> outputfile, "DNA, "+fn+"-3 = "+str(start+2)+" - "+str(end)+"\\3"
+			print >> outputfile, "DNA, "+fn+"-1-2="+str(start)+"-"+str(end)+"\\3, "+str(start+1)+"-"+str(end)+"\\3"
+			print >> outputfile, "DNA, "+fn+"-3="+str(start+2)+"-"+str(end)+"\\3"
 # print >> debug, "---------------------------------------------------------"
 # print >> debug, "total bad loci:", len(badlocus)
 # for x in badlocus:
