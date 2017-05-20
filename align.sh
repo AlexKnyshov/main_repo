@@ -1,17 +1,15 @@
 echo "starting..."
-if [ "$HOSTNAME" = pigeon ]; then
-    echo "loading modules"
-    module load mafft
-elif [ -z "$PBS_ENVIRONMENT" ]; then
-	echo "no modules loaded"
-else 
+if [[ $5 == y ]]
 	echo "loading modules"
-    module load mafft
+	module load mafft
+else 
+	echo "no modules loaded"
 fi
 #$1 - folder with alignments
 #$2 - algorithm: linsi, ginsi, einsi
 #$3 - direction: adjust, noadjust, slow
 #$4 - number of processers
+#$5 -y/n, loading modules
 ALG=""
 if [[ $2 == einsi ]]
 then
