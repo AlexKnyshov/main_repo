@@ -1,11 +1,10 @@
-if [ "$HOSTNAME" = pigeon ]; then
-    echo "loading modules"
-    module load ncbi-blast
-elif [ -z "$PBS_ENVIRONMENT" ]; then
-	echo "no modules loaded"
-else 
+echo "starting..."
+if [[ $5 == y ]]
+then
 	echo "loading modules"
-    module load ncbi-blast
+	module load ncbi-blast
+else 
+	echo "no modules loaded"
 fi
 echo "erasing the content of the blast output file..."
 rm *.blast
