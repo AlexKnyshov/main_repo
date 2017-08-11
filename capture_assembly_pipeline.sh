@@ -23,14 +23,12 @@ do
 	gunzip output_reverse_unpaired.fq.gz 
 	cat output_forward_unpaired.fq out.notCombined_1.fastq > forward_up.fq
 	cat output_reverse_unpaired.fq out.notCombined_2.fastq > reverse_up.fq
-
-############
-
 	cat forward_up.fq reverse_up.fq out.extendedFrags.fastq > PH$ph-$LINE.fq
-
+############
+	perl ~/tools/prinseq-lite-0.20.4/prinseq-lite.pl -verbose -fastq PH$ph-$LINE.fq -lc_method dust -lc_threshold 45 -out_good PH$ph-$LINE-good
 ############
 	echo "assembly..."
-	~/tools/SPAdes-3.10.1-Linux/bin/spades.py -o spades_out-PH$ph -s PH$ph-$LINE.fq
+	~/tools/SPAdes-3.10.1-Linux/bin/spades.py -o spades_out-PH$ph -s PH$ph-$LINE-good.fastq
 
 	cd ..
 	echo "done"
