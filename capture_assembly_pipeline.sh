@@ -1,5 +1,6 @@
 #$1 - barcode list
 #$2 - location of files
+module load flash
 declare -i ph=1
 while read LINE
 do
