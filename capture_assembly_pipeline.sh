@@ -14,7 +14,7 @@ do
 
 	cd PH$ph-$LINE
 	echo "trimming..."
-	java -jar ~/tools/Trimmomatic-0.36/trimmomatic-0.36.jar PE -phred33 ../$pair1 ../$pair2 output_forward_paired.fq.gz output_forward_unpaired.fq.gz output_reverse_paired.fq.gz output_reverse_unpaired.fq.gz LEADING:3 TRAILING:3 SLIDINGWINDOW:4:25 MINLEN:64
+	java -jar ~/tools/Trimmomatic-0.36/trimmomatic-0.36.jar PE -phred33 $pair1 $pair2 output_forward_paired.fq.gz output_forward_unpaired.fq.gz output_reverse_paired.fq.gz output_reverse_unpaired.fq.gz LEADING:3 TRAILING:3 SLIDINGWINDOW:4:25 MINLEN:64
 	echo "read merging..."
 	flash output_forward_paired.fq.gz output_reverse_paired.fq.gz
 	echo "prep files..."
