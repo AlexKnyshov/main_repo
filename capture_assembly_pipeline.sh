@@ -5,8 +5,10 @@ while read LINE
 do
 	echo $LINE
 	mkdir PH$ph-$LINE
-	pair1=$(find $2 -maxdepth 1 -name "*pair1_$LINE*")
-	pair2=$(find $2 -maxdepth 1 -name "*pair2_$LINE*")
+	# pair1=$(find $2 -maxdepth 1 -name "*pair1_$LINE*")
+	# pair2=$(find $2 -maxdepth 1 -name "*pair2_$LINE*")
+	pair1=$2flowcell692_lane1_pair1_$LINE.fastq.gz
+	pair2=$2flowcell692_lane1_pair2_$LINE.fastq.gz
 	echo $pair1
 	echo $pair2
 
