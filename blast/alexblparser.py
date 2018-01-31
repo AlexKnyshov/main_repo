@@ -5,16 +5,17 @@ import shutil
 import csv
 import sys
 import math
-if len(sys.argv) == 6:
+if len(sys.argv) == 7:
     blastfilearg = sys.argv[1]
     trif = sys.argv[2]
     ahefoldarg = sys.argv[3]
     evalue = float(sys.argv[4])
     opt = sys.argv[5]
+    paropt = int(sys.argv[6])
 else:
-    print "FORMAT: python alexblparser.py [blastfile or folder] [asemblyfile or folder] [ahefolder] [evalue] [option: -n (normal), -s (extract only matched parts), -ss (short are discarded), -e (extended s option), -mn (multiple normal), -ms (multiple selected), -mss(short are discarded), -me (extended ms option)]"
-    print "EXAMPLE: python alexblparser.py ./blast_outputs/ /transcriptomes/ ./fasta 1e-40 -mn"
-    print "EXAMPLE: python alexblparser.py blast.tab trinity.fas ./fasta/ 1e-40 -n"
+    print "FORMAT: python alexblparser.py [blastfile or folder] [asemblyfile or folder] [ahefolder] [evalue] [option: -n (normal), -s (extract only matched parts), -ss (short are discarded), -e (extended s option), -mn (multiple normal), -ms (multiple selected), -mss(short are discarded), -me (extended ms option)] [number of hits extracted per query: 1-9]"
+    print "EXAMPLE: python alexblparser.py ./blast_outputs/ /transcriptomes/ ./fasta 1e-40 -mn 2"
+    print "EXAMPLE: python alexblparser.py blast.tab trinity.fas ./fasta/ 1e-40 -n 1"
     sys.exit()
 
 dash = "--------------------------------------------------------"
@@ -85,7 +86,7 @@ def readblastfilefunc(b, debugfile):
                     else:
                         print "warning: several matches detected", row[1], row[10], row[11], "hit is", round(float(row[11])/best_hit*100), "%"#"; ratio with best_eval is"#, round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
                         print >> debugfile, "warning: several matches detected", row[1], row[10], row[11], "hit is", round(float(row[11])/best_hit*100), "%"#"; ratio with best_eval is"#, round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
-                        if round(float(row[11])/best_hit*100) > 70 and query_counter < 9:#round(math.log(float(row[10]))/math.log(best_eval)*100) > 90 or :
+                        if round(float(row[11])/best_hit*100) > 70 and query_counter < paropt:#round(math.log(float(row[10]))/math.log(best_eval)*100) > 90 or :
                             #number += 1
                             #numberset.add(row[0])
                             print >> debugfile, "paralog added"
@@ -224,9 +225,12 @@ def seqprepfunc(output, locusfname, opt, seq):
 
 #function for appending the seqeunce to the alignemnt
 #returns 1 if success, 0 otherwise
-def seqwritefunc(seq, opt, locusfname, seqname):
+def seqwritefunc(seq, opt, locusfname, seqname, paropt):
     fhandle = open("./modified/"+locusfname.split("-")[0], "a")
-    seq.id = seqname+"."+locusfname.split("-")[1]
+    if paropt == 1:
+        seq.id = seqname
+    else:
+        seq.id = seqname+"."+locusfname.split("-")[1]
     seq.name =""
     seq.description =""
     if (opt == "-mss" or opt == "-ss") and (float(len(seq.seq)) / loclenfunc(locusfname) > 0.8):
@@ -243,9 +247,12 @@ def seqwritefunc(seq, opt, locusfname, seqname):
     fhandle.close()
 
 #alternative function for writing, all in 1 file
-def altwritefunc(seq, opt, locusfname, seqname):
+def altwritefunc(seq, opt, locusfname, seqname, paropt):
     fhandle = open("./"+seqname+"_conSeqs.fasta", "a")
-    seq.id = locusfname.split("_")[-1].split(".")[0]+"."+locusfname.split("-")[1]
+    if paropt == 1:
+        seq.id = locusfname.split("_")[-1].split(".")[0]
+    else:
+        seq.id = locusfname.split("_")[-1].split(".")[0]+"."+locusfname.split("-")[1]
     seq.name =""
     seq.description =""
     print >> fhandle, ">"+seq.id
@@ -361,10 +368,10 @@ for b in blastlist:
                     print >> debugfile, "extracted length:", len(seq.seq)
                     #append sequence
                     if opt == "-msl" or opt == "-sl":
-                        altwritefunc(seq, opt, locusfname, seqname)
+                        altwritefunc(seq, opt, locusfname, seqname, paropt)
                         c1 += 1
                     else:
-                        if seqwritefunc(seq, opt, locusfname, seqname) == 1:
+                        if seqwritefunc(seq, opt, locusfname, seqname, paropt) == 1:
                            c1 += 1
                         elif opt == "-mss" or opt == "-ss":
                             print "Warning: blast hit is too short"
