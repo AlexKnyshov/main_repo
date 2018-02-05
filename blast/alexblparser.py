@@ -201,6 +201,7 @@ def seqprepfunc(output, locusfname, opt, seq):
     # print out trans and AHE stats...
     #print "BLAST:", "transf:",output[locusfname][0], "transr:",output[locusfname][1], "transb:",output[locusfname][2], "ahef:",output[locusfname][3], "aher:",output[locusfname][4], "aheb:",output[locusfname][5]
     #print "LOCUS", "ahe:", len(recs[0].seq), "trans:", len(seq.seq)
+    #print gaps, output[locusfname]
     #print gaps
     if opt == "-me" or opt == "-e":
         #TEST
@@ -215,7 +216,10 @@ def seqprepfunc(output, locusfname, opt, seq):
         if output[locusfname][2] and output[locusfname][5]:
             seq.seq = seq.seq[output[locusfname][0]:output[locusfname][1]] #secret opt
         else:
-            seq.seq = seq.seq[output[locusfname][1]:output[locusfname][0]]
+            if output[locusfname][0] > output[locusfname][1]:
+                seq.seq = seq.seq[output[locusfname][1]:output[locusfname][0]]
+            else:
+                seq.seq = seq.seq[output[locusfname][0]:output[locusfname][1]]
             seq = seq.reverse_complement()
     elif opt == "-mn" or opt == "-n":
         if not output[locusfname][2] and not output[locusfname][5]:
