@@ -13,9 +13,13 @@ if len(sys.argv) == 7:
     opt = sys.argv[5]
     paropt = int(sys.argv[6])
 else:
-    print "FORMAT: python alexblparser.py [blastfile or folder] [asemblyfile or folder] [ahefolder] [evalue] [option: -n (normal), -s (extract only matched parts), -ss (short are discarded), -e (extended s option), -mn (multiple normal), -ms (multiple selected), -mss(short are discarded), -me (extended ms option)] [number of hits extracted per query: 1-9]"
+    print "FORMAT: python alexblparser.py [blastfile or folder] [asemblyfile or folder] [ahefolder] [evalue] [option: -n (normal), -s (extract only matched parts), -ss (short are discarded), -e[value] (extended s option), -mn (multiple normal), -ms (multiple selected), -mss(short are discarded), -me[value] (extended ms option)] [number of hits extracted per query: 1-9]"
     print "EXAMPLE: python alexblparser.py ./blast_outputs/ /transcriptomes/ ./fasta 1e-40 -mn 2"
     print "EXAMPLE: python alexblparser.py blast.tab trinity.fas ./fasta/ 1e-40 -n 1"
+    print "HELP for -e / -me option: [value] indicates a size of the flank in bp that needs to be extracted"
+    print "HELP for -e / -me option: when [value]=0, extracts flanks to match the length of the query"
+    print "EXAMPLE: python alexblparser.py blast.tab trinity.fas ./fasta/ 1e-40 -e1500 1"
+    print "1500 bp from each side (if possible) will be added to blast hit region and extracted"
     sys.exit()
 
 dash = "--------------------------------------------------------"
@@ -190,29 +194,125 @@ def gapfunc(output, locusfname, recs):
                 gaptrev = 0
     return [gap, gaprev, gapt, gaptrev]
 
+
+
+#gap function for -e and -me options
+def gapfunc_e(output, locusfname, recs, e_range):
+    if output[locusfname][5]:#aheb: #ahe is forward
+        #print "AHE forw"
+        if output[locusfname][2]:#transb: #trans is forward
+            ##need to check if trans has start - OK
+            if output[locusfname][0] - e_range >= 0:
+                gapt = output[locusfname][0] - e_range#transf - gap #this is the corrected trans start
+            else:
+                print "Start gap is too large"
+                gapt = 0 # otherwise start from start
+        else:
+            ##need to check if trans is long enough - OK
+            if output[locusfname][0] + e_range <= len(tempseq):
+                gapt = output[locusfname][0] + e_range#transf + gap #this is the corrected trans start
+            else:
+                gapt = len(tempseq) # otherwise start from the end
+                print "End gap is too large"
+        #check the ahe end:
+        #if gaprev >= 0:#aher #some AHE left
+        if output[locusfname][2]:#transb: #trans is forward
+            #check the trans end
+            if output[locusfname][1] + e_range <= len(tempseq): #check that trans is long enough
+                gaptrev = output[locusfname][1] + e_range#transf - gap #this is the corrected trans start
+            else:
+                print "End gap is too large"
+                gaptrev = len(tempseq)
+        else:
+            ##need to check if trans has start
+            if output[locusfname][1] - e_range >= 0:
+                gaptrev = output[locusfname][1] - e_range#transf + gap #this is the corrected trans start
+            else:
+                print "Start gap is too large"
+                gaptrev = 0
+    #reverse AHE:
+    else: #ahe is reverse
+        #print "AHE rev"
+        if output[locusfname][2]:#transb: #trans is forward
+            ##need to check if trans has start - OK
+            if output[locusfname][0] - e_range >= 0:
+                gapt = output[locusfname][0] - e_range#transf - gap #this is the corrected trans start
+            else:
+                gapt = 0
+                print "Start gap is too large"
+        else:
+            ##need to check if trans is long enough - OK
+            if output[locusfname][0] + e_range <= len(tempseq):
+                gapt = output[locusfname][0] + e_range#transf + gap #this is the corrected trans start
+            else:
+                gapt = len(tempseq)
+                print "End gap is too large"
+        #check the ahe end:
+        #if gaprev >= 0:#aher #some AHE left
+        if output[locusfname][2]:#transb: #trans is forward
+            #check the trans end
+            if output[locusfname][1] + e_range <= len(tempseq): #check that trans is long enough
+                gaptrev = output[locusfname][1] + e_range#transf - gap #this is the corrected trans start
+            else:
+                gaptrev = len(tempseq)
+                print "End gap is too large"
+        else:
+            ##need to check if trans has start
+            if output[locusfname][1] - e_range >= 0:
+                gaptrev = output[locusfname][1] - e_range#transf + gap #this is the corrected trans start
+            else:
+                print "Start gap is too large"
+                gaptrev = 0
+    return [gapt, gaptrev]
+
+
+
+
 #function for preparing found target sequence for appending
 #returns prepared sequence
 def seqprepfunc(output, locusfname, opt, seq):
     rhandle = open("./modified/"+locusfname.split("-")[0], "r")
     ali = SeqIO.parse(rhandle, "fasta")
     recs = list(ali)
-    # identify gaps
-    gaps = gapfunc(output, locusfname, recs)
+    
     # print out trans and AHE stats...
     #print "BLAST:", "transf:",output[locusfname][0], "transr:",output[locusfname][1], "transb:",output[locusfname][2], "ahef:",output[locusfname][3], "aher:",output[locusfname][4], "aheb:",output[locusfname][5]
     #print "LOCUS", "ahe:", len(recs[0].seq), "trans:", len(seq.seq)
-    #print gaps, output[locusfname]
-    #print gaps
-    if opt == "-me" or opt == "-e":
+
+    if opt[:3] == "-me" or opt[:2] == "-e":
         #TEST
-        if output[locusfname][2]:
-            #print "STATS:", output[locusfname][2], "start:", gaps[2],"stop:",  gaps[3]
-            seq.seq = seq.seq[gaps[2]:gaps[3]]
+        if opt[:3] == "-me" and int(opt[3:]) == 0  or opt[:2] == "-e" and int(opt[2:]) == 0 :
+            # identify gaps
+            gaps = gapfunc(output, locusfname, recs)
+            if output[locusfname][2]:
+                #print "STATS:", output[locusfname][2], "start:", gaps[2],"stop:",  gaps[3]
+                seq.seq = seq.seq[gaps[2]:gaps[3]]
+            else:
+                #print "STATS:", output[locusfname][2], "start:", gaps[3],"stop:",  gaps[2]
+                seq.seq = seq.seq[gaps[3]:gaps[2]]
+                seq = seq.reverse_complement()
         else:
-            #print "STATS:", output[locusfname][2], "start:", gaps[3],"stop:",  gaps[2]
-            seq.seq = seq.seq[gaps[3]:gaps[2]]
-            seq = seq.reverse_complement()
+            # identify gaps
+            if opt[:3] == "-me":
+                gapsE = gapfunc_e(output, locusfname, recs,int(opt[3:]))
+            else:
+                gapsE = gapfunc_e(output, locusfname, recs,int(opt[2:]))
+            if output[locusfname][2]:
+                #print "STATS:", output[locusfname][2], "start:", gaps[2],"stop:",  gaps[3]
+                seq.seq = seq.seq[gapsE[0]:gapsE[1]]
+            else:
+                #print "STATS:", output[locusfname][2], "start:", gaps[3],"stop:",  gaps[2]
+                seq.seq = seq.seq[gapsE[1]:gapsE[0]]
+                seq = seq.reverse_complement()
+            # if output[locusfname][2] and output[locusfname][5]:
+            #     #print "STATS:", output[locusfname][2], "start:", gaps[2],"stop:",  gaps[3]
+            #     seq.seq = seq.seq[gaps[2]:gaps[3]]
+            # else:
+            #     #print "STATS:", output[locusfname][2], "start:", gaps[3],"stop:",  gaps[2]
+            #     seq.seq = seq.seq[gaps[3]:gaps[2]]
+            #     seq = seq.reverse_complement()  
     elif opt == "-ms" or opt == "-mss" or opt == "-s" or opt == "-ss" or opt == "-msl" or opt == "-sl":
+        #if output[locusfname][2] and output[locusfname][5]:
         if output[locusfname][2] and output[locusfname][5]:
             seq.seq = seq.seq[output[locusfname][0]:output[locusfname][1]] #secret opt
         else:
@@ -240,7 +340,10 @@ def seqwritefunc(seq, opt, locusfname, seqname, paropt):
     if (opt == "-mss" or opt == "-ss") and (float(len(seq.seq)) / loclenfunc(locusfname) > 0.8):
         SeqIO.write(seq, fhandle, "fasta")
         return 1
-    elif opt == "-ms" or opt == "-me" or opt == "-s" or opt == "-e":
+    elif opt == "-ms" or opt == "-s":
+        SeqIO.write(seq, fhandle, "fasta")
+        return 1
+    elif opt[:3] == "-me" or opt[:2] == "-e":
         SeqIO.write(seq, fhandle, "fasta")
         return 1
     elif opt == "-mn" or opt == "-n":
@@ -286,7 +389,7 @@ print >> debugfile, "copy files..."
 copyfunc()
 
 #multi db option
-if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt == "-me" or opt == "-msl":
+if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt[:3] == "-me" or opt == "-msl":
     #reading the blastfile
     blastlist = glob.glob(blastfilearg+"/*.blast")
     translist = glob.glob(trif+"/*.fasta")
