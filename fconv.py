@@ -25,10 +25,13 @@ else:
 	print "------------file input-------------"
 	print "FORMAT: python fconv.py [option: -a, -s, -print] [inputfile] [inputformat] [outputformat] [outputext]"
 	print "EXAMPLE: python fconv.py -a ./test.fas fasta phylip-relaxed .phy"
-	print "--------some format options--------"
+	print "--------general manual--------"
+	print "for options -a (AlignIO) and -s (SeqIO) see format options in the corresponding biopython module manual. Some are listed below"
 	print "fasta - fasta format"
 	print "phylip - basic phylip with truncated names"
-	print "phylip-relaxed - extended phylip (only in -a mode)"
+	print "phylip-relaxed - extended interleaved phylip (only in -a mode)"
+	print "option -print in conjunction with output format set to fasta writes fasta file directly"
+	print "option -print in conjunction with output format set to phylip-relaxed writes non-interleaved phylip-relaxed file directly"
 	sys.exit()
 
 if len(sys.argv) == 8:
@@ -54,6 +57,11 @@ if len(sys.argv) == 8:
 			sequences = SeqIO.parse(input_handle, inputformat)
 			for seq in sequences:
 				print >> output_handle, ">"+seq.id, "\n", seq.seq
+		elif option == "-print" and outputformat == "phylip-relaxed":
+			alignments = AlignIO.read(input_handle, inputformat)
+			print >> output_handle, str(len(alignments))+" "+str(alignments.get_alignment_length())
+			for seq in alignments:
+				print >> output_handle, str(seq.id)+" "+str(seq.seq)
 		output_handle.close()
 		input_handle.close()
 		count += 1
@@ -73,6 +81,11 @@ elif len(sys.argv) == 6:
 		sequences = SeqIO.parse(input_handle, inputformat)
 		for seq in sequences:
 			print >> output_handle, ">"+seq.id, "\n", seq.seq
+	elif option == "-print" and outputformat == "phylip-relaxed":
+		alignments = AlignIO.read(input_handle, inputformat)
+		print >> output_handle, str(len(alignments))+" "+str(alignments.get_alignment_length())
+		for seq in alignments:
+			print >> output_handle, str(seq.id)+" "+str(seq.seq)
 	output_handle.close()
 	input_handle.close()	
 print "Done"
