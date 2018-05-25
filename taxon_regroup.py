@@ -20,6 +20,10 @@ if len(sys.argv) >= 3:
 			count+=1
 	elif sys.argv[1] == "-seqlen":
 		print "seqlen mode"
+	elif sys.argv[1] == "-seqname":
+		form = sys.argv[3]
+		print "seqname mode, format:", form
+
 else:
 	print "FORMAT: python taxon_regroup.py [option: -tree (regroup based on tree topology), -seqlen (regroup based on seqlen)] [folder] ([tree file])"
 	print "EXAMPLE: python taxon_regroup.py -tree ./fasta tree.tre"
@@ -27,14 +31,18 @@ else:
 	sys.exit()
 
 inputfolder = sys.argv[2]
-
-files = glob.glob(inputfolder+"/*.fas")
+if sys.argv[1] == "-seqname":
+	files = glob.glob(inputfolder+"/*")
+else:
+	files = glob.glob(inputfolder+"/*.fas")
 if not os.path.exists ("./regrouped"):
 	os.makedirs("./regrouped")
 for f in files:
 	fhandle = open(f, "r")
 	sortdict = {}
-	for seq in SeqIO.parse(fhandle, "fasta"):
+	if not sys.argv[1] == "-seqname":
+		form = "fasta"
+	for seq in SeqIO.parse(fhandle, form):
 		sortdict[seq.id] = seq.seq
 	fhandle.close()
 	fnew = f.split("/")
@@ -42,12 +50,16 @@ for f in files:
 	fn2 = "./regrouped/"+fn.split(".")[0]+".fas"
 	fhandle2 = open(fn2, "w")
 	if sys.argv[1] == "-seqlen":
-		for key in sorted(sortdict, key=lambda value: len(sortdict[value])):# lambda r: len(str(value).replace("-", "").upper().replace("N", ""))):
+		for key in sorted(sortdict, key=lambda value: len(str(sortdict[value]).replace("-", "").upper().replace("N", "")), reverse = True):# lambda r: len(str(value).replace("-", "").upper().replace("N", ""))):
 			print >> fhandle2, ">L"+str(key)
 			print >> fhandle2, sortdict[key]
 	if sys.argv[1] == "-tree":
 		for key in sorted(sortdict, key = lambda r: d[r.id]):# lambda r: len(str(value).replace("-", "").upper().replace("N", ""))):
 			print >> fhandle2, ">L"+str(key)
+			print >> fhandle2, sortdict[key]
+	if sys.argv[1] == "-seqname":
+		for key in sorted(sortdict, key=lambda value: value[0]):
+			print >> fhandle2, ">"+str(key)
 			print >> fhandle2, sortdict[key]
 	fhandle2.close()
 
