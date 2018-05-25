@@ -8,9 +8,6 @@ import re
 import sys
 import glob
 import os
-def most_common(lst):
-    return max(set(lst), key=lst.count)
-
 
 if len(sys.argv) == 4:
 	inputfolder = sys.argv[1]
@@ -36,31 +33,48 @@ for f in files:
 	transseq = ""
 	nuclseq = ""
 	alignment = AlignIO.read(f, "fasta", alphabet=Gapped(IUPAC.ambiguous_dna))
-	framelist = []
+	prop_good_per_frame = []
 	stoplist = []
-	bf2list = []
-	for frame in range(0,3):
+	num_ext_stopslist = []
+	for frame in range(0,6):
 		counter = 0
-		badframe = 0
-		bf2 = 0
+		num_stops = 0
+		num_ext_stops = 0
 		for seq in alignment:
 			t1 = str(seq.seq).replace("-", "N")
 			t2 = t1.replace("?", "N")
-			seq.seq = Seq(t2, alphabet=Gapped(IUPAC.ambiguous_dna))
-			#if seq.seq[0:3] != "NNN":
-			nuclseq = seq.seq
-			remainder = len(nuclseq) % 3
-			if remainder > 0:
-				nuclseq = nuclseq+Seq("N"*(3-remainder), Gapped(IUPAC.ambiguous_dna))
-			nuclseq = nuclseq[frame:]+Seq("N"*frame, Gapped(IUPAC.ambiguous_dna))
-			transseq = nuclseq.translate() #frame1
-			if transseq[:-1].count("*") > 1: #check number of stops
-				badframe += transseq[:-1].count("*")
-				bf2 += transseq[int(0.2*len(transseq)):(len(transseq)-int(0.2*len(transseq)))].count("*")
+			if frame < 3:
+				seq.seq = Seq(t2, alphabet=Gapped(IUPAC.ambiguous_dna))
+				#if seq.seq[0:3] != "NNN":
+				nuclseq = seq.seq
+				remainder = len(nuclseq) % 3
+				if remainder > 0:
+					nuclseq = nuclseq+Seq("N"*(3-remainder), Gapped(IUPAC.ambiguous_dna))
+				nuclseq = nuclseq[frame:]+Seq("N"*frame, Gapped(IUPAC.ambiguous_dna))
+				transseq = nuclseq.translate() #frame1
+				if transseq[:-1].count("*") > 0: #check number of stops
+					num_stops += transseq[:-1].count("*")
+					num_ext_stops += transseq[int(0.2*len(transseq)):(len(transseq)-int(0.2*len(transseq)))].count("*")
+				else:
+					counter += 1
+					num_stops += transseq[:-1].count("*") # still count #stops to check
+					num_ext_stops += transseq[int(0.2*len(transseq)):(len(transseq)-int(0.2*len(transseq)))].count("*")
+			#revcom
 			else:
-				counter += 1
-				badframe += transseq[:-1].count("*") # still count #stops to check
-				bf2 += transseq[int(0.2*len(transseq)):(len(transseq)-int(0.2*len(transseq)))].count("*")
+				seq.seq = Seq(t2, alphabet=Gapped(IUPAC.ambiguous_dna)).reverse_complement()
+				nuclseq = seq.seq
+				remainder = len(nuclseq) % 3
+				if remainder > 0:
+					nuclseq = nuclseq+Seq("N"*(3-remainder), Gapped(IUPAC.ambiguous_dna))
+				nuclseq = nuclseq[frame:]+Seq("N"*frame, Gapped(IUPAC.ambiguous_dna))
+				transseq = nuclseq.translate() #frame4
+				if transseq[:-1].count("*") > 0: #check number of stops
+					num_stops += transseq[:-1].count("*")
+					num_ext_stops += transseq[int(0.2*len(transseq)):(len(transseq)-int(0.2*len(transseq)))].count("*")
+				else:
+					counter += 1
+					num_stops += transseq[:-1].count("*") # still count #stops to check
+					num_ext_stops += transseq[int(0.2*len(transseq)):(len(transseq)-int(0.2*len(transseq)))].count("*")
 			# #test
 			# length = len(nuclseq)
 			# start = int(length*0.2)
@@ -70,23 +84,25 @@ for f in files:
 				#print >> debug, seq.id, frame
 			#else:
 				#print >> debug, seq.id, "NNN seq"
-		framelist.append(float(counter)/len(alignment))
-		stoplist.append(badframe)
-		bf2list.append(bf2)
-	print >> debug, "framelist", framelist, max(framelist), framelist.index(max(framelist))
-	print >> debug, "stoplist", stoplist, min(stoplist), stoplist.index(min(stoplist))
-	print >> debug, "bf2list", bf2list, min(bf2list), bf2list.index(min(bf2list))
+		prop_good_per_frame.append(float(counter)/len(alignment))
+		stoplist.append(num_stops)
+		num_ext_stopslist.append(num_ext_stops)
+	print >> debug, "prop_good_per_frame", prop_good_per_frame, "best proportion", max(prop_good_per_frame), "best frame", prop_good_per_frame.index(max(prop_good_per_frame))
+	print >> debug, "stoplist", stoplist, "least stops", min(stoplist), "best frame", stoplist.index(min(stoplist))
+	print >> debug, "num_ext_stopslist", num_ext_stopslist, "least stops", min(num_ext_stopslist), "best frame", num_ext_stopslist.index(min(num_ext_stopslist))
 
-	
-	if max(framelist) < cutoff:
+	if max(prop_good_per_frame) < cutoff:#modified condition in case several frames are good
 		print >> debug, "BAD LOCUS", stoplist
 		badloci[f] = stoplist.index(min(stoplist))
 		goodlocus = False
 		frame = badloci[f]
 	else:
-		if framelist.index(max(framelist)) != stoplist.index(min(stoplist)):
-			print >> debug, "discrepancy btw framelist and stoplist", framelist.index(max(framelist)), stoplist.index(min(stoplist))
-			if framelist [stoplist.index(min(stoplist))] > cutoff:
+		if prop_good_per_frame.index(max(prop_good_per_frame)) != stoplist.index(min(stoplist)):
+			print >> debug, "discrepancy btw prop_good_per_frame and stoplist", prop_good_per_frame.index(max(prop_good_per_frame)), stoplist.index(min(stoplist))
+			if prop_good_per_frame [stoplist.index(min(stoplist))] > cutoff:
+				goodlocus = True
+				frame = stoplist.index(min(stoplist))
+			elif 0 in stoplist:
 				goodlocus = True
 				frame = stoplist.index(min(stoplist))
 			else:
@@ -94,23 +110,27 @@ for f in files:
 				badloci[f] = stoplist.index(min(stoplist))
 				goodlocus = False
 				frame = badloci[f]
-		elif bf2list.index(min(bf2list)) != stoplist.index(min(stoplist)):
-			print >> debug, "discrepancy btw bf2list and stoplist", bf2list.index(min(bf2list)), stoplist.index(min(stoplist))
-			if framelist [bf2list.index(min(bf2list))] > cutoff:
+		elif num_ext_stopslist.index(min(num_ext_stopslist)) != stoplist.index(min(stoplist)):
+			print >> debug, "discrepancy btw num_ext_stopslist and stoplist", num_ext_stopslist.index(min(num_ext_stopslist)), stoplist.index(min(stoplist))
+			if prop_good_per_frame [num_ext_stopslist.index(min(num_ext_stopslist))] > cutoff:
 				goodlocus = True
-				frame = bf2list.index(min(bf2list))
+				frame = num_ext_stopslist.index(min(num_ext_stopslist))
+			elif 0 in num_ext_stopslist:
+				goodlocus = True
+				frame = num_ext_stopslist.index(min(num_ext_stopslist))
 			else:
-				print >> debug, "BAD LOCUS", bf2list
-				badloci[f] = bf2list.index(min(bf2list))
+				print >> debug, "BAD LOCUS", num_ext_stopslist
+				badloci[f] = num_ext_stopslist.index(min(num_ext_stopslist))
 				goodlocus = False
 				frame = badloci[f]
 		else:
 			goodlocus = True
 			count +=1
-			frame = framelist.index(max(framelist))
-	prog = "working on file "+str(f)+": status "+str(goodlocus)+", frame "+str(framelist.index(max(framelist)))
+			frame = prop_good_per_frame.index(max(prop_good_per_frame))
+	prog = "working on file "+str(f)+": status "+str(goodlocus)+", frame "+str(prop_good_per_frame.index(max(prop_good_per_frame)))
  	sys.stdout.write(prog+"\r")
  	sys.stdout.flush()
+ 	alignment = AlignIO.read(f, "fasta", alphabet=Gapped(IUPAC.ambiguous_dna))
 	if goodlocus == True:
 		goodlocus = False
 		if opt == "-t":
@@ -121,14 +141,24 @@ for f in files:
 			for seq in alignment:
 				t1 = str(seq.seq).replace("-", "N")
 				t2 = t1.replace("?", "N")
-				seq.seq = Seq(t2, alphabet=Gapped(IUPAC.ambiguous_dna))
-				if frame == 1:
-					seq.seq = seq.seq[1:]
-				if frame == 2:
-					seq.seq = seq.seq[2:]
-				remainder = len(seq.seq) % 3
-				if remainder > 0:
-					seq.seq = seq.seq+Seq("N"*(3-remainder), Gapped(IUPAC.ambiguous_dna))
+				if frame < 3:
+					seq.seq = Seq(t2, alphabet=Gapped(IUPAC.ambiguous_dna))
+					if frame == 1:
+						seq.seq = seq.seq[1:]
+					if frame == 2:
+						seq.seq = seq.seq[2:]
+					remainder = len(seq.seq) % 3
+					if remainder > 0:
+						seq.seq = seq.seq+Seq("N"*(3-remainder), Gapped(IUPAC.ambiguous_dna))
+				else:
+					seq.seq = Seq(t2, alphabet=Gapped(IUPAC.ambiguous_dna)).reverse_complement()
+					if frame == 4:
+						seq.seq = seq.seq[1:]
+					if frame == 5:
+						seq.seq = seq.seq[2:]
+					remainder = len(seq.seq) % 3
+					if remainder > 0:
+						seq.seq = seq.seq+Seq("N"*(3-remainder), Gapped(IUPAC.ambiguous_dna))
 				transseq = seq.seq.translate()
 				t = str(seq.seq.translate()).upper().replace("*","X")
 				print >> debug, transseq
@@ -139,11 +169,6 @@ for f in files:
 					if transseq[t] != "X":
 						transseq = transseq[:t]+"X"+transseq[t+1:]
 						break
-				#unambig_translate = transseq.replace("B", "X")
-				#unambig_translate = unambig_translate.replace("Z", "X")
-				#unambig_translate = unambig_translate.replace("J", "X")
-				#unambig_translate = unambig_translate.replace("U", "X")
-				#unambig_translate = unambig_translate.replace("O", "X")
 				print >> outfile, ">"+seq.id, "\n", transseq#unambig_translate
 			outfile.close()
 		elif opt == "-orf":
