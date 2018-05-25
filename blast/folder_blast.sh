@@ -25,11 +25,11 @@ else
 	  then
 	    echo "single db blast option selected"
 	    echo "blasting queries:"
-		COUNT=0
 		declare -i CT2=0
 		declare -i TOTAL=$(ls $1/*.fas | cat | wc -l) #number of ahe files
 		for f in $(ls $1/*.fas)
 		do
+			COUNT=0
 			zo=$(( CT2*100 / TOTAL ))
 			echo -ne "                                                    \r"
 			echo -ne $zo"%\treading... \r"
@@ -62,13 +62,12 @@ else
 	  else
 	  	echo "multiple db blast option selected, number of dbs: $(cat $7 | wc -l)"
 	  	echo "blasting queries:"
-		COUNT=0
 		declare -i CT2=0
 		declare -i TOTAL=$(ls $1/*.fas | cat | wc -l)*$(cat $7 | wc -l) #number of files
 		zo=$(( CT2*100 / TOTAL ))
 		for f in $(ls $1/*.fas)
 		do
-			
+			COUNT=0
 			echo -ne "                                                    \r"
 			echo -ne $zo"%\treading... \r"
 			while read LINE
