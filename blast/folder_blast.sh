@@ -8,10 +8,11 @@ then
 	echo "\$3 threshold"
 	echo "\$4 method: tblastx, blastn"
 	echo "\$5 cpu: 4"
-	echo "\$6 list (for multiple dbs)"
+	echo "\$6 cluster: y / n"
+	echo "\$7 list (for multiple dbs)"
 	echo "########################################"
 else 
-	if [[ $7 == y ]]
+	if [[ $6 == y ]]
 	then
 		echo "loading modules"
 		module load ncbi-blast
@@ -20,7 +21,7 @@ else
 	fi
 	echo "erasing the content of the blast output file..."
 	rm *.blast
-	if [ -z "$6" ]
+	if [ -z "$7" ]
 	  then
 	    echo "single db blast option selected"
 	    echo "blasting queries:"
@@ -59,11 +60,11 @@ else
 		 	cat output.blast | sort -k1,1 -k2,2 -k11,11g -k12,12nr | sort -u -k2,2 --merge | sort -k1,1 -k11,11g -k12,12nr >> $blname.blast
 		done
 	  else
-	  	echo "multiple db blast option selected, number of dbs: $(cat $6 | wc -l)"
+	  	echo "multiple db blast option selected, number of dbs: $(cat $7 | wc -l)"
 	  	echo "blasting queries:"
 		COUNT=0
 		declare -i CT2=0
-		declare -i TOTAL=$(ls $1/*.fas | cat | wc -l)*$(cat $6 | wc -l) #number of files
+		declare -i TOTAL=$(ls $1/*.fas | cat | wc -l)*$(cat $7 | wc -l) #number of files
 		zo=$(( CT2*100 / TOTAL ))
 		for f in $(ls $1/*.fas)
 		do
@@ -97,7 +98,7 @@ else
 		 		touch output.blast
 		 		$4 -db $2/$fdb -query fasextr.blast -out output.blast -outfmt 6 -num_threads $5 -evalue $3
 		 		cat output.blast | sort -k1,1 -k2,2 -k11,11g -k12,12nr | sort -u -k2,2 --merge | sort -k1,1 -k11,11g -k12,12nr >> $fdb.blast
-		 	done < $6
+		 	done < $7
 		done
 	fi
 	echo ""
