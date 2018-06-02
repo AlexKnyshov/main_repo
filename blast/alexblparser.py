@@ -446,7 +446,7 @@ for b in blastlist:
                 if y[6] == seq.id and locusfname not in extr_loci:
                     print dash
                     print >> debugfile, dash
-                    print "progress:", round((int(len(output))-count)/int(len(output))*100, 2), "% found," count, "loci left, working on", transname
+                    print "progress:", round((int(len(output))-count)/int(len(output))*100, 2), "% found,", count, "loci left, working on", transname
                     print "target", seq.id, "found as a blast hit, matched the locus", locusfname
                     print >> debugfile, "target", seq.id, "found as a blast hit, matched the locus",locusfname
                     temp = seq.id
