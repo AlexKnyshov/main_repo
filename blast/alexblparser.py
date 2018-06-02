@@ -288,6 +288,7 @@ def seqprepfunc(output, locusfname, opt, seq):
                 else:
                     seq.seq = seq.seq[gaps[3]:gaps[2]]
                 seq = seq.reverse_complement()
+            rhandle.close()
         else:
             # identify gaps
             if opt[:3] == "-me":
@@ -314,7 +315,6 @@ def seqprepfunc(output, locusfname, opt, seq):
     elif opt == "-mn" or opt == "-n":
         if not output[locusfname][2] and not output[locusfname][5]:
             seq = seq.reverse_complement()
-    rhandle.close()
     return seq
 
 #function for appending the seqeunce to the alignemnt
