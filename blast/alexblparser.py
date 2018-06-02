@@ -196,7 +196,9 @@ def gapfunc(output, locusfname, recs):
 
 
 #gap function for -e and -me options
-def gapfunc_e(output, locusfname, recs, e_range):
+def gapfunc_e(output, locusfname, e_range):
+    starterr = "Start offset is too large"
+    enderr = "End offset is too large"
     if output[locusfname][5]:#aheb: #ahe is forward
         #print "AHE forw"
         if output[locusfname][2]:#transb: #trans is forward
@@ -204,7 +206,7 @@ def gapfunc_e(output, locusfname, recs, e_range):
             if output[locusfname][0] - e_range >= 0:
                 gapt = output[locusfname][0] - e_range#transf - gap #this is the corrected trans start
             else:
-                print "Start gap is too large"
+                print starterr
                 gapt = 0 # otherwise start from start
         else:
             ##need to check if trans is long enough - OK
@@ -212,7 +214,7 @@ def gapfunc_e(output, locusfname, recs, e_range):
                 gapt = output[locusfname][0] + e_range#transf + gap #this is the corrected trans start
             else:
                 gapt = len(tempseq) # otherwise start from the end
-                print "End gap is too large"
+                print enderr
         #check the ahe end:
         #if gaprev >= 0:#aher #some AHE left
         if output[locusfname][2]:#transb: #trans is forward
@@ -220,14 +222,14 @@ def gapfunc_e(output, locusfname, recs, e_range):
             if output[locusfname][1] + e_range <= len(tempseq): #check that trans is long enough
                 gaptrev = output[locusfname][1] + e_range#transf - gap #this is the corrected trans start
             else:
-                print "End gap is too large"
+                print enderr
                 gaptrev = len(tempseq)
         else:
             ##need to check if trans has start
             if output[locusfname][1] - e_range >= 0:
                 gaptrev = output[locusfname][1] - e_range#transf + gap #this is the corrected trans start
             else:
-                print "Start gap is too large"
+                print starterr
                 gaptrev = 0
     #reverse AHE:
     else: #ahe is reverse
@@ -238,14 +240,14 @@ def gapfunc_e(output, locusfname, recs, e_range):
                 gapt = output[locusfname][0] - e_range#transf - gap #this is the corrected trans start
             else:
                 gapt = 0
-                print "Start gap is too large"
+                print starterr
         else:
             ##need to check if trans is long enough - OK
             if output[locusfname][0] + e_range <= len(tempseq):
                 gapt = output[locusfname][0] + e_range#transf + gap #this is the corrected trans start
             else:
                 gapt = len(tempseq)
-                print "End gap is too large"
+                print enderr
         #check the ahe end:
         #if gaprev >= 0:#aher #some AHE left
         if output[locusfname][2]:#transb: #trans is forward
@@ -254,13 +256,13 @@ def gapfunc_e(output, locusfname, recs, e_range):
                 gaptrev = output[locusfname][1] + e_range#transf - gap #this is the corrected trans start
             else:
                 gaptrev = len(tempseq)
-                print "End gap is too large"
+                print enderr
         else:
             ##need to check if trans has start
             if output[locusfname][1] - e_range >= 0:
                 gaptrev = output[locusfname][1] - e_range#transf + gap #this is the corrected trans start
             else:
-                print "Start gap is too large"
+                print starterr
                 gaptrev = 0
     return [gapt, gaptrev]
 
@@ -270,28 +272,35 @@ def gapfunc_e(output, locusfname, recs, e_range):
 #function for preparing found target sequence for appending
 #returns prepared sequence
 def seqprepfunc(output, locusfname, opt, seq):
-    rhandle = open("./modified/"+locusfname.split("-copy")[0], "r")
-    ali = SeqIO.parse(rhandle, "fasta")
-    recs = list(ali)
     if opt[:3] == "-me" or opt[:2] == "-e":
         if opt[:3] == "-me" and int(opt[3:]) == 0  or opt[:2] == "-e" and int(opt[2:]) == 0 :
+            rhandle = open("./modified/"+locusfname.split("-copy")[0], "r")
+            ali = SeqIO.parse(rhandle, "fasta")
+            recs = list(ali)
             # identify gaps
             gaps = gapfunc(output, locusfname, recs)
-            if output[locusfname][2]:
+            if output[locusfname][2] and output[locusfname][5]:
+            #if output[locusfname][2]:
                 seq.seq = seq.seq[gaps[2]:gaps[3]]
             else:
-                seq.seq = seq.seq[gaps[3]:gaps[2]]
+                if gaps[2] < gaps[3]:
+                    seq.seq = seq.seq[gaps[2]:gaps[3]]
+                else:
+                    seq.seq = seq.seq[gaps[3]:gaps[2]]
                 seq = seq.reverse_complement()
         else:
             # identify gaps
             if opt[:3] == "-me":
-                gapsE = gapfunc_e(output, locusfname, recs,int(opt[3:]))
-            else:
-                gapsE = gapfunc_e(output, locusfname, recs,int(opt[2:]))
-            if output[locusfname][2]:
+                gapsE = gapfunc_e(output, locusfname, int(opt[3:]))
+            else: #-e option
+                gapsE = gapfunc_e(output, locusfname, int(opt[2:]))
+            if output[locusfname][2] and output[locusfname][5]:
                 seq.seq = seq.seq[gapsE[0]:gapsE[1]]
             else:
-                seq.seq = seq.seq[gapsE[1]:gapsE[0]]
+                if gapsE[0] < gapsE[1]:
+                    seq.seq = seq.seq[gapsE[0]:gapsE[1]]
+                else:
+                    seq.seq = seq.seq[gapsE[1]:gapsE[0]]
                 seq = seq.reverse_complement()
     elif opt == "-ms" or opt == "-mss" or opt == "-s" or opt == "-ss" or opt == "-msl" or opt == "-sl":
         if output[locusfname][2] and output[locusfname][5]:
