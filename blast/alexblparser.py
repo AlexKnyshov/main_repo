@@ -280,8 +280,9 @@ def seqprepfunc(output, locusfname, opt, seq):
             # identify gaps
             gaps = gapfunc(output, locusfname, recs)
             if output[locusfname][2] and output[locusfname][5]:
-            #if output[locusfname][2]:
                 seq.seq = seq.seq[gaps[2]:gaps[3]]
+            elif not output[locusfname][2] and not output[locusfname][5]:
+                seq.seq = seq.seq[gaps[3]:gaps[2]]
             else:
                 if gaps[2] < gaps[3]:
                     seq.seq = seq.seq[gaps[2]:gaps[3]]
@@ -297,6 +298,8 @@ def seqprepfunc(output, locusfname, opt, seq):
                 gapsE = gapfunc_e(output, locusfname, int(opt[2:]))
             if output[locusfname][2] and output[locusfname][5]:
                 seq.seq = seq.seq[gapsE[0]:gapsE[1]]
+            elif not output[locusfname][2] and not output[locusfname][5]:
+                seq.seq = seq.seq[gapsE[1]:gapsE[0]]
             else:
                 if gapsE[0] < gapsE[1]:
                     seq.seq = seq.seq[gapsE[0]:gapsE[1]]
@@ -305,7 +308,9 @@ def seqprepfunc(output, locusfname, opt, seq):
                 seq = seq.reverse_complement()
     elif opt == "-ms" or opt == "-mss" or opt == "-s" or opt == "-ss" or opt == "-msl" or opt == "-sl":
         if output[locusfname][2] and output[locusfname][5]:
-            seq.seq = seq.seq[output[locusfname][0]:output[locusfname][1]] #secret opt
+            seq.seq = seq.seq[output[locusfname][0]:output[locusfname][1]]
+        elif not output[locusfname][2] and not output[locusfname][5]:
+            seq.seq = seq.seq[output[locusfname][1]:output[locusfname][0]]
         else:
             if output[locusfname][0] > output[locusfname][1]:
                 seq.seq = seq.seq[output[locusfname][1]:output[locusfname][0]]
@@ -313,7 +318,7 @@ def seqprepfunc(output, locusfname, opt, seq):
                 seq.seq = seq.seq[output[locusfname][0]:output[locusfname][1]]
             seq = seq.reverse_complement()
     elif opt == "-mn" or opt == "-n":
-        if not output[locusfname][2] and not output[locusfname][5]:
+        if not output[locusfname][2] and not output[locusfname][5]: #incorrect condition
             seq = seq.reverse_complement()
     return seq
 
