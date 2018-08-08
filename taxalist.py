@@ -23,7 +23,7 @@ else:
 #inputformat = sys.argv[2]
 #query = sys.argv[2]
 #partnum = len(files)
-partnum = 3
+partnum = 2
 d = {}
 # for x in files:
 # 	d["{0}".format(x)]=[]
@@ -81,19 +81,20 @@ if wr:
 		input_handle = open(infile, "rU")
 		outhandle = open(infile+".fas", "w")
 		alignments = SeqIO.parse(input_handle, "fasta")
-		checkcsv = list(dcsv)
+		if sys.argv[3] == "-csv":
+			checkcsv = list(dcsv)
 		for seq in alignments:
 			#print seq.id.split("_")[-1]
 			if sys.argv[3] == "-csv" and seq.id.split("_")[-1] in dcsv:
 				print >> outhandle, ">"+seq.id
 				print >> outhandle, seq.seq
 				checkcsv.remove(seq.id.split("_")[-1])
-			# elif seq.id in d:
-			# 	print >> outhandle, ">"+seq.id
-			# 	print >> outhandle, seq.seq
+			elif seq.id in d:
+				print >> outhandle, ">"+seq.id
+				print >> outhandle, seq.seq
 		input_handle.close()
 		outhandle.close()
-		print infile, checkcsv, len(checkcsv)#, dcsv
+		#print infile, checkcsv, len(checkcsv)#, dcsv
 # for key, value in sorted(result.items(), key=operator.itemgetter(0)):
 # 	print key, value
 # 	for x in value:
