@@ -13,7 +13,7 @@ else:
 fhandle = open(fname, "rU")
 seqs = SeqIO.parse(fhandle, "fasta")
 for seq in seqs:
-    seq.id = seq.id.split("-")[0]
+    #seq.id = seq.id.split("-")[1]
     print "processing", seq.id
     fnew = open(seq.id+".fas", "a")
     SeqIO.write(seq, fnew, "fasta")
