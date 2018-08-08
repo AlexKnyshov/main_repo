@@ -93,9 +93,10 @@ for f in files:
 					trimlist.add(term.name)
 			names = list(trimlist)
 			result[f] = names
-			fname = locusname.match(f)
-			aliout = open("./reduced/"+fname.group(1), "w")
-			aliin = open(alifiles+"/"+fname.group(1), "rU")
+			#fname = locusname.match(f)
+			fname = ".".join(f.split("/")[-1].split(".")[1:])
+			aliout = open("./reduced/"+fname, "w")
+			aliin = open(alifiles+"/"+fname, "rU")
 			for seq in SeqIO.parse(aliin, "fasta"):
 				if seq.id not in names:
 				 	print >> aliout, ">"+seq.id, "\n", seq.seq
