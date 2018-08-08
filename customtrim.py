@@ -50,6 +50,7 @@ if not os.path.exists ("./trimmed"):
 
 print "parsing files:"
 for f in files:
+	reftaxa = False
 	fnew = f.split("/")
 	fn = fnew[len(fnew)-1]
 	fn2 = "./trimmed/"+fnew[-1]#fn.split(".")[0]+".fas"
@@ -60,25 +61,30 @@ for f in files:
 	inputalignment = AlignIO.read(infile, "fasta")
 	for seq in inputalignment:
 	    seqs[seq.id] = str(seq.seq).upper()
+	    if trimopt == "-a" or trimopt == "-1" or trimopt[:3] == "-d%":
+		    if seq.id in taxalist:
+		    	reftaxa = True
+	print >> outf, "reftaxa:", reftaxa
 	#pairwise
 	names =[]
 	lengths = []
-	if trimopt[:2] == "-%" or trimopt == "-refine" or trimopt == "-d": #trim counting all taxa
+	if trimopt[:2] == "-%" or trimopt == "-refine" or trimopt == "-d" or reftaxa == False: #trim counting all taxa
 		for key in seqs.keys():
 			names.append(key)
 			lengths.append(len(seqs[key]))
 			#print key, len(seqs[key])	
-	else: #trim to AHE taxa
+	elif reftaxa: #trim to AHE taxa
 		for key in seqs.keys():
 			if key in taxalist:
 				names.append(key)
 				lengths.append(len(seqs[key]))
-				#print key, len(seqs[key])	
+				#print key, len(seqs[key])
+	#else skip	
 	distlist = []
 	#forward trim
 	startpos = 0
 	endpos = max(lengths)
-	if trimopt == "-a":
+	if trimopt == "-a" and reftaxa == True:
 		for basenum in range(len(seqs[names[0]])):
 			baselist = []
 			misdata = 0
@@ -92,7 +98,7 @@ for f in files:
 				break
 			#print misdata, "misdata", startpos, "startpos"
 			startpos += 1
-	elif trimopt == "-1":
+	elif trimopt == "-1" and reftaxa == True:
 		finish = False
 		for basenum in range(len(seqs[names[0]])):
 			baselist = []
@@ -166,7 +172,7 @@ for f in files:
 					break
 			if misdata <= (len(names)*0.4):
 				positions.append(basenum)
-	elif trimopt[:3] == "-d%":
+	elif trimopt[:3] == "-d%" and reftaxa == True:
 		positions = []
 		for basenum in range(len(seqs[names[0]])):
 			baselist = []
@@ -182,7 +188,7 @@ for f in files:
 				positions.append(basenum)
 	#print startpos, "startpos"
 	#reverse trim
-	if trimopt == "-a":
+	if trimopt == "-a" and reftaxa == True:
 		for basenum in range(len(seqs[names[0]])-1, -1, -1):
 			baselist = []
 			misdata = 0
@@ -196,7 +202,7 @@ for f in files:
 				break
 			#print misdata, "misdata", endpos, "endpos"
 			endpos -= 1
-	elif trimopt == "-1":
+	elif trimopt == "-1" and reftaxa == True:
 		finish = False
 		for basenum in range(len(seqs[names[0]])-1, -1, -1):
 			baselist = []
@@ -259,15 +265,15 @@ for f in files:
 		endpos = potential_endpos
 	#print endpos, "endpos"
 	infile.close()
-	if trimopt == "-d" or trimopt[:3] == "-d%":
+	if trimopt == "-d" or trimopt[:3] == "-d%" and reftaxa == True:
 		print >> outf, len(positions),"good positions:", positions
 	else:
 		print >> outf, "startpos: ", startpos
 		print >> outf, "endpos: ", endpos
 
 	#writing to files
-	if endpos-startpos > 0 or trimopt == "-d" or trimopt[:3] == "-d%":
-		if (trimopt == "-d" or trimopt[:3] == "-d%") and len(positions) > 0:
+	if endpos-startpos > 0 or trimopt == "-d" or trimopt[:3] == "-d%" and reftaxa == True:
+		if (trimopt == "-d" or trimopt[:3] == "-d%" and reftaxa == True) and len(positions) > 0:
 			outfile = open(fn2, "w")
 			align = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna)) # new ali
 			for tempseq in inputalignment:
@@ -279,7 +285,7 @@ for f in files:
 			for aliseq in align:
 				print >> outfile, ">"+aliseq.id, "\n", aliseq.seq
 			outfile.close()
-		elif (trimopt == "-d" or trimopt[:3] == "-d%") and len(positions) == 0:
+		elif (trimopt == "-d" or trimopt[:3] == "-d%" and reftaxa == True) and len(positions) == 0:
 			print >> outf, len(positions), "good positions, skipping the locus..."
 			warninglist.append(f)
 		else:
