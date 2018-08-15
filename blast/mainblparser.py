@@ -17,12 +17,12 @@ if len(sys.argv) == 7:
         print "[paropt] cannot be less than 1"
         sys.exit()
 else:
-    print "FORMAT: python alexblparser.py [blastfile or folder] [asemblyfile or folder] [ahefolder] [evalue] [option: -n (normal), -s (extract only matched parts), -ss (short are discarded), -e[value] (extended s option), -a (blast region extraction and stiching), -b (extract between two outmost blast regions), -mn (multiple normal), -ms (multiple selected), -mss(short are discarded), -me[value] (extended ms option), -ma, -mb] [number of hits extracted per query]"
-    print "EXAMPLE: python alexblparser.py ./blast_outputs/ /transcriptomes/ ./fasta 1e-40 -mn 2"
-    print "EXAMPLE: python alexblparser.py blast.tab trinity.fas ./fasta/ 1e-40 -n 1"
+    print "FORMAT: python mainblparser.py [blastfile or folder] [asemblyfile or folder] [ahefolder] [evalue] [option: -n (normal), -s (extract only matched parts), -ss (short are discarded), -e[value] (extended s option), -a (blast region extraction and stiching), -b (extract between two outmost blast regions), -mn (multiple normal), -ms (multiple selected), -mss(short are discarded), -me[value] (extended ms option), -ma, -mb] [number of hits extracted per query]"
+    print "EXAMPLE: python mainblparser.py ./blast_outputs/ /transcriptomes/ ./fasta 1e-40 -mn 2"
+    print "EXAMPLE: python mainblparser.py blast.tab trinity.fas ./fasta/ 1e-40 -n 1"
     print "HELP for -e / -me option: [value] indicates a size of the flank in bp that needs to be extracted"
     print "HELP for -e / -me option: when [value]=0, extracts flanks to match the length of the query"
-    print "EXAMPLE: python alexblparser.py blast.tab trinity.fas ./fasta/ 1e-40 -e1500 1"
+    print "EXAMPLE: python mainblparser.py blast.tab trinity.fas ./fasta/ 1e-40 -e1500 1"
     print "1500 bp from each side (if possible) will be added to blast hit region and extracted"
     sys.exit()
 
@@ -41,7 +41,7 @@ def mkdirfunc():
 #all alignments are copied regardless of whether they will be modified or not
 def copyfunc():
     print "copying files:"
-    for x in glob.glob(ahefoldarg+"/*.fas"):
+    for x in glob.glob(ahefoldarg+"/*.fas*"):
         locusfname = x.split("/")[-1]
         #print locusfname
         if not os.path.exists ("./modified/"+locusfname):
@@ -517,8 +517,8 @@ def loclenfunc(locusfname):
     rhandle.close()
 #---------------------------------------------------------------------
 
-print "alexblparser run with option", opt, "selected"
-debugfile = open("alexblparser.log", "w")
+print "mainblparser run with option", opt, "selected"
+debugfile = open("mainblparser.log", "w")
 print >> debugfile, "debug file start"
 print >> debugfile, "command line parameters:", sys.argv
 #make modified dir
@@ -550,9 +550,7 @@ totalloci = 0
 #parsing blast files
 print "parsing blast files..."
 print >> debugfile, "parsing blast files..."
-b1 = 0
 for b in blastlist:
-    b+=1
     #obtain a dictionary with blast results
     output = readblastfilefunc(b, debugfile)
     partsnumdict = partsnumfunc(output)
