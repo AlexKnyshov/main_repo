@@ -550,7 +550,9 @@ totalloci = 0
 #parsing blast files
 print "parsing blast files..."
 print >> debugfile, "parsing blast files..."
+b1 = 0
 for b in blastlist:
+    b1 += 1
     #obtain a dictionary with blast results
     output = readblastfilefunc(b, debugfile)
     partsnumdict = partsnumfunc(output)
@@ -661,7 +663,7 @@ for b in blastlist:
                     seq.id = temp
                     seq.seq = tempseq
                     count -= 1
-                    print "progress:", count, "loci left, working on", transname, b, "/", len(blastlist)
+                    print "progress:", count, "loci left, working on", transname, b1, "/", len(blastlist)
     if opt == "-msl" or opt == "-sl":
         print "sorting file....."
         fhandle = open("./"+seqname+"_conSeqs.fasta", "r")
