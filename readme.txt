@@ -44,7 +44,7 @@ AHE + transcriptome pipeline:
 	-ms (extracts the hit region of a contig, group of transcriptomes mode)
 	-mss (extracts the hit region of a contig, hits shorter than 80% length of query are discarded, group of transcriptomes mode)
 	-me (extracts the region of a conting that matches the length of the query, group of transcriptomes mode)
-
+![mainblparser options image](./mainblparser.png)
 
 5) realign the loci
 	bash align.sh ./FASTA_FOLDER ALGORITHM DIRECTION_OPTION CPU(number)
