@@ -95,6 +95,7 @@ def readblastfilefunc(b, debugfile):
                         if row[1].split("_c")[0] == output2[row[0].split("/")[-1]+"-copy0"+"-copy"+str(parts_counter)][6].split("_c")[0]:
                             print "warning: several isoforms detected", row[1], row[10], row[11]
                             print >> debugfile, "warning: several isoforms detected", row[1], row[10], row[11]
+                            query_counter -= 1
                         else:
                             print "warning: several matches detected", row[1], row[10], row[11], "hit is", round(float(row[11])/best_hit*100), "%"#"; ratio with best_eval is"#, round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
                             print >> debugfile, "warning: several matches detected", row[1], row[10], row[11], "hit is", round(float(row[11])/best_hit*100), "%"#"; ratio with best_eval is"#, round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
@@ -469,7 +470,7 @@ def seqwritefunc(seq, opt, locusfname, seqname, paropt):
     if paropt == 1:
         seq.id = seqname
     else:
-        seq.id = seqname+"."+locusfname.split("-copy")[1]
+        seq.id = seqname+"|"+locusfname.split("-copy")[1]
     seq.name =""
     seq.description =""
     if (opt == "-mss" or opt == "-ss") and (float(len(seq.seq)) / loclenfunc(locusfname) > 0.8):
@@ -500,7 +501,7 @@ def altwritefunc(seq, opt, locusfname, seqname, paropt):
     if paropt == 1:
         seq.id = locusfname.split("_")[-1].split(".")[0]
     else:
-        seq.id = locusfname.split("_")[-1].split(".")[0]+"."+locusfname.split("-copy")[1]
+        seq.id = locusfname.split("_")[-1].split(".")[0]+"|"+locusfname.split("-copy")[1]
     seq.name =""
     seq.description =""
     print >> fhandle, ">"+seq.id
