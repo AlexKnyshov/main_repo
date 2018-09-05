@@ -50,12 +50,12 @@ for f in files:
 	fn2 = "./regrouped/"+fn.split(".")[0]+".fas"
 	fhandle2 = open(fn2, "w")
 	if sys.argv[1] == "-seqlen":
-		for key in sorted(sortdict, key=lambda value: len(str(sortdict[value]).replace("-", "").upper().replace("N", "")), reverse = True):# lambda r: len(str(value).replace("-", "").upper().replace("N", ""))):
-			print >> fhandle2, ">L"+str(key)
+		for key in sorted(sortdict, key=lambda value: len(str(sortdict[value]).replace("-", "").upper().replace("N", "").replace("?", "")), reverse = True):# lambda r: len(str(value).replace("-", "").upper().replace("N", ""))):
+			print >> fhandle2, ">"+str(key)
 			print >> fhandle2, sortdict[key]
 	if sys.argv[1] == "-tree":
 		for key in sorted(sortdict, key = lambda r: d[r.id]):# lambda r: len(str(value).replace("-", "").upper().replace("N", ""))):
-			print >> fhandle2, ">L"+str(key)
+			print >> fhandle2, ">"+str(key)
 			print >> fhandle2, sortdict[key]
 	if sys.argv[1] == "-seqname":
 		for key in sorted(sortdict, key=lambda value: value[0]):
