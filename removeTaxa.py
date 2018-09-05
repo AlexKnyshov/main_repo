@@ -73,7 +73,7 @@ for f in files:
 			elif sys.argv[2] == "-ar" and seq.id in exclusion_list:
 				print >> outputfile, ">"+exclusion_list[seq.id], "\n", seq.seq
 				count += 1
-			elif sys.argv[2] == "-l" and float(len(str(seq.seq).replace("-", "").upper().replace("N", "")))/len(seq.seq)>threshold:
+			elif sys.argv[2] == "-l" and float(len(str(seq.seq).replace("-", "").upper().replace("N", "").replace("?", "")))/len(seq.seq)>threshold:
 				print >> outputfile, ">"+seq.id, "\n", seq.seq
 				count += 1
 		outputfile.close()
