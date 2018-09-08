@@ -38,16 +38,22 @@ def mkdirfunc():
 #function for copying alignment files before changing them
 #all alignments are copied regardless of whether they will be modified or not
 def copyfunc():
-    print "copying files:"
-    for x in glob.glob(ahefoldarg+"/*.fas"):
+    print "copying files *.fa*"
+    print >> debugfile, "copying files *.fa*"
+    copyfunc_c = 0
+    for x in glob.glob(ahefoldarg+"/*.fa*"):
         locusfname = x.split("/")[-1]
         #print locusfname
         if not os.path.exists ("./modified/"+locusfname):
             prog = "copying "+str(locusfname)+"..."
             sys.stdout.write(prog+"\r")
             sys.stdout.flush()
-            shutil.copy2(ahefoldarg+locusfname, "./modified")
+            shutil.copy2(ahefoldarg+"/"+locusfname, "./modified")
+            copyfunc_c += 1
     print ""
+    print "copied", copyfunc_c, "files"
+    print >> debugfile, "copied", copyfunc_c, "files"
+
 
 #function for parsing a blast output file
 #each query is allowed to have only 1 target
@@ -318,7 +324,7 @@ def seqprepfunc(output, locusfname, opt, seq):
                 seq.seq = seq.seq[output[locusfname][0]:output[locusfname][1]]
             seq = seq.reverse_complement()
     elif opt == "-mn" or opt == "-n":
-        if not output[locusfname][2] and not output[locusfname][5]: #incorrect condition
+        if (output[locusfname][2] and not output[locusfname][5]) or (not output[locusfname][2] and output[locusfname][5]):
             seq = seq.reverse_complement()
     return seq
 
@@ -374,7 +380,7 @@ def loclenfunc(locusfname):
 print "alexblparser run with option", opt, "selected"
 debugfile = open("alexblparser.log", "w")
 print >> debugfile, "debug file start"
-print >> debugfile, "command line parameters:", sys.argv
+print >> debugfile, "command line parameters:", ' '.join(sys.argv)
 #make modified dir
 print >> debugfile, "make modified dir..."
 mkdirfunc()
@@ -392,8 +398,8 @@ else:
     blastlist = [blastfilearg]
     translist = [trif]
 
-print "list of transcriptomes:"
-print >> debugfile, "list of transcriptomes:"
+print "list of target fasta files detected (mask *.fasta):"
+print >> debugfile, "list of target fasta files detected (mask *.fasta):"
 for l in translist:
     print l
     print >> debugfile, l
@@ -413,10 +419,10 @@ for b in blastlist:
     print count, "targets found to be extracted"
     print >> debugfile, count, "targets found to be extracted"
     
-    print "scanning the transcriptome..."
-    print >> debugfile, "scanning the transcriptome..."
+    print "scanning the target fasta file..."
+    print >> debugfile, "scanning the target fasta file..."
     warninglist = []
-    #get the transcriptome filename, matching blast filename
+    #get the target fasta filename, matching blast filename
     for t_file in translist:
         if b[:-6].split("/")[-1] in t_file:
             #print >> debugfile, b[:-6].split("/")[-1], t_file
@@ -426,8 +432,8 @@ for b in blastlist:
             break
     print >> debugfile, "target:", transname, "; target name:", seqname
     if not inputf:
-        print "error, transcriptome file is not found"
-        print >> debugfile, "error, transcriptome file is not found"
+        print "error, the target fasta file is not found"
+        print >> debugfile, "error, the target fasta file is not found"
         break
     print "searching for contigs in:", transname
     print >> debugfile, "searching for contigs in:", transname
