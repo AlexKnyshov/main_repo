@@ -8,7 +8,7 @@ import shutil
 if len(sys.argv) == 4:
 	inputfolder = sys.argv[1]
 	files = glob.glob(inputfolder+"/*.fas")
-	if sys.argv[2] == "-a" or sys.argv[2] == "-ar" or sys.argv[2] == "-e":
+	if sys.argv[2] == "-a" or sys.argv[2] == "-ar" or sys.argv[2] == "-e" or sys.argv[2] == "-r":
 		exclusion_file = sys.argv[3]
 	elif sys.argv[2] == "-l" or sys.argv[2] == "-ll":
 		threshold = float(sys.argv[3])
@@ -16,9 +16,10 @@ if len(sys.argv) == 4:
 		print "incorrect command line parameters"
 		sys.exit()
 else:
-	print "FORMAT: python removeTaxa.py [folder with fasta] [option: -a (leave specified taxa), -ar (leave and rename specified taxa), -e (exclude specified taxa), -l (exclude short seq taxa), -ll (exclude loci with few taxa)] [taxalist (or csv) or lenght percent threshold]"
+	print "FORMAT: python removeTaxa.py [folder with fasta] [option: -a (leave specified taxa), -ar (leave and rename specified taxa), -r (rename only specified taxa leaving all the rest unchanged), -e (exclude specified taxa), -l (exclude short seq taxa), -ll (exclude loci with few taxa)] [taxalist (or csv) or lenght percent threshold]"
 	print "EXAMPLE: python removeTaxa.py ./fasta -l 0.75"
 	print "EXAMPLE: python removeTaxa.py ./fasta -a list.lst"
+	print "EXAMPLE: python removeTaxa.py ./fasta -r list.csv"
 	sys.exit()
 
 if sys.argv[2] == "-a" or sys.argv[2] == "-e":
@@ -31,23 +32,22 @@ if sys.argv[2] == "-a" or sys.argv[2] == "-e":
 	exfile.close()
 	print "read", len(exclusion_list), "records"
 
-if sys.argv[2] == "-ar":
+if sys.argv[2] == "-ar" or sys.argv[2] == "-r":
 	print "reading csv taxalist..."
 	exclusion_list = {}
 	exfile = open(exclusion_file, "r")
 	reader = csv.reader(exfile)
 	for row in reader:
-		#l = line.strip()
 		exclusion_list[row[0]] = row[1]
 	exfile.close()
 	print "read", len(exclusion_list), "records"
 
 print "creating an output folder..."
-if not os.path.exists ("./reduced/"):
-    os.makedirs("./reduced") #creating folder if necessary
+if not os.path.exists ("./rmtaxaout/"):
+    os.makedirs("./rmtaxaout") #creating folder if necessary
 else:
-    shutil.rmtree("./reduced/") #removing old files
-    os.makedirs("./reduced")
+    shutil.rmtree("./rmtaxaout/") #removing old files
+    os.makedirs("./rmtaxaout")
 
 print "parsing the files..."
 for f in files:
@@ -56,14 +56,12 @@ for f in files:
  	sys.stdout.write(prog+"\r")
  	sys.stdout.flush()
  	if sys.argv[2] == "-ll":
- 		#print len([SeqIO.parse(f, "fasta")])
  		if len(list(SeqIO.parse(f, "fasta"))) >= threshold:
- 			shutil.copy2(inputfolder+fn, "./reduced")
+ 			shutil.copy2(inputfolder+fn, "./rmtaxaout")
  	else:
-		outputfile=open("./reduced/"+fn, "w")
+		outputfile=open("./rmtaxaout/"+fn, "w")
 		count = 0
 		for seq in SeqIO.parse(f, "fasta"):
-			#print seq.id, len(str(seq.seq).replace("-", "").replace("N", "")), len(seq.seq), float(len(str(seq.seq).replace("-", "").replace("N", "")))/len(seq.seq)
 			if sys.argv[2] == "-e" and seq.id not in exclusion_list:
 				print >> outputfile, ">"+seq.id, "\n", seq.seq
 				count += 1
@@ -73,10 +71,16 @@ for f in files:
 			elif sys.argv[2] == "-ar" and seq.id in exclusion_list:
 				print >> outputfile, ">"+exclusion_list[seq.id], "\n", seq.seq
 				count += 1
+			elif sys.argv[2] == "-r":
+				if seq.id in exclusion_list:
+					print >> outputfile, ">"+exclusion_list[seq.id], "\n", seq.seq
+				else:
+					print >> outputfile, ">"+seq.id, "\n", seq.seq
+				count += 1
 			elif sys.argv[2] == "-l" and float(len(str(seq.seq).replace("-", "").upper().replace("N", "").replace("?", "")))/len(seq.seq)>threshold:
 				print >> outputfile, ">"+seq.id, "\n", seq.seq
 				count += 1
 		outputfile.close()
 		if count == 0:
-			os.remove("./reduced/"+fn)
+			os.remove("./rmtaxaout/"+fn)
 print "\ndone"
