@@ -29,4 +29,4 @@ for infile in files:
 	input_handle.close()
 
 for key, value in sorted(d.items()):
-	print key, len(value), value
+	print key+"\t"+str(len(value))+"\t"+str(value)
