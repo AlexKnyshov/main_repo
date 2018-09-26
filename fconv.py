@@ -84,7 +84,16 @@ for f in files:
 		#print list(alignments)
 		AlignIO.write(alignments, output_handle, outputformat)
 	elif option == "-s":
-		sequences = SeqIO.parse(input_handle, inputformat)
+		if outputformat == "nexus" or inputformat == "nexus":
+			alph = check_alphabet(input_handle, inputformat)
+			input_handle.seek(0)
+			print alph
+			if alph == "DNA":
+				sequences = SeqIO.parse(input_handle, inputformat, alphabet = Gapped(IUPAC.ambiguous_dna))
+			elif alph == "Prot":
+				sequences = SeqIO.parse(input_handle, inputformat, alphabet = Gapped(IUPAC.protein, '-'))
+		else:
+			sequences = SeqIO.parse(input_handle, inputformat)
 		SeqIO.write(sequences, output_handle, outputformat)
 	elif option == "-print" and outputformat == "fasta":
 		sequences = SeqIO.parse(input_handle, inputformat)
