@@ -43,10 +43,12 @@ def check_alphabet(filename, fformat):#code for this function is modified from h
 	leftover = set(str(first_record.seq).upper()) - set(alphabets[0].letters) - set(["-", "?"])
 	if len(leftover) == 0:
 		detected = "DNA"
+		print filename, "Detected alphabet: DNA"
 	else:
 		leftover = set(str(first_record.seq).upper()) - set(alphabets[1].letters) - set(["-", "?","X"])
 		if len(leftover) == 0:
 			detected = "Prot"
+			print filename, "Detected alphabet: Protein"
 		else:
 			print filename, "error: unknown alphabet, problematic symbols:", leftover
 			sys.exit()
@@ -66,15 +68,14 @@ count = 0
 for f in files:
 	fnew = f.split("/")
 	fn = fnew[len(fnew)-1]
-	print fn[:(len(fn)-extlen)]
-	print outputfolder+"/"+fn[:(len(fn)-extlen)]+outputext
+	print "basename detected:", fn[:(len(fn)-extlen)]
+	print "output file:", outputfolder+"/"+fn[:(len(fn)-extlen)]+outputext
 	input_handle = open(f, "rU")
 	output_handle = open(outputfolder+"/"+fn[:(len(fn)-extlen)]+outputext, "w")
 	if option == "-a":
 		if outputformat == "nexus" or inputformat == "nexus":
 			alph = check_alphabet(input_handle, inputformat)
 			input_handle.seek(0)
-			print alph
 			if alph == "DNA":
 				alignments = AlignIO.parse(input_handle, inputformat, alphabet = Gapped(IUPAC.ambiguous_dna))
 			elif alph == "Prot":
@@ -87,7 +88,6 @@ for f in files:
 		if outputformat == "nexus" or inputformat == "nexus":
 			alph = check_alphabet(input_handle, inputformat)
 			input_handle.seek(0)
-			print alph
 			if alph == "DNA":
 				sequences = SeqIO.parse(input_handle, inputformat, alphabet = Gapped(IUPAC.ambiguous_dna))
 			elif alph == "Prot":
