@@ -33,14 +33,12 @@ def check_alphabet(filename, fformat):#code for this function is modified from h
 	leftover = set(str(first_record.seq).upper()) - set(alphabets[0].letters) - set(["-", "?"])
 	if len(leftover) == 0:
 		detected = "DNA"
-		print "Detected alphabet: DNA"
 	else:
 		leftover = set(str(first_record.seq).upper()) - set(alphabets[1].letters) - set(["-", "?","X"])
 		if len(leftover) == 0:
 			detected = "Prot"
-			print "Detected alphabet: Protein"
 		else:
-			print "Error: unknown alphabet, problematic symbols:", leftover
+			print filename, "Error: unknown alphabet, problematic symbols:", leftover
 			sys.exit()
 	return detected
 
