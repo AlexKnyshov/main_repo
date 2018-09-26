@@ -31,7 +31,7 @@ rme = raw_input("Enter end")
 crop_start = int(rms)
 crop_end = int(rme)
 if rev:
-	alignment = alignment[crop_start:crop_end]
+	alignment = alignment[:, crop_start:crop_end]
 else:
 	alignment = alignment[:, :crop_start]+alignment[:, crop_end:]
 	q = raw_input("More?")
