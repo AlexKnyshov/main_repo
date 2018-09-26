@@ -40,25 +40,21 @@ def check_alphabet(filename, fformat):#code for this function is modified from h
 		else:
 			print filename, "error: unknown alphabet, problematic symbols:", leftover
 			sys.exit()
-	#print "alph:", detected
 	return detected
 
 if len(sys.argv) == 3:
 	inputfolder = sys.argv[1]
 	partnum = sys.argv[2]
-	# phyliptype = sys.argv[3]
-	# pf2opt = sys.argv[4]
-	# if partnum == "-orf":
-	# 	framefile = sys.argv[5]
+
 else:
-	print "FORMAT: python concat.py [folder with fasta] [split to codon positions: -3 (yes), -1 (no), -prot, -orf] [phylip type: -i (interleaved), -s (sequential)] [partition_finder output: -pf2y, -pf2n] ([exclusion list])"
-	print "EXAMPLE: python concat.py ./fasta -1 -i -pf2n"
-	print "EXAMPLE: python concat.py ./fasta -1 -s -pf2y list.lst"
+	print "FORMAT: python concat.py [folder with fasta] [split to codon positions: -3 (yes), -1 (no)]"
+	print "EXAMPLE: python concat.py ./fasta -1"
 	print "output is written to COMBINED.phy, partitions are written to partitions.prt"
 	sys.exit()
 
 fasta = ["fasta", "fas", "fa"]
 phylip = ["phylip", "phy"]
+nexus = ["nexus", "nex"]
 
 print "first pass: creating a list of taxa..."
 d = {}
@@ -66,9 +62,11 @@ files = glob.glob(inputfolder+"/*")
 for f in files:
 	fnew = f.split("/")
 	fn = fnew[len(fnew)-1]
-	if f.split(".")[-1] in fasta or f.split(".")[-1] in phylip:
+	if f.split(".")[-1] in fasta or f.split(".")[-1] in phylip or f.split(".")[-1] in nexus:
 		if f.split(".")[-1] in fasta:
 			fformat = "fasta"
+		elif f.split(".")[-1] in nexus:
+			fformat = "nexus"
 		else:
 			fformat = "phylip-relaxed"
 		alph = check_alphabet(f, fformat)
@@ -147,14 +145,13 @@ for f in files:
 	end = start + length - 1
 	if partnum == "-3":
 		if model == "DNA":
-			print >> outputfile, model, ", "+fn+"-1="+str(start+1)+"-"+str(end+1)+"\\3"
-			print >> outputfile, model, ", "+fn+"-2="+str(start+2)+"-"+str(end+1)+"\\3"
-			print >> outputfile, model, ", "+fn+"-3="+str(start+3)+"-"+str(end+1)+"\\3"
+			print >> outputfile, model+", "+fn+"-1="+str(start+1)+"-"+str(end+1)+"\\3"
+			print >> outputfile, model+", "+fn+"-2="+str(start+2)+"-"+str(end+1)+"\\3"
+			print >> outputfile, model+", "+fn+"-3="+str(start+3)+"-"+str(end+1)+"\\3"
 		else:
-			print >> outputfile, model, ", "+fn+"="+str(start+1)+"-"+str(end+1)
+			print >> outputfile, model+", "+fn+"="+str(start+1)+"-"+str(end+1)
 	elif partnum == "-1":
-	 	print >> outputfile, model, ", "+fn+"="+str(start+1)+"-"+str(end+1)
-	#print start+1, end+1, length
+	 	print >> outputfile, model+", "+fn+"="+str(start+1)+"-"+str(end+1)
 	prog = "working on partition "+str(fn)+": starts "+str(start+1)+", ends "+str(end+1)
   	sys.stdout.write(prog+"\r")
   	sys.stdout.flush()
