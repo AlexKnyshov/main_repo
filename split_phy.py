@@ -7,6 +7,7 @@ import csv
 import sys
 import glob
 import os
+import shutil
 
 if len(sys.argv) == 4 or len(sys.argv) == 3:
 	concat_name = sys.argv[1]
@@ -29,13 +30,14 @@ else:
     shutil.rmtree("./splitout/") #removing old files
     os.makedirs("./splitout")
 
+print "splitting..."
 if par == "DNA":
-	alph = "Gapped(IUPAC.ambiguous_dna)"
+	alph = Gapped(IUPAC.ambiguous_dna)
 elif par == "Prot":
-	alph = "Gapped(IUPAC.protein, '-')"
+	alph = Gapped(IUPAC.protein, '-')
 concat_handle = open(concat_name, "rU")
 partition_handle = open(partname, "r")
-alignment = AlignIO.read(concat_handle, "phylip-relaxed", alphabet = alph)
+alignment = AlignIO.read(concat_handle, "phylip-relaxed", alphabet = Gapped(IUPAC.ambiguous_dna))
 for line in partition_handle:
 	l = line.strip().split("=")
 	fname = l[0].split(",")[-1].strip() #partition name
@@ -43,7 +45,8 @@ for line in partition_handle:
 	end = int(l[1].split("-")[1])
 	outfile = open("./splitout/"+fname, "w")
 	for record in alignment:
-		print >> outfile, ">"+record.id, "\n",record.seq[start:end]
+		if set(record.seq[start:end]) != set(['?']):
+			print >> outfile, ">"+record.id, "\n",record.seq[start:end]
 	outfile.close()
 concat_handle.close()
 partition_handle.close()
