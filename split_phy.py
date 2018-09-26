@@ -8,34 +8,42 @@ import sys
 import glob
 import os
 
-concat_name = sys.argv[1]
-partname = sys.argv[2]
-opt = sys.argv[3]
+if len(sys.argv) == 4 or len(sys.argv) == 3:
+	concat_name = sys.argv[1]
+	partname = sys.argv[2]
+	if len(sys.argv) == 4:
+		par = sys.argv[3]
+	else:
+		par = "DNA"
+else:
+	print "FORMAT: python split_phy.py [concatenated file] [partition file] [option: -uniq (append locus name to taxa names), -n (normal mode, keep taxa names as is) ([type: DNA (default), Prot])"
+	print "EXAMPLE: python split_phy.py file.phy file.prt"
+	print "EXAMPLE: python split_phy.py file.phy file.prt Prot"
+	sys.exit()
 
 ######
+print "creating an output folder..."
+if not os.path.exists ("./splitout/"):
+    os.makedirs("./splitout") #creating folder if necessary
+else:
+    shutil.rmtree("./splitout/") #removing old files
+    os.makedirs("./splitout")
+
+if par == "DNA":
+	alph = "Gapped(IUPAC.ambiguous_dna)"
+elif par == "Prot":
+	alph = "Gapped(IUPAC.protein, '-')"
 concat_handle = open(concat_name, "rU")
 partition_handle = open(partname, "r")
-alignment = AlignIO.read(concat_handle, "phylip-relaxed", alphabet = Gapped(IUPAC.protein, '-'))
+alignment = AlignIO.read(concat_handle, "phylip-relaxed", alphabet = alph)
 for line in partition_handle:
 	l = line.strip().split("=")
-	fname = l[0].split(",")[-1].strip()#, l[1].split(",")
-	#print fname
-	#outfile = open(fname+".fas", "w")
-	i = 1
-	for p in l[1].split(","):
-		start = int(p.split("-")[0])-1
-		end = int(p.split("-")[1])
-		outfile = open(fname+"-"+str(i)+".fas", "w")
-		for record in alignment:
-			#print start, end
-			#print record.id, record.seq[start:end]
-			if opt == "-uniq":
-				print >> outfile, ">"+record.id+"_"+fname+"-"+str(i), "\n",record.seq[start:end]
-			else:
-				print >> outfile, ">"+record.id, "\n",record.seq[start:end]
-		#outfile
-		i += 1
-
-
+	fname = l[0].split(",")[-1].strip() #partition name
+	start = int(l[1].split("-")[0])-1
+	end = int(l[1].split("-")[1])
+	outfile = open("./splitout/"+fname, "w")
+	for record in alignment:
+		print >> outfile, ">"+record.id, "\n",record.seq[start:end]
+	outfile.close()
 concat_handle.close()
 partition_handle.close()
