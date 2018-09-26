@@ -9,10 +9,11 @@ else:
     sys.exit()
 
 fhandle = open(fname, "rU")
-seq = SeqIO.read(fhandle, "fasta")
-seq.seq = seq.seq.reverse_complement()
 fnew = open(fname+".revcom.fas", "w")
-SeqIO.write(seq, fnew, "fasta")
+seqs = SeqIO.parse(fhandle, "fasta")
+for seq in seqs:
+	seq.seq = seq.seq.reverse_complement()
+	SeqIO.write(seq, fnew, "fasta")
 fnew.close()
 fhandle.close()
 print "done"
