@@ -17,7 +17,7 @@ if len(sys.argv) == 4 or len(sys.argv) == 3:
 	else:
 		par = "DNA"
 else:
-	print "FORMAT: python split_phy.py [concatenated file] [partition file] [option: -uniq (append locus name to taxa names), -n (normal mode, keep taxa names as is) ([type: DNA (default), Prot])"
+	print "FORMAT: python split_phy.py [concatenated file] [partition file] ([type: DNA (default), Prot])"
 	print "EXAMPLE: python split_phy.py file.phy file.prt"
 	print "EXAMPLE: python split_phy.py file.phy file.prt Prot"
 	sys.exit()
