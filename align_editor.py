@@ -13,16 +13,16 @@ if len(sys.argv) == 4 or len(sys.argv) == 5:
 		rev = True
 	else:
 		rev = False
-if tp == "DNA":
-	alph = Gapped(IUPAC.ambiguous_dna)
-elif tp == "Prot":
-	alph = Gapped(IUPAC.protein, '-')
-
 else:
 	print "FORMAT: python align_editor.py [alignment or single seq file] [format] [type: DNA, Prot] ([-v (retain selected region insted of cutting it out)])"
 	print "EXAMPLE: python align_editor.py file.phy phylip-relaxed DNA"
 	print "EXAMPLE: python align_editor.py file.phy phylip-relaxed Prot -v"
 	sys.exit()
+
+if tp == "DNA":
+	alph = Gapped(IUPAC.ambiguous_dna)
+elif tp == "Prot":
+	alph = Gapped(IUPAC.protein, '-')
 
 alignment = AlignIO.read(infile, fmt, alphabet=alph)
 
