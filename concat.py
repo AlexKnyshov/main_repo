@@ -104,9 +104,11 @@ for f in files:
 	length = 0
 	missed = list(d)
 	model = ""
-	if f.split(".")[-1] in fasta or f.split(".")[-1] in phylip:
+	if f.split(".")[-1] in fasta or f.split(".")[-1] in phylip or f.split(".")[-1] in nexus:
 		if f.split(".")[-1] in fasta:
 			fformat = "fasta"
+		elif f.split(".")[-1] in nexus:
+			fformat = "nexus"
 		else:
 			fformat = "phylip-relaxed"
 		alph = check_alphabet(f, fformat)
