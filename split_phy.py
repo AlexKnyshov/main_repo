@@ -43,7 +43,7 @@ for line in partition_handle:
 	fname = l[0].split(",")[-1].strip() #partition name
 	start = int(l[1].split("-")[0])-1
 	end = int(l[1].split("-")[1])
-	outfile = open("./splitout/"+fname, "w")
+	outfile = open("./splitout/"+fname+".fas", "w")
 	for record in alignment:
 		if set(record.seq[start:end]) != set(['?']):
 			print >> outfile, ">"+record.id, "\n",record.seq[start:end]
