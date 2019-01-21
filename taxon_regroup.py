@@ -50,7 +50,7 @@ for f in files:
 	fn2 = "./regrouped/"+fn.split(".")[0]+".fas"
 	fhandle2 = open(fn2, "w")
 	if sys.argv[1] == "-seqlen":
-		for key in sorted(sortdict, key=lambda value: len(str(sortdict[value]).replace("-", "").upper().replace("N", "").replace("?", "")), reverse = True):# lambda r: len(str(value).replace("-", "").upper().replace("N", ""))):
+		for key in sorted(sortdict, key=lambda value: len(str(sortdict[value]).replace("-", "").upper().replace("N", "").replace("?", "").replace("X", "")), reverse = False):# lambda r: len(str(value).replace("-", "").upper().replace("N", ""))):
 			print >> fhandle2, ">"+str(key)
 			print >> fhandle2, sortdict[key]
 	if sys.argv[1] == "-tree":
@@ -62,15 +62,3 @@ for f in files:
 			print >> fhandle2, ">"+str(key)
 			print >> fhandle2, sortdict[key]
 	fhandle2.close()
-
-	# alignment = AlignIO.read(f, "fasta")
-	# if sys.argv[1] == "-tree":
-	# 	alignment.sort(key = lambda r: d[r.id])
-	# elif sys.argv[1] == "-seqlen":
-	# 	alignment.sort(key = lambda r: len(str(r.seq).replace("-", "").upper().replace("N", "")))
-	# fnew = f.split("/")
-	# fn = fnew[len(fnew)-1]
-	# fn2 = "./regrouped/"+fn.split(".")[0]+".fas"
-	# outfile = open(fn2, "w")
-	# AlignIO.write(alignment, outfile, "fasta")
-	# outfile.close()
