@@ -1,34 +1,59 @@
 from Bio import SeqIO
 from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
 import glob
 import os
 import shutil
 import csv
 import sys
 import math
-if len(sys.argv) == 7:
+import itertools
+if len(sys.argv) == 10:
     blastfilearg = sys.argv[1]
-    trif = sys.argv[2]
-    ahefoldarg = sys.argv[3]
+    targetf = sys.argv[2]
+    queryf = sys.argv[3] #add possibility to interpret this as query file, split it per locus and 
     evalue = float(sys.argv[4])
-    opt = sys.argv[5]
-    paropt = int(sys.argv[6])
-    if paropt < 1:
-        print "[paropt] cannot be less than 1"
+    filefolder = sys.argv[5]
+    extractiontype = sys.argv[6]
+    if extractiontype == "-e":
+        print "option -e must have a numerical value, for ex. -e100 would extract 100bp flanks"
         sys.exit()
+    contignum = int(sys.argv[7])
+    if contignum == 0:
+        print "[contignum] set to 0, extracting all contigs"
+    if sys.argv[8] == "-Ry":
+        reciprocate = True
+    else:
+        reciprocate = False
+    if sys.argv[9] == "-IMy":
+        interstich = True
+    else:
+        interstich = False
+    print blastfilearg, targetf, queryf, evalue, "filefolder:",filefolder, "extractiontype:",extractiontype, "contignum:",contignum, "reciprocate:", reciprocate, "interstich:",interstich
 else:
-    print "FORMAT: python mainblparser.py [blastfile or folder] [asemblyfile or folder] [ahefolder] [evalue] [option: -n (normal), -s (extract only matched parts), -ss (short are discarded), -e[value] (extended s option), -a (blast region extraction and stiching), -b (extract between two outmost blast regions), -mn (multiple normal), -ms (multiple selected), -mss(short are discarded), -me[value] (extended ms option), -ma, -mb] [number of hits extracted per query]"
-    print "EXAMPLE: python mainblparser.py ./blast_outputs/ /transcriptomes/ ./fasta 1e-40 -mn 2"
-    print "EXAMPLE: python mainblparser.py blast.tab trinity.fas ./fasta/ 1e-40 -n 1"
-    print "HELP for -e / -me option: [value] indicates a size of the flank in bp that needs to be extracted"
-    print "HELP for -e / -me option: when [value]=0, extracts flanks to match the length of the query"
-    print "EXAMPLE: python mainblparser.py blast.tab trinity.fas ./fasta/ 1e-40 -e1500 1"
-    print "1500 bp from each side (if possible) will be added to blast hit region and extracted"
+    print "FORMAT: python mainblparser.py [blast file or folder] [target file or folder] [query folder] [evalue] [single (-S)/ multiple file mode (-M)] [extraction type] [number of target contigs per query (if 0, extract all)] [check reciprocal best match] [perform intercontig stiching]"
+    print ""
+    print "Extraction types: -n (normal), -s (only best hit region), -e[value] (only best hit region plus flanks in bp), -a (extract all hit regions and join them), -b (extract region between two outmost blast regions)"
+    print ""
+    print "EXAMPLE: python mainblparser.py ./blast_outputs/ /transcriptomes/ ./fasta 1e-40 -M -n 2 -Ry -IMy"
+    print "EXAMPLE: python mainblparser.py blast.tab trinity.fas ./fasta/ 1e-40 -S -n 1 -Rn -IMn"
     sys.exit()
 
+#reciprocate = True
 dash = "--------------------------------------------------------"
-starterr = "Start offset is too large"
-enderr = "End offset is too large"
+# starterr = "Start offset is too large"
+# enderr = "End offset is too large"
+
+def messagefunc(msg, f, fl=True):
+    if fl:
+        sys.stdout.write(msg+"\r")
+        sys.stdout.flush()
+    else:
+        print ""
+        print msg
+    print >> f, msg
+
+
 #function for creating an output folder. old stuff will be deleted
 def mkdirfunc():
     if not os.path.exists ("./modified/"):
@@ -40,128 +65,102 @@ def mkdirfunc():
 #function for copying alignment files before changing them
 #all alignments are copied regardless of whether they will be modified or not
 def copyfunc():
-    print "copying files:"
-    for x in glob.glob(ahefoldarg+"/*.fas*"):
+    messagefunc("copying files *.fa*", debugfile, False)
+    copyfunc_c = 0
+    for x in glob.glob(queryf+"/*.fa*"):
         locusfname = x.split("/")[-1]
         #print locusfname
         if not os.path.exists ("./modified/"+locusfname):
             prog = "copying "+str(locusfname)+"..."
-            sys.stdout.write(prog+"\r")
-            sys.stdout.flush()
-            shutil.copy2(ahefoldarg+locusfname, "./modified")
-    print ""
+            messagefunc(prog, debugfile)
+            shutil.copy2(queryf+"/"+locusfname, "./modified")
+            copyfunc_c += 1
+    messagefunc("copied "+str(copyfunc_c)+" files", debugfile, False)
 
 #function for parsing a blast output file
 #each query is allowed to have only 1 target
 def readblastfilefunc(b, debugfile):
-    print "processing", b
-    print >> debugfile, "processing blastfile", b
-    output2 = {}
+    messagefunc("processing "+b, debugfile, False)
+    querydict = {}
+    targetdict = {}
     blastfile = open(b, "rU")
     reader = csv.reader(blastfile, delimiter='\t')
-    currentkey = ""
-    best_eval = 0.0
-    best_hit = 0
-    query_counter = 0
+    linecounter = 0
     for row in reader:
         if float(row[10]) <= evalue:
-            if currentkey != row[0]: ##new query
-                print >> debugfile, "### NEW QUERY & TARGET###"
-                query_counter = 0
-                parts_counter = 0
-                #if float(row[10]) <= evalue:
-                if row[0].split("/")[-1] in output2: ##query is present
-                    print "warning: the key exists", row[0].split("/")[-1]
-                    print >> debugfile, "warning: the key exists", row[0].split("/")[-1]
+            qname = row[0].split("/")[-1]
+            tname = row[1]
+            #populate query table
+            if qname in querydict:
+                if tname in querydict[qname]:
+                    querydict[qname][tname][linecounter] = rowfunc(row)
                 else:
-                    print dash
-                    print >> debugfile, dash
-                    best_eval = float(row[10])
-                    best_hit = float(row[11])
-                    output2[row[0].split("/")[-1]+"-copy"+str(query_counter)+"-copy"+str(parts_counter)] = rowfunc(row)
-                    print "query", row[0].split("/")[-1], ", direction:", output2[row[0].split("/")[-1]+"-copy"+str(query_counter)+"-copy"+str(parts_counter)][5], "; target", row[1], ", direction: ", output2[row[0].split("/")[-1]+"-copy"+str(query_counter)+"-copy"+str(parts_counter)][2]
-                    print >> debugfile, "query", row[0].split("/")[-1], ", direction:", output2[row[0].split("/")[-1]+"-copy"+str(query_counter)+"-copy"+str(parts_counter)][5], "; target", row[1], ", direction: ", output2[row[0].split("/")[-1]+"-copy"+str(query_counter)+"-copy"+str(parts_counter)][2]
-                    print "identity:", row[2], ", eval:", row[10], ", bitscore", row[11]
-                    print >> debugfile, "identity:", row[2], ", eval:", row[10], ", bitscore", row[11]
-                    #query_counter += 1
-            else: ##same query
-                print >> debugfile, "### SAME QUERY ###"
-                if currentmatch != row[1]:# and float(row[10]) <= evalue:#new target
-                    print >> debugfile, "### NEW TARGET ###"
-                    query_counter += 1
-                    parts_counter = 0
-                    if row[0].split("/")[-1]+"-copy0"+"-copy"+str(parts_counter) in output2: #
-                        #adopted for trinity assembly sequence headers
-                        if row[1].split("_c")[0] == output2[row[0].split("/")[-1]+"-copy0"+"-copy"+str(parts_counter)][6].split("_c")[0]:
-                            print "warning: several isoforms detected", row[1], row[10], row[11]
-                            print >> debugfile, "warning: several isoforms detected", row[1], row[10], row[11]
-                            query_counter -= 1
-                        else:
-                            print "warning: several matches detected", row[1], row[10], row[11], "hit is", round(float(row[11])/best_hit*100), "%"#"; ratio with best_eval is"#, round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
-                            print >> debugfile, "warning: several matches detected", row[1], row[10], row[11], "hit is", round(float(row[11])/best_hit*100), "%"#"; ratio with best_eval is"#, round(math.log(float(row[10]))/math.log(best_eval)*100), "% (log), hit is", round(float(row[11])/best_hit*100), "%"
-                            if query_counter < paropt:#round(float(row[11])/best_hit*100) > 70 and query_counter < paropt:#round(math.log(float(row[10]))/math.log(best_eval)*100) > 90 or :
-                                print >> debugfile, "homolog added"
-                                #store the additional data:
-                                #query_counter += 1
-                                output2[row[0].split("/")[-1]+"-copy"+str(query_counter)+"-copy"+str(parts_counter)] = rowfunc(row)
-                                print "locus", row[0].split("/")[-1]+"-copy"+str(query_counter)+"-copy"+str(parts_counter)
-                            else:
-                                print >> debugfile, "Too many copies, ignored", query_counter, parts_counter, paropt
-                        #query_counter += 1
-                    else:
-                        output2[row[0].split("/")[-1]+"-copy"+str(query_counter)+"-copy"+str(parts_counter)] = rowfunc(row)
-                        print >> debugfile, "ERROR: if this appears, the script may have worked incorrectly and/or the input file is formatted incorrectly"
+                    querydict[qname][tname] = {linecounter: rowfunc(row)}
+            else:
+                querydict[qname] = {tname: {linecounter: rowfunc(row)}}
+            #populate target table
+            if tname in targetdict:
+                if qname in targetdict[tname]:
+                    targetdict[tname][qname][linecounter] = rowfunc(row)
                 else:
-                    #if float(row[10]) <= evalue:
-                    if query_counter < paropt:                    
-                        print >> debugfile, "same query and target, current interval", row[1], int(row[8]), int(row[9]),"key", row[0].split("/")[-1]+"-copy"+str(query_counter)+"-copy"+str(parts_counter), "stored interval", output2[row[0].split("/")[-1]+"-copy"+str(query_counter)+"-copy0"][0:2]
-                        new = True
-                        for key,value in output2.items():#create comparative dict
-                            comp_dict = {}
-                            num = 0
-                            if "-copy".join(key.split("-copy")[0:2]) == row[0].split("/")[-1]+"-copy"+str(query_counter) and value[6] == row[1]:
-                                if getOverlap([int(row[8]), int(row[9])],value[0:2]) > 0 or getOverlap([int(row[6]), int(row[7])],value[3:5]) > 0:
-                                    new = False
-                                    #correct region to elongate hit region:
+                    targetdict[tname][qname] = {linecounter: rowfunc(row)}
+            else:
+                targetdict[tname] = {qname: {linecounter: rowfunc(row)}}
 
-                        if new:
-                            parts_counter += 1
-                            print >> debugfile, "interval equal 0, new region recovered, value7", parts_counter
-                            output2[row[0].split("/")[-1]+"-copy"+str(query_counter)+"-copy"+str(parts_counter)] = rowfunc(row)
-                            print >> debugfile, row[0].split("/")[-1]+"-copy"+str(query_counter)+"-copy"+str(parts_counter), rowfunc(row)
-                        else:
-                            print >> debugfile, "interval greater than 0, rowfunc not called, value7", parts_counter
-                    else:
-                        print >> debugfile, "(additional stiching) Too many copies, ignored", query_counter, parts_counter, paropt
-            currentkey = row[0]
-            currentmatch = row[1]
-            currente = float(row[10])
-        else:
-            print >> debugfile, "low evalue, skipping row", row
+        # else:
+        #     print >> debugfile, "low evalue, skipping row", row
+        linecounter += 1
     blastfile.close()
-    return output2
+    return querydict, targetdict
 
-#function to return a list for dict
-#returns a dictionary like this:
-#output2[AHE] = [transf, transr, transb, ahef, aher, aheb, row[1]]
-#AHE - query name, transf - target start pos, transr - target end, transb - forward or reverse target direction
-#ahef - query start, aher - query end, aheb - query direction, trans - target name
+
+#implement reciprocator break value, default 10. DO percet, e.g. 0.1 of the shortes range
+def reciprocator(inpdict, query, range1, range2, emax, bitscore):
+    messagefunc("running reciprocator", debugfile)
+    cond = True
+    for key, val in inpdict.items():
+        if key != query: #all other queries
+            target_ranks_temp = compute_ranks(val) #get all pieces, compute values for this query
+            if getOverlap([target_ranks_temp[2],target_ranks_temp[3]],[range1,range2]) > 10:
+                if target_ranks_temp[0] < emax:
+                    #print key, target_ranks_temp[2],target_ranks_temp[3], target_ranks_temp[0], query, range1,range2, emax
+                    cond = False
+                    break
+                elif target_ranks_temp[0] == emax:
+                    if target_ranks_temp[1] > bitscore:
+                        cond = False
+                        break
+                    else:
+                        messagefunc("warning, target has equal hits to several loci, cannot decide", debugfile)
+    return cond
+
+
+def bltableout(output, bltableout_file):
+    #bltableout_file = open(fname, "a")
+    for key, value in sorted(output.items()):
+        print >> bltableout_file, key, value
+    #bltableout_file.close()
+
+#function to return a list for dict like this:
+#dict[query] = [target_f, target_r, target_b, query_f, query_r, query_b, eval, bitscore]
+#query - query name, target_f - target start pos, target_r - target end, target_b - forward or reverse target direction
+#query_f - query start, query_r - query end, query_b - query direction
 def rowfunc(row):
     if int(row[8]) < int(row[9]):
-        transb = True
+        target_b = True
     else:
-        transb = False
-    transf = int(row[8])
-    transr = int(row[9])
+        target_b = False
+    target_f = int(row[8])
+    target_r = int(row[9])
     #check query
     if int(row[6]) < int(row[7]):
-        aheb = True
+        query_b = True
     else:
-        aheb = False
-    ahef = int(row[6])
-    aher = int(row[7])
-    return [transf, transr, transb, ahef, aher, aheb, row[1]]
-
+        query_b = False
+    query_f = int(row[6])
+    query_r = int(row[7])
+    return [target_f, target_r, target_b, query_f, query_r, query_b, float(row[10]), float(row[11])]
+    
 #function to compute overlap between two ranges supplied as lists with start and end
 #returns overlap value
 def getOverlap(a, b):
@@ -172,342 +171,37 @@ def getOverlap(a, b):
     #print >> debugfile, "interval computation", a, b, a0, a1, b0, b1, max(0, min(a1, b1) - max(a0, b0))
     return max(0, min(a1, b1) - max(a0, b0))
 
-#function to count amount of blast hits for each copy
-#returns dict[locus] = copy_number
-def partsnumfunc(input_dict):
-    output_dict = {}
-    for key1, value1 in input_dict.items():
-        if "-copy".join(key1.split("-copy")[0:2]) in output_dict:
-            output_dict["-copy".join(key1.split("-copy")[0:2])] += 1
-        else:
-            output_dict["-copy".join(key1.split("-copy")[0:2])] = 1
-    return output_dict
-
-
-#function for determining the offsets of blast hit in a query and a target
-#returns the list of four elements:
-#gap - query hit start offset, gaprev - query hit end offset
-#gapt - target hit start offset, gaptrev - target hit end offset
-def gapfunc(output, locusfname, recs):
-    if output[locusfname][5]:#aheb: #ahe is forward
-        #print "AHE forw"
-        gap = output[locusfname][3]#ahef #ahe start gap
-        if output[locusfname][2]:#transb: #trans is forward
-            ##need to check if trans has start - OK
-            if output[locusfname][0] - gap >= 0:
-                gapt = output[locusfname][0] - gap#transf - gap #this is the corrected trans start
-            else:
-                print starterr
-                gapt = 0 # otherwise start from start
-        else:
-            ##need to check if trans is long enough - OK
-            if output[locusfname][0] + gap <= len(tempseq):
-                gapt = output[locusfname][0] + gap#transf + gap #this is the corrected trans start
-            else:
-                print enderr
-                gapt = len(tempseq) # otherwise start from the end
-        #check the ahe end:
-        gaprev = len(recs[0].seq) - output[locusfname][4]#ali.get_alignment_length() - output[locusfname][0][4]
-        #if gaprev >= 0:#aher #some AHE left
-        if output[locusfname][2]:#transb: #trans is forward
-            #check the trans end
-            if output[locusfname][1] + gaprev <= len(tempseq): #check that trans is long enough
-                gaptrev = output[locusfname][1] + gaprev#transf - gap #this is the corrected trans start
-            else:
-                print enderr
-                gaptrev = len(tempseq)
-        else:
-            ##need to check if trans has start
-            if output[locusfname][1] - gaprev >= 0:
-                gaptrev = output[locusfname][1] - gaprev#transf + gap #this is the corrected trans start
-            else:
-                print starterr
-                gaptrev = 0
-    #reverse AHE:
-    else: #ahe is reverse
-        #print "AHE rev"
-        gap = len(recs[0].seq) - output[locusfname][3]#ali.get_alignment_length() - output[locusfname][0][3]#ahef #ahe start gap
-        if output[locusfname][2]:#transb: #trans is forward
-            ##need to check if trans has start - OK
-            if output[locusfname][0] - gap >= 0:
-                gapt = output[locusfname][0] - gap#transf - gap #this is the corrected trans start
-            else:
-                print starterr
-                gapt = 0
-        else:
-            ##need to check if trans is long enough - OK
-            if output[locusfname][0] + gap <= len(tempseq):
-                gapt = output[locusfname][0] + gap#transf + gap #this is the corrected trans start
-            else:
-                print enderr
-                gapt = len(tempseq)
-        #check the ahe end:
-        gaprev = output[locusfname][4] # ahe end gap
-        #if gaprev >= 0:#aher #some AHE left
-        if output[locusfname][2]:#transb: #trans is forward
-            #check the trans end
-            if output[locusfname][1] + gaprev <= len(tempseq): #check that trans is long enough
-                gaptrev = output[locusfname][1] + gaprev#transf - gap #this is the corrected trans start
-            else:
-                print enderr
-                gaptrev = len(tempseq)
-        else:
-            ##need to check if trans has start
-            if output[locusfname][1] - gaprev >= 0:
-                gaptrev = output[locusfname][1] - gaprev#transf + gap #this is the corrected trans start
-            else:
-                print starterr
-                gaptrev = 0
-    return [gap, gaprev, gapt, gaptrev]
-
-
-
-#gap function for -e and -me options
-def gapfunc_e(output, locusfname, e_range):
-    if output[locusfname][5]:#aheb: #ahe is forward
-        #print "AHE forw"
-        if output[locusfname][2]:#transb: #trans is forward
-            ##need to check if trans has start - OK
-            if output[locusfname][0] - e_range >= 0:
-                gapt = output[locusfname][0] - e_range#transf - gap #this is the corrected trans start
-            else:
-                print starterr
-                gapt = 0 # otherwise start from start
-        else:
-            ##need to check if trans is long enough - OK
-            if output[locusfname][0] + e_range <= len(tempseq):
-                gapt = output[locusfname][0] + e_range#transf + gap #this is the corrected trans start
-            else:
-                gapt = len(tempseq) # otherwise start from the end
-                print enderr
-        #check the ahe end:
-        #if gaprev >= 0:#aher #some AHE left
-        if output[locusfname][2]:#transb: #trans is forward
-            #check the trans end
-            if output[locusfname][1] + e_range <= len(tempseq): #check that trans is long enough
-                gaptrev = output[locusfname][1] + e_range#transf - gap #this is the corrected trans start
-            else:
-                print enderr
-                gaptrev = len(tempseq)
-        else:
-            ##need to check if trans has start
-            if output[locusfname][1] - e_range >= 0:
-                gaptrev = output[locusfname][1] - e_range#transf + gap #this is the corrected trans start
-            else:
-                print starterr
-                gaptrev = 0
-    #reverse AHE:
-    else: #ahe is reverse
-        #print "AHE rev"
-        if output[locusfname][2]:#transb: #trans is forward
-            ##need to check if trans has start - OK
-            if output[locusfname][0] - e_range >= 0:
-                gapt = output[locusfname][0] - e_range#transf - gap #this is the corrected trans start
-            else:
-                gapt = 0
-                print starterr
-        else:
-            ##need to check if trans is long enough - OK
-            if output[locusfname][0] + e_range <= len(tempseq):
-                gapt = output[locusfname][0] + e_range#transf + gap #this is the corrected trans start
-            else:
-                gapt = len(tempseq)
-                print enderr
-        #check the ahe end:
-        #if gaprev >= 0:#aher #some AHE left
-        if output[locusfname][2]:#transb: #trans is forward
-            #check the trans end
-            if output[locusfname][1] + e_range <= len(tempseq): #check that trans is long enough
-                gaptrev = output[locusfname][1] + e_range#transf - gap #this is the corrected trans start
-            else:
-                gaptrev = len(tempseq)
-                print enderr
-        else:
-            ##need to check if trans has start
-            if output[locusfname][1] - e_range >= 0:
-                gaptrev = output[locusfname][1] - e_range#transf + gap #this is the corrected trans start
-            else:
-                print starterr
-                gaptrev = 0
-    return [gapt, gaptrev]
-
-
-
-
-#function for preparing found target sequence for appending
-#returns prepared sequence
-def seqprepfunc(output, locusfname, opt, seq):
-    if opt[:3] == "-me" or opt[:2] == "-e":
-        if opt[:3] == "-me" and int(opt[3:]) == 0  or opt[:2] == "-e" and int(opt[2:]) == 0 :
-            rhandle = open("./modified/"+locusfname.split("-copy")[0], "r")
-            ali = SeqIO.parse(rhandle, "fasta")
-            recs = list(ali)
-            # identify gaps
-            gaps = gapfunc(output, locusfname, recs)
-            if output[locusfname][2] and output[locusfname][5]:
-                seq.seq = seq.seq[gaps[2]:gaps[3]]
-            elif not output[locusfname][2] and not output[locusfname][5]:
-                seq.seq = seq.seq[gaps[3]:gaps[2]]
-            else:
-                if gaps[2] < gaps[3]:
-                    seq.seq = seq.seq[gaps[2]:gaps[3]]
-                else:
-                    seq.seq = seq.seq[gaps[3]:gaps[2]]
-                seq = seq.reverse_complement()
-            rhandle.close()
-        else:
-            # identify gaps
-            if opt[:3] == "-me":
-                gapsE = gapfunc_e(output, locusfname, int(opt[3:]))
-            else: #-e option
-                gapsE = gapfunc_e(output, locusfname, int(opt[2:]))
-            if output[locusfname][2] and output[locusfname][5]:
-                seq.seq = seq.seq[gapsE[0]:gapsE[1]]
-            elif not output[locusfname][2] and not output[locusfname][5]:
-                seq.seq = seq.seq[gapsE[1]:gapsE[0]]
-            else:
-                if gapsE[0] < gapsE[1]:
-                    seq.seq = seq.seq[gapsE[0]:gapsE[1]]
-                else:
-                    seq.seq = seq.seq[gapsE[1]:gapsE[0]]
-                seq = seq.reverse_complement()
-    elif opt == "-ms" or opt == "-mss" or opt == "-s" or opt == "-ss" or opt == "-msl" or opt == "-sl":
-        if output[locusfname][2] and output[locusfname][5]:
-            seq.seq = seq.seq[output[locusfname][0]:output[locusfname][1]]
-        elif not output[locusfname][2] and not output[locusfname][5]:
-            seq.seq = seq.seq[output[locusfname][1]:output[locusfname][0]]
-        else:
-            if output[locusfname][0] > output[locusfname][1]:
-                seq.seq = seq.seq[output[locusfname][1]:output[locusfname][0]]
-            else:
-                seq.seq = seq.seq[output[locusfname][0]:output[locusfname][1]]
-            seq = seq.reverse_complement()
-    elif opt == "-mn" or opt == "-n":
-        if (output[locusfname][2] and not output[locusfname][5]) or (not output[locusfname][2] and output[locusfname][5]):
-            seq = seq.reverse_complement()
-    return seq
-
-#alternative function for preparing target sequence for appending
-#stiches non-overlapping blast hit regions
-#returns prepared sequence
-def seqprepfunc_es(output, locus1, opt, seq1, partsnumdict):
-    if opt == "-ma" or opt == "-a":
-        rhandle = open("./modified/"+locusfname.split("-copy")[0], "r")
-        ali = SeqIO.parse(rhandle, "fasta")
-        recs = list(ali)
-        startlist = {}
-        endlist = {}
-        outseq = Seq("")
-        endpos = 0
-        indel = 0
-        print >> debugfile, "locus:", locusfname, "num parts:", partsnumdict[locus1]
-        for loc in output.keys():
-            if "-copy".join(loc.split("-copy")[0:2]) == locus1:
-                if output[loc][5]:
-                    startlist[loc] = output[loc][3]-1
-                    endlist[loc] = output[loc][4]
-                else:
-                    startlist[loc] = output[loc][4]-1
-                    endlist[loc] = output[loc][3]
-        #print >> debugfile, "DEBUG1", locus1, "startlist and endlist", startlist, endlist
-        for key1 in sorted(startlist, key=startlist.__getitem__):
-
-            if endpos == startlist[key1]:
-                print >> debugfile, "DEBUG1", key1, "no start added gap", endpos, startlist[key1]
-            else:
-                outseq += Seq("-"*(startlist[key1]-endpos))
-                #print >> debugfile, "DEBUG1", key1, "start added gap =", endpos, startlist[key1], startlist[key1]-endpos
-
-            print >> debugfile, "locus:", startlist[key1], "output", output[key1]
-            if output[key1][2] and output[key1][5]:
-                outseq += seq1[(output[key1][0]-1):(output[key1][1])]
-            elif not output[key1][2] and not output[key1][5]:
-                outseq += seq1[(output[key1][1]-1):(output[key1][0])]
-            else:
-                if output[key1][0] > output[key1][1]:#transrev
-                    outseq += seq1[(output[key1][1]-1):(output[key1][0])].reverse_complement()
-                else:#transforw
-                    outseq += seq1[(output[key1][0]-1):(output[key1][1])].reverse_complement()
-                #outseq = outseq.reverse_complement()
-            endpos = endlist[key1]
-            #outseq += Seq("NNNNN")
-            #print >> debugfile, "DEBUG1", key1, "startpos and endpos", endpos
-        outseq += Seq("-"*(len(recs[0].seq)-endpos))
-    elif opt == "-mb" or opt == "-b":
-        startlist = {}
-        endlist = {}
-        #outseq = Seq("")
-        print >> debugfile, "locus:", locusfname, "num parts:", partsnumdict[locus1]
-        for loc in output.keys():
-            if "-copy".join(loc.split("-copy")[0:2]) == locus1:
-                if output[loc][2]:
-                    startlist[loc] = output[loc][0]
-                    endlist[loc] = output[loc][1]
-                else:
-                    startlist[loc] = output[loc][1]
-                    endlist[loc] = output[loc][0]
-        startpos = min(startlist.values())
-        endpos = max(endlist.values())
-        print >> debugfile, "locus:", locus1, "coords", startpos, endpos
-        if output[locus1+"-copy0"][2] and output[locus1+"-copy0"][5]:
-            outseq = seq1[startpos:endpos]
-        elif not output[locus1+"-copy0"][2] and not output[locus1+"-copy0"][5]:
-            #outseq = seq1[endpos:startpos]
-            outseq = seq1[startpos:endpos]
-        else:
-            outseq = seq1[startpos:endpos].reverse_complement()
-            # if output[locus1+"-copy0"][0] > output[locus1+"-copy0"][1]:
-            #     outseq = seq1[endpos:startpos].reverse_complement()
-            # else:
-            #     outseq = seq1[startpos:endpos].reverse_complement()
-            #outseq = outseq.reverse_complement()
-    return outseq#+Seq("NNNNN")
-
 #function for appending the seqeunce to the alignemnt
 #returns 1 if success, 0 otherwise
-def seqwritefunc(seq, opt, locusfname, seqname, paropt):
-    fhandle = open("./modified/"+locusfname.split("-copy")[0], "a")
-    if paropt == 1:
-        seq.id = seqname
+def seqwritefunc(sequence, qname, tname, seqname):
+    fhandle = open("./modified/"+qname, "a")
+    finalseq = SeqRecord(sequence)
+    if contignum == 1 or seqname == "none":
+        finalseq.id = tname
     else:
-        seq.id = seqname+"|"+locusfname.split("-copy")[1]
-    seq.name =""
-    seq.description =""
-    if (opt == "-mss" or opt == "-ss") and (float(len(seq.seq)) / loclenfunc(locusfname) > 0.8):
-        SeqIO.write(seq, fhandle, "fasta")
-        return 1
-    elif opt == "-ms" or opt == "-s":
-        SeqIO.write(seq, fhandle, "fasta")
-        return 1
-    elif opt[:3] == "-me" or opt[:2] == "-e":
-        SeqIO.write(seq, fhandle, "fasta")
-        return 1
-    elif opt == "-mn" or opt == "-n":
-        SeqIO.write(seq, fhandle, "fasta")
-        return 1
-    elif opt == "-ma" or opt == "-a":
-        SeqIO.write(seq, fhandle, "fasta")
-        return 1
-    elif opt == "-mb" or opt == "-b":
-        SeqIO.write(seq, fhandle, "fasta")
-        return 1
-    else:
-        return 0
-    fhandle.close()
-
-#alternative function for writing, all in 1 file
-def altwritefunc(seq, opt, locusfname, seqname, paropt):
-    fhandle = open("./"+seqname+"_conSeqs.fasta", "a")
-    if paropt == 1:
-        seq.id = locusfname.split("_")[-1].split(".")[0]
-    else:
-        seq.id = locusfname.split("_")[-1].split(".")[0]+"|"+locusfname.split("-copy")[1]
-    seq.name =""
-    seq.description =""
-    print >> fhandle, ">"+seq.id
-    print >> fhandle, seq.seq
+        finalseq.id = tname+"|"+seqname
+    finalseq.name =""
+    finalseq.description =""
+    # if (opt == "-mss" or opt == "-ss") and (float(len(seq.seq)) / loclenfunc(locusfname) > 0.8):
+    #     SeqIO.write(seq, fhandle, "fasta")
+    #     return 1
+    SeqIO.write(finalseq, fhandle, "fasta")
     return 1
     fhandle.close()
+
+# #alternative function for writing, all in 1 file
+# def altwritefunc(seq, opt, locusfname, seqname, contignum):
+#     fhandle = open("./"+seqname+"_conSeqs.fasta", "a")
+#     if contignum == 1:
+#         seq.id = locusfname.split("_")[-1].split(".")[0]
+#     else:
+#         seq.id = locusfname.split("_")[-1].split(".")[0]+"|"+locusfname.split("-copy")[1]
+#     seq.name =""
+#     seq.description =""
+#     print >> fhandle, ">"+seq.id
+#     print >> fhandle, seq.seq
+#     return 1
+#     fhandle.close()
 
 #function for determining the length of the query alignment
 #returns length (int)
@@ -516,56 +210,346 @@ def loclenfunc(locusfname):
     ali = list(SeqIO.parse(rhandle, "fasta"))
     return len(ali[0])
     rhandle.close()
+
+def compute_ranks(hits):
+    eval_max = []
+    bitscore_avg = []
+    coord = []
+    for key, hit in hits.items():
+        eval_max.append(hit[6])
+        bitscore_avg.append(hit[7])
+        coord.append(hit[0])
+        coord.append(hit[1])
+    return [min(eval_max), float(sum(bitscore_avg)) / max(len(bitscore_avg), 1), min(coord), max(coord)]
+
+def hit_sticher(inpdict, extractiontype):
+    outlist = []
+    #get best item and its direction
+    bhit = -1
+    best = 1
+    for key, val in inpdict.items():
+        if bhit == -1:
+            bhit = val[7]
+        if val[6] < best or (val[6] == best and val[7] > bhit):
+            best = val[6]
+            bhit = val[7]
+            if val[2] == val[5]:
+                direct = True
+            else:
+                direct = False
+            if extractiontype == "-n" or extractiontype == "-s" or extractiontype[:2] == "-e" or len(inpdict.keys()) == 1:
+                if extractiontype == "-n":
+                    outlist = [direct, [-1, -1, val[3], val[4]]]
+                else:
+                    #Option -e is taken care of at the moment of seq extraction
+                    outlist = [direct, [val[0],val[1], val[3], val[4]]]
+                    if extractiontype == "-a" or extractiontype == "-b":
+                        messagefunc("stiching was not checked, one element", debugfile)
+    if extractiontype == "-a" and len(inpdict.keys()) > 1 or extractiontype == "-b" and len(inpdict.keys()) > 1:
+        messagefunc("running hit overlapper...", debugfile)
+        stichlist = inpdict.values()
+        ovlp = True
+        while ovlp:
+            if len(stichlist) == 1:
+                break
+            else:
+                combos = list(itertools.combinations(range(len(stichlist)), 2))
+                messagefunc("iteration length"+str(len(combos))+", "+str(len(stichlist)), debugfile)
+                for comb in range(len(combos)):
+                    #print >> debugfile, "comparing ...", combos,stichlist
+                    tovlp = getOverlap(stichlist[combos[comb][0]][0:2],stichlist[combos[comb][1]][0:2])
+                    qovlp = getOverlap(stichlist[combos[comb][0]][3:5],stichlist[combos[comb][1]][3:5])
+                    if tovlp > 0 and qovlp > 10: #somehow make the second threshold less arbitrary... perhaps percent?
+                        #stichlist[combos[comb][0]] # this is whole record with 8 elements
+                        stichlist[combos[comb][0]] = [min(stichlist[combos[comb][0]][0], stichlist[combos[comb][1]][0],stichlist[combos[comb][0]][1], stichlist[combos[comb][1]][1]), max(stichlist[combos[comb][0]][0], stichlist[combos[comb][1]][0],stichlist[combos[comb][0]][1], stichlist[combos[comb][1]][1]), direct, min(stichlist[combos[comb][0]][3], stichlist[combos[comb][1]][3],stichlist[combos[comb][0]][4], stichlist[combos[comb][1]][4]), max(stichlist[combos[comb][0]][3], stichlist[combos[comb][1]][3],stichlist[combos[comb][0]][4], stichlist[combos[comb][1]][4])]
+                        del stichlist[combos[comb][1]]
+                        messagefunc("overlapped, breaking", debugfile)
+                        
+                        ovlp = True
+                        break
+                    elif tovlp == 0 and qovlp > 10: #target non overlapping, but query overlapps - do not stich, remove?
+                        #print >> debugfile, "TEST", stichlist[combos[comb][0]],stichlist[combos[comb][1]]
+                        if abs(stichlist[combos[comb][0]][0]-stichlist[combos[comb][0]][1]) >= abs(stichlist[combos[comb][1]][0]-stichlist[combos[comb][1]][1]):
+                            del stichlist[combos[comb][1]]
+                        else:
+                            del stichlist[combos[comb][0]]
+                        messagefunc("bad hit region, deleting the shortest, breaking", debugfile)
+                        ovlp = True
+                        break
+                    elif tovlp > 10 and qovlp == 0: #target overlapping but query is not - remove as well
+                        if abs(stichlist[combos[comb][0]][0]-stichlist[combos[comb][0]][1]) >= abs(stichlist[combos[comb][1]][0]-stichlist[combos[comb][1]][1]):
+                            del stichlist[combos[comb][1]]
+                        else:
+                            del stichlist[combos[comb][0]]
+                        messagefunc("bad hit region, deleting the shortest, breaking", debugfile)
+                        ovlp = True
+                        break
+                    else:
+                        ovlp = False
+                if not ovlp:
+                    messagefunc("no more overlaps", debugfile)
+        #RUN STICHER and return margins and also sequence of regions and gaps
+        messagefunc("running hit sticher...", debugfile)
+        median_coords = {}
+        start_coords = {}
+        end_coords = {}
+        start_target = {}
+        end_target = {}
+        for chunk in range(len(stichlist)):
+            #print inplist[chunk][3],inplist[chunk][4]
+            median_coords[chunk] = median([stichlist[chunk][3],stichlist[chunk][4]])
+            start_coords[chunk] = min(stichlist[chunk][3],stichlist[chunk][4])
+            end_coords[chunk] = max(stichlist[chunk][3],stichlist[chunk][4])
+            start_target[chunk] = min(stichlist[chunk][0],stichlist[chunk][1])
+            end_target[chunk] = max(stichlist[chunk][0],stichlist[chunk][1])
+        gapstart = 0
+        outlist = [direct]
+        for key in sorted(median_coords, key=lambda x: median_coords[x]):
+            if gapstart > 0:
+                #print >> debugfile, "gap", start_coords[key]-gapstart
+                outlist.append(start_coords[key]-gapstart)
+            #print >> debugfile, key, median_coords[key], "start", start_coords[key], "end", end_coords[key]
+            outlist.append([start_target[key], end_target[key], start_coords[key], end_coords[key]])
+            gapstart = end_coords[key]
+    return outlist
+
+def median(lst): #taken from https://stackoverflow.com/questions/24101524/finding-median-of-list-in-python
+    n = len(lst)
+    if n < 1:
+            return None
+    if n % 2 == 1:
+            return sorted(lst)[n//2]
+    else:
+            return sum(sorted(lst)[n//2-1:n//2+1])/2.0
+
+def contig_overlap(inplist):
+    tab = {}
+    for target in inplist:
+        #print target[1][-1]
+        tab[target[0]] = [min(target[1][1][2],target[1][1][3]),max(target[1][-1][2],target[1][-1][3])]
+    flatlist = tab.values()
+    messagefunc("checking contig overlap", debugfile)
+    
+    combos = list(itertools.combinations(range(len(flatlist)), 2))
+    ovlp = False
+    for comb in range(len(combos)):
+        #print combos[comb][1], flatlist[combos[comb][0]][:2],flatlist[combos[comb][1]][:2]
+        if getOverlap(flatlist[combos[comb][0]][:2],flatlist[combos[comb][1]][:2]) > 0:
+            #messagefunc("overlapping contigs", debugfile)        
+            #print "overlapping contigs", flatlist[combos[comb][0]][:2],flatlist[combos[comb][1]][:2]
+            ovlp = True
+            break
+    if ovlp:
+        return True
+    else:
+        return False
+
+def contig_sticher(inplist):
+    messagefunc("running contig sticher...", debugfile)
+    median_coords = {}
+    start_coords = {}
+    end_coords = {}
+    for target in inplist:
+        median_coords[target[0]] = median([min(target[1][1][2],target[1][1][3]),max(target[1][-1][2],target[1][-1][3])])
+        start_coords[target[0]] = min(target[1][1][2],target[1][1][3])
+        end_coords[target[0]] = max(target[1][-1][2],target[1][-1][3])
+    gapstart = 0
+    output = []
+    for key in sorted(median_coords, key=lambda x: median_coords[x]):
+        if gapstart > 0:
+            #print >> debugfile, "gap", start_coords[key]-gapstart
+            output.append(start_coords[key]-gapstart)
+        #print >> debugfile, key, median_coords[key], "start", start_coords[key], "end", end_coords[key]
+        output.append(key)
+        gapstart = end_coords[key]
+    return output
+
+def get_sequence(inplist, seq, extractiontype):
+    finalseq = Seq("")
+    if extractiontype == "-a":
+        for i in inplist[1:]:
+            if type(i) is not int:
+                start = min(i[0],i[1])
+                end = max(i[0],i[1])
+                if inplist[0]:
+                    finalseq += seq.seq[start:end]
+                else:
+                    finalseq += seq.seq[start:end].reverse_complement()
+            else:
+                if i > 0:
+                    finalseq += Seq("N"*i)
+                else:
+                    finalseq += Seq("N")
+        #messagefunc("running extractor: final range as is, length "+str(len(finalseq)), debugfile)
+    elif extractiontype == "-b":
+        f1 = True
+        for i in inplist[1:]:
+            if type(i) is not int:
+                if f1:
+                    start = min(i[:2])
+                    end = max(i[:2])
+                    f1 = False
+                else:
+                    start = min(start, i[0], i[1])
+                    end = max(end, i[0], i[1])
+        finalseq = seq.seq[start:end]
+        #messagefunc("running extractor: final range "+str([start, end])+", length "+str(len(finalseq)), debugfile)
+    elif extractiontype == "-n":
+        finalseq = seq.seq
+        #messagefunc("running extractor: final range is full, length "+str(len(finalseq)), debugfile)
+    elif extractiontype == "-s":
+        start = min(inplist[1][0],inplist[1][1])
+        end = max(inplist[1][0],inplist[1][1])
+        finalseq = seq.seq[start:end]
+        #messagefunc("running extractor: final range "+str([start, end])+", length "+str(len(finalseq)), debugfile)
+    elif extractiontype[:2] == "-e":
+        flank = int(extractiontype[2:])
+        start = min(inplist[1][0],inplist[1][1])
+        end = max(inplist[1][0],inplist[1][1])
+        if start - flank < 0:
+            start = 0
+        else:
+            start = start - flank
+        if end + flank > len(seq.seq)-1:
+            end = len(seq.seq)-1
+        else:
+            end = end + flank
+        finalseq = seq.seq[start:end]
+        #messagefunc("running extractor: final range "+str([start, end])+", length "+str(len(finalseq)), debugfile)
+    if not inplist[0] and extractiontype != "-a":
+        finalseq = finalseq.reverse_complement()
+    return finalseq
+
+def dumper(inplist, extractiontype):
+    finalseq = Seq("")
+    for i in inplist:
+        if type(i) is not int:
+            finalseq += i
+        else:
+            if i > 0 and extractiontype != "-n":
+                finalseq += Seq("N"*i)
+            else:
+                finalseq += Seq("N")
+    return finalseq
 #---------------------------------------------------------------------
 
-print "mainblparser run with option", opt, "selected"
 debugfile = open("mainblparser.log", "w")
-print >> debugfile, "debug file start"
-print >> debugfile, "command line parameters:", sys.argv
+
+qout = open("mainblparser_qtable.tab", "w")
+tout = open("mainblparser_ttable.tab", "w")
+
+messagefunc("mainblparser run with option "+filefolder+" selected", debugfile, False)
+messagefunc("command line parameters: "+' '.join(sys.argv), debugfile, False)
+
+
 #make modified dir
-print >> debugfile, "make modified dir..."
+messagefunc("make modified dir...", debugfile, False)
 mkdirfunc()
 
 #copy files
-print >> debugfile, "copy files..."
+messagefunc("copy files...", debugfile, False)
 copyfunc()
 
 #multi db option
-if opt == "-mn" or opt == "-ms" or opt == "-mss" or opt[:3] == "-me" or opt == "-msl" or opt == "-ma" or opt == "-mb":
+if filefolder == "-M":
     #reading the blastfile
     blastlist = glob.glob(blastfilearg+"/*.blast")
-    translist = glob.glob(trif+"/*.fasta")
-else:
+    translist = glob.glob(targetf+"/*.fasta")
+elif filefolder == "-S":
     blastlist = [blastfilearg]
-    translist = [trif]
+    translist = [targetf]
+else:
+    messagefunc("incorrect option @@@"+filefolder, debugfile, False)
+    sys.exit()
 
-print "list of transcriptomes:"
-print >> debugfile, "list of transcriptomes:"
+messagefunc("list of target fasta files detected (mask *.fasta):", debugfile, False)
 for l in translist:
-    print l
-    print >> debugfile, l
+    messagefunc(l, debugfile)
+
 #debug vars
 number = 0
 numberset = set()
 totalloci = 0
 #parsing blast files
-print "parsing blast files..."
-print >> debugfile, "parsing blast files..."
+messagefunc("parsing blast files...", debugfile, False)
+
 b1 = 0
 for b in blastlist:
     b1 += 1
-    #obtain a dictionary with blast results
-    output = readblastfilefunc(b, debugfile)
-    partsnumdict = partsnumfunc(output)
-    print >> debugfile, partsnumdict
-    print dash
-    print >> debugfile, dash
-    count = int(len(partsnumdict))
-    print count, "targets found to be extracted"
-    print >> debugfile, count, "targets found to be extracted"
+    messagefunc("target "+str(b1)+" out of "+str(len(blastlist)), debugfile, False)
+    output = readblastfilefunc(b, debugfile) #output 0 is query, 1 is target
+    final_table = {}
+    final_target_table = {}
+    for query in output[0].keys():
+        #QUERY PROCESSING: first, rank targets by highest eval, also get average bitscore
+        messagefunc("Q: "+query, debugfile)
+        ranks = [{},{}] #evail is first, bitscore is second
+        for target, hits in output[0][query].items():
+            ranks_temp = compute_ranks(hits)
+            #print >> debugfile, ranks_temp
+            #check reciprocy
+            if reciprocate == False or reciprocate == True and reciprocator(output[1][target], query, ranks_temp[2], ranks_temp[3], ranks_temp[0],ranks_temp[1]):
+                ranks[0][target] = ranks_temp[0]
+                ranks[1][target] = ranks_temp[1]
+            else:
+                messagefunc("Reciprocator: target "+target+" removed from query "+query,  debugfile)
+                
+        #print >> debugfile, ranks
+        if len(ranks[0]) == 0:
+            messagefunc("EMPTY "+query,  debugfile)
+            #print >> debugfile, "EMPTY", query
+        else:
+            sorted_evals = sorted(ranks[0], key=lambda x: ranks[0][x])
+            sorted_bits = sorted(ranks[1], key=lambda x: ranks[1][x], reverse=True)
+            #GET TARGETS ORDERED AND STICHED
+            targets = []
+            #print "Q:", query
+            for x in range(len(ranks[0])): #using length of ranks, since some contigs are removed due to better hit elsewhere
+                if sorted_evals[0] == sorted_bits[0]:
+                    messagefunc("best match: "+sorted_evals[0], debugfile)
+                    
+                else:
+                    messagefunc("eval and bit disagree: "+sorted_evals[0]+" and "+sorted_bits[0], debugfile)
+                    
+                tname1 = sorted_evals.pop(0)
+                del sorted_bits[0]
+                #SELECT OPTION:
+                targets.append([tname1, hit_sticher(output[0][query][tname1], extractiontype)])
+            #print >> debugfile, targets
+            #CHECK TARGETS FOR OVERLAP
+            if interstich:
+                if len(targets) > 1:
+                    if contig_overlap(targets):
+                        messagefunc("contigs overlapping, no contig stiching", debugfile)        
+                        stiching_schedule = "none"
+                        #CUTTING OFF EXCESS CONTIGS
+                        if len(targets) > contignum and contignum > 0:
+                            targets = targets[:contignum]
+                    else:
+                        stiching_schedule = contig_sticher(targets)
+                        #ALL will be stiched to just one
+                else:
+                    messagefunc("only 1 target, no contig stiching", debugfile)
+                    stiching_schedule = "none"
+            else:
+                messagefunc("-IM deactivated, no contig stiching", debugfile)
+                stiching_schedule = "none"
+                if len(targets) > contignum and contignum > 0:
+                    targets = targets[:contignum]
+
+        final_table[query] = [targets, stiching_schedule]
+        for t in targets:
+            if t[0] in final_target_table:
+                final_target_table[t[0]].append(query)
+            else:
+                final_target_table[t[0]] = [query]
+    bltableout(final_table,qout)
+    bltableout(final_target_table,tout)
+
+#####-----------------------------------------------------------------------
+
+    messagefunc("scanning the target fasta file...", debugfile, False)
     
-    print "scanning the transcriptome..."
-    print >> debugfile, "scanning the transcriptome..."
     warninglist = []
     #get the transcriptome filename, matching blast filename
     for t_file in translist:
@@ -573,131 +557,52 @@ for b in blastlist:
             #print >> debugfile, b[:-6].split("/")[-1], t_file
             inputf = SeqIO.parse(t_file, "fasta")
             seqname = b[:-6].split("/")[-1]
-            transname = t_file.split("/")[-1]
+            target_db_name = t_file.split("/")[-1]
             break
-    print >> debugfile, "target:", transname, "; target name:", seqname
+    #print >> debugfile, "target:", target_db_name, "; target name:", seqname
     if not inputf:
-        print "error, transcriptome file is not found"
-        print >> debugfile, "error, transcriptome file is not found"
+        messagefunc("error, the target fasta file is not found", debugfile, False)
         break
-    print "searching for contigs in:", transname
-    print >> debugfile, "searching for contigs in:", transname
-    c1 = 0
-    extr_loci = []
-    if opt == "-msl" and os.path.exists("./"+seqname+"_conSeqs.fasta"):
-        os.remove("./"+seqname+"_conSeqs.fasta")
-    for seq in inputf:
-        #print count
-        if count == 0:
-            print dash
-            print >> debugfile, dash
-            print "search terminated"
-            print >> debugfile, "search terminated"
+    c1 = len(final_target_table)
+    messagefunc("searching for contigs in: "+target_db_name+", total number of contigs: "+str(c1), debugfile, False)
+    
+    for seq in inputf: #going over seqs in target file
+        if seq.id in final_target_table: #looking up same seq in target file
+            for qname in final_target_table[seq.id]: #checking it's queries
+                for t in range(len(final_table[qname][0])): #looking for target in the query table
+                    if final_table[qname][0][t][0] == seq.id: #found target in the query table
+                        if final_table[qname][1] == "none":
+                            #extraction
+                            messagefunc(str(c1)+" EXTRACTING: contig "+final_table[qname][0][t][0]+", query "+qname, debugfile)
+                            s1 = get_sequence(final_table[qname][0][t][1], seq, extractiontype)
+                            print >> debugfile, "- EXTRACTING: final seq", s1[:10], "ranges", final_table[qname][0][t][1]
+                            seqwritefunc(s1, qname,target_db_name, seq.id)
+                        else:
+                            s1 = get_sequence(final_table[qname][0][t][1], seq, extractiontype)
+                            final_table[qname][1][final_table[qname][1].index(final_table[qname][0][t][0])] = s1[:5]
+                            messagefunc(str(c1)+" BUCKET: contig "+final_table[qname][0][t][0]+", query "+qname, debugfile)
+                            dump_bucket = True
+                            for buck1 in final_table[qname][1]:
+                                if type(buck1) is str:
+                                    dump_bucket = False
+                                    break
+                            if dump_bucket:
+                                s1 = dumper(final_table[qname][1], extractiontype)
+                                messagefunc(str(c1)+" EXTRACTING: bucket "+qname+" dumped", debugfile)
+                                print >> debugfile, "- EXTRACTING: final seq", s1[:10], "ranges", final_table[qname][1]
+                                seqwritefunc(s1, qname,target_db_name, "none")
+                        #cleanup
+                        del final_table[qname][0][t]
+                        break # breaking from target table
+            #clean up after all qs are done
+            del final_target_table[seq.id]
+            c1 = c1 - 1
+        if len(final_target_table) == 0:
+            messagefunc(str(c1)+" search finished", debugfile, False)
             break
-        else:
-            #for locusfname,y in output.items(): #checking all ahe (seach which ahe has it)
-            for locus1 in partsnumdict.keys():
-                #locusfname - AHE name
-                #y - trans locus name
-                #seq.id = trans locus name as well
-                locusfname = locus1+"-copy0"
-                y = output[locusfname]
-                if y[6] == seq.id and locusfname not in extr_loci:
-                    print dash
-                    print >> debugfile, dash
-                    print "target", seq.id, "found as a blast hit, matched the locus", locus1
-                    print >> debugfile, "target", seq.id, "found as a blast hit, matched the locus",locus1
-                    temp = seq.id
-                    tempseq = seq.seq
-                    temprec = seq
-                    ######
-                    print >> debugfile, "partsnumdict", partsnumdict[locus1]
-                    if opt == "-a" or opt == "-b" or opt == "-ma" or opt == "-mb":
-                        print "number of fragments to stich", partsnumdict[locus1]
-                        print >> debugfile, "number of fragments to stich", partsnumdict[locus1]
-                        writeseq = seqprepfunc_es(output, locus1, opt, temprec, partsnumdict)
-                    else:
-                        writeseq = seqprepfunc(output, locus1+"-copy0", opt, temprec)
-                    extr_loci.append(locus1+"-copy0")
-                    # if partsnumdict[locus1] == 1:
-                    #     #print >> debugfile, "SEQ", seq.seq, len(seq.seq)
-                    #     #print >> debugfile, "output debug",output[locus1+"-copy"+str(part)]#, seqprepfunc(output, locus1+"-copy"+str(part), opt, seq, partsnumdict)
-                    #     if opt == "-a" or opt == "-b" or opt == "-ma" or opt == "-mb":
-                    #     #writeseq = seqprepfunc(output, locus1+"-copy0", opt, temprec)
-                    #         writeseq = seqprepfunc_es(output, locus1, opt, temprec, partsnumdict)
-                    #     else:
-                    #         writeseq = seqprepfunc(output, locus1+"-copy0", opt, temprec)
-                    #     #else:
-                    #     #    writeseq = writeseq + Seq("N"*5) + seqprepfunc(output, locus1+"-copy"+str(part), opt, temprec, partsnumdict)
-                    #     #print >> debugfile, "output min", min(output[locus1+"-copy"+str(part)][0:2])
-                    #     extr_loci.append(locus1+"-copy0")
-                    #     #count -= 1
-                    #     #print >> debugfile, writeseq, len(writeseq)
-                    # else:
-                    #     #print >> debugfile, "SEQ", seq.seq, len(seq.seq)
-                    #     #print >> debugfile, "output debug",output[locus1+"-copy"+str(part)]#, seqprepfunc(output, locus1+"-copy"+str(part), opt, seq, partsnumdict)
-                    #     #if part == 0:
-                    #     writeseq = seqprepfunc_es(output, locus1, opt, temprec, partsnumdict)
-                    #     #else:
-                    #     #    writeseq = writeseq + Seq("N"*5) + seqprepfunc(output, locus1+"-copy"+str(part), opt, temprec, partsnumdict)
-                    #     #print >> debugfile, "output min", min(output[locus1+"-copy"+str(part)][0:2])
-                    #     extr_loci.append(locus1+"-copy0")
-                    #     #count -= partsnumdict[locus1]
-                    #     #print >> debugfile, writeseq, len(writeseq)
 
-                    #check direction and length
-                    #seq = seqprepfunc(output, locusfname, opt, seq, partsnumdict)
-                    print "extracted length:", len(str(writeseq.seq).replace("-", ""))
-                    print >> debugfile, "extracted length:", len(str(writeseq.seq).replace("-", ""))
-                    #append sequence
-                    if opt == "-msl" or opt == "-sl":
-                        altwritefunc(writeseq, opt, locusfname, seqname, paropt)
-                        c1 += 1
-                    else:
-                        if seqwritefunc(writeseq, opt, locusfname, seqname, paropt) == 1:
-                           c1 += 1
-                        elif opt == "-mss" or opt == "-ss":
-                            print "Warning: blast hit is too short"
-                            print >> debugfile, "Warning: blast hit is too short"
-                            warninglist.append(locusfname)
-                    #extr_loci.append(locusfname)
-                    seq.id = temp
-                    seq.seq = tempseq
-                    count -= 1
-                    print "progress:", count, "loci left, working on", transname, b1, "/", len(blastlist)
-    if opt == "-msl" or opt == "-sl":
-        print "sorting file....."
-        fhandle = open("./"+seqname+"_conSeqs.fasta", "r")
-        transdict = {}
-        for seq in SeqIO.parse(fhandle, "fasta"):
-            transdict[float(seq.id[1:])] = seq.seq
-        fhandle.close()
-        fhandle2 = open("./"+seqname+"_conSeqs.fasta", "w")
-        for key, value in sorted(transdict.items()):
-            print >> fhandle2, ">L"+str(key)
-            print >> fhandle2, value
-        fhandle2.close()
-    count = int(len(partsnumdict))
-    print "queries found:", len(extr_loci)
-    print >> debugfile, "queries found:", len(extr_loci)
-    print c1, "sequences extracted"
-    print >> debugfile, c1, "seqeunces extracted"
-    print "warning list:", len(warninglist)
-    print >> debugfile, "warning list:", len(warninglist)
-    for wle in warninglist:
-        print wle
-        print >> debugfile, wle
-    totalloci += c1
-
-
-
-print "number of >90% close suboptimal hits", number
-print "number of queries with >90% close suboptimal hits", len(numberset)
-print "total number of queries extracted", totalloci, ", in average", totalloci/float(len(translist)), "per database"
-
-print >> debugfile, "number of >90% close suboptimal hits", number
-print >> debugfile, "number of queries with >90% close suboptimal hits", len(numberset)
-print >> debugfile, "total number of queries extracted", totalloci, ", in average", totalloci/float(len(translist)), "per database"
 print >> debugfile, "done"
 debugfile.close()
+qout.close()
+tout.close()
 print "done"
