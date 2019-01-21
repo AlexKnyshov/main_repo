@@ -42,12 +42,12 @@ def check_alphabet(filename, fformat):#code for this function is modified from h
 			sys.exit()
 	return detected
 
-if len(sys.argv) == 3:
+if len(sys.argv) >= 3:
 	inputfolder = sys.argv[1]
 	partnum = sys.argv[2]
 
 else:
-	print "FORMAT: python concat.py [folder with fasta] [split to codon positions: -3 (yes), -1 (no)]"
+	print "FORMAT: python concat.py [folder with fasta] [split to codon positions: -3 (yes), -1 (no), -tnt, -nex]"
 	print "EXAMPLE: python concat.py ./fasta -1"
 	print "output is written to COMBINED.phy, partitions are written to partitions.prt"
 	sys.exit()
@@ -95,7 +95,11 @@ print "second pass: concatenating..."
 final_matrix = dict.fromkeys(d.keys(),"")
 start = 0
 end = 0
-outputfile = open("partitions.prt", "w")
+if partnum != "-tnt" and partnum != "-nex":
+	outputfile = open("partitions.prt", "w")
+models = []
+starts = []
+ends = []
 for f in files:
 	fnew = f.split("/")
 	fn = fnew[len(fnew)-1]
@@ -145,6 +149,9 @@ for f in files:
 				final_matrix[m] = ""
 				final_matrix[m] += "?"*length
 	end = start + length - 1
+	models.append(model)
+	starts.append(start+1)
+	ends.append(end+1)
 	if partnum == "-3":
 		if model == "DNA":
 			print >> outputfile, model+", "+fn+"-1="+str(start+1)+"-"+str(end+1)+"\\3"
@@ -158,9 +165,75 @@ for f in files:
   	sys.stdout.write(prog+"\r")
   	sys.stdout.flush()
 	start = end + 1
-outf = open("COMBINED.phy", "w")
-print >> outf, str(len(final_matrix))+" "+str(start)
-for rec in final_matrix.keys():
-	print >> outf, str(rec)+" "+str(final_matrix[rec])
-outf.close()
+if partnum == "-tnt":
+	outf = open("COMBINED.tnt", "w")
+	print >> outf, "xread"
+	print >> outf, str(start)+" "+str(len(final_matrix))
+	#print >> outf, models, starts, ends
+	tntm = []
+	tnts = []
+	tnte = []
+	for part in range(0, len(models)):
+		#print >> outf, "part", part
+		if part == 0:
+			tnts.append(starts[0]-1)
+			tnte.append(ends[0])
+			tntm.append(models[0])
+		else:
+			if models[part] == models[part-1]:
+				tnte[-1] = ends[part]
+			else:
+				tnts.append(starts[part]-1)
+				tnte.append(ends[part])
+				tntm.append(models[part])
+	for tntp in range(0, len(tntm)):
+		#print >> outf, tnts[tntp], tnte[tntp]
+		if tntm[tntp] == "DNA":
+			print >> outf, "&[dna]"
+		elif tntm[tntp] == "MULTI":
+			print >> outf, "&[num]"
+		for rec in final_matrix.keys():
+			print >> outf, str(rec)+" "+str(final_matrix[rec][tnts[tntp]:tnte[tntp]])
+	print >> outf, ";"
+	print >> outf, "proc/;"
+	outf.close()
+elif partnum == "-nex":
+	outf = open("COMBINED.nex", "w")
+	# mline = ""
+	# for part in range(0, len(models)):
+	# 	if models[part] == "MULTI":
+	# 		models[part] = "Standard"
+	# 	if part == 0:
+	# 		mline += models[0]
+	# 		mline += ":"
+	# 		mline += str(starts[0])
+	# 	else:
+	# 		if models[part] != models[part-1]:
+	# 			mline += "-"
+	# 			mline += str(ends[part-1])
+	# 			mline += ","
+	# 			mline += models[part]
+	# 			mline += ":"
+	# 			mline += str(starts[part])
+	# mline += "-"
+	# mline += str(ends[part])
+	# mline += ") interleave=yes  GAP = - MISSING = ? SYMBOLS = \"  0 1 2 3 4 5\";"
+	print >> outf, "#nexus"
+	print >> outf, "begin data;"
+	print >> outf, "dimensions ntax="+str(len(final_matrix))+" nchar="+str(start)+";"
+	# print >> outf, "format datatype=mixed("+mline
+	print >> outf, "format datatype=STANDARD interleave=yes  GAP = - MISSING = ? SYMBOLS = \"  0 1 2 3 4 5\";"
+	print >> outf, "matrix"
+	for rec in final_matrix.keys():
+		print >> outf, str(rec)+"\t"+str(final_matrix[rec]).replace("a", "0").replace("t", "1").replace("g", "2").replace("c", "3").replace("w", "?").replace("n", "?").replace("r", "?").replace("y", "?").replace("s", "?").replace("m", "?")
+	print >> outf, ";"
+	print >> outf, "end;"
+	outf.close()
+else:
+	outf = open("COMBINED.phy", "w")
+	print >> outf, str(len(final_matrix))+" "+str(start)
+	for rec in final_matrix.keys():
+		print >> outf, str(rec)+" "+str(final_matrix[rec])
+	outf.close()
+	outputfile.close()
 print "\ndone"
