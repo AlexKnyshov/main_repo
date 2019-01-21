@@ -197,7 +197,7 @@ for f in files:
 	print >> debug, "stoplist", stoplist, "least stops", min(stoplist), "best frame", stoplist.index(min(stoplist))
 	print >> debug, "num_ext_stopslist", num_ext_stopslist, "least stops", min(num_ext_stopslist), "best frame", num_ext_stopslist.index(min(num_ext_stopslist))
 
-	if max(prop_good_per_frame) < cutoff:#modified condition in case several frames are good
+	if max(prop_good_per_frame) < cutoff and min(num_ext_stopslist) > 0:#modified condition in case several frames are good
 		print >> debug, "BAD LOCUS", stoplist
 		badloci[f] = stoplist.index(min(stoplist))
 		goodlocus = False
@@ -214,21 +214,28 @@ for f in files:
 		if len(getindex_3) == 2:
 			print >> debug, "two identical 3, frames", getindex_3
 		#print >> debug, "getindex", getindex_1, getindex_2, getindex_3
-		if getindex_1 == getindex_2 and len(getindex_1) == len(getindex_2) == 2:
-			print >> debug, "checking average distance, frames", getindex_1
-			frame = alidist(f, getindex_1)
-			print >> debug, "frame with lowest distance", frame
+		#option for internal!! correct later
+		if min(num_ext_stopslist) == 0 and min(num_ext_stopslist) < min(stoplist) and len(getindex_3) == 1:
+			print >> debug, "conflict btw stoplist and ext_stoplist, the latter has a single 0 stop frame", getindex_3[0]
+			frame = getindex_3[0]
 			goodlocus = True
+			count +=1
 		else:
-			if len(set(bestframeslst)) < 3:
-				frame = max(set(bestframeslst), key=bestframeslst.count)
+			if getindex_1 == getindex_2 and len(getindex_1) == len(getindex_2) == 2:
+				print >> debug, "checking average distance, frames", getindex_1
+				frame = alidist(f, getindex_1)
+				print >> debug, "frame with lowest distance", frame
 				goodlocus = True
-				count +=1
 			else:
-				badloci[f] = stoplist.index(min(stoplist))
-				print >> debug, "BAD LOCUS", bestframeslst
-				goodlocus = False
-				frame = badloci[f]
+				if len(set(bestframeslst)) < 3:
+					frame = max(set(bestframeslst), key=bestframeslst.count)
+					goodlocus = True
+					count +=1
+				else:
+					badloci[f] = stoplist.index(min(stoplist))
+					print >> debug, "BAD LOCUS", bestframeslst
+					goodlocus = False
+					frame = badloci[f]
 		# if prop_good_per_frame.index(max(prop_good_per_frame)) != stoplist.index(min(stoplist)):
 		# 	print >> debug, "discrepancy btw prop_good_per_frame and stoplist", prop_good_per_frame.index(max(prop_good_per_frame)), stoplist.index(min(stoplist))
 		# 	if prop_good_per_frame [stoplist.index(min(stoplist))] > cutoff:
