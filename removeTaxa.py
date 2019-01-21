@@ -77,7 +77,7 @@ for f in files:
 				else:
 					print >> outputfile, ">"+seq.id, "\n", seq.seq
 				count += 1
-			elif sys.argv[2] == "-l" and float(len(str(seq.seq).replace("-", "").upper().replace("N", "").replace("?", "")))/len(seq.seq)>threshold:
+			elif sys.argv[2] == "-l" and float(len(str(seq.seq).replace("-", "").upper().replace("N", "").replace("?", "").replace("X", "")))/len(seq.seq)>threshold:
 				print >> outputfile, ">"+seq.id, "\n", seq.seq
 				count += 1
 		outputfile.close()
