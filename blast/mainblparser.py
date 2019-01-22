@@ -45,6 +45,11 @@ dash = "--------------------------------------------------------"
 # starterr = "Start offset is too large"
 # enderr = "End offset is too large"
 warninglist = []
+recip_olvp = 10 #max overlap on query, after which contigs start compete
+hit_query_ovl = 10 #max overlap on query, after which target hits are merged
+hit_target_ovl = 0 #max overlap on target, after which target hits are merged
+contig_ovlp = 0 #max overlap on query, after which contigs are considered overlapping and are not stiched
+
 
 def messagefunc(msg, f, fl=True):
     if fl:
@@ -123,7 +128,7 @@ def reciprocator(inpdict, query, range1, range2, emax, bitscore, target):
     for key, val in inpdict.items():
         if key != query: #all other queries
             target_ranks_temp = compute_ranks(val) #get all pieces, compute values for this query
-            if getOverlap([target_ranks_temp[2],target_ranks_temp[3]],[range1,range2]) > 10:
+            if getOverlap([target_ranks_temp[2],target_ranks_temp[3]],[range1,range2]) > recip_olvp:
                 if target_ranks_temp[0] < emax:
                     #print key, target_ranks_temp[2],target_ranks_temp[3], target_ranks_temp[0], query, range1,range2, emax
                     cond = False
@@ -263,7 +268,7 @@ def hit_sticher(inpdict, extractiontype):
                     #print >> debugfile, "comparing ...", combos,stichlist
                     tovlp = getOverlap(stichlist[combos[comb][0]][0:2],stichlist[combos[comb][1]][0:2])
                     qovlp = getOverlap(stichlist[combos[comb][0]][3:5],stichlist[combos[comb][1]][3:5])
-                    if tovlp > 0 and qovlp > 10: #somehow make the second threshold less arbitrary... perhaps percent?
+                    if tovlp > hit_target_ovl and qovlp > hit_query_ovl: #somehow make the second threshold less arbitrary... perhaps percent?
                         #stichlist[combos[comb][0]] # this is whole record with 8 elements
                         stichlist[combos[comb][0]] = [min(stichlist[combos[comb][0]][0], stichlist[combos[comb][1]][0],stichlist[combos[comb][0]][1], stichlist[combos[comb][1]][1]), max(stichlist[combos[comb][0]][0], stichlist[combos[comb][1]][0],stichlist[combos[comb][0]][1], stichlist[combos[comb][1]][1]), direct, min(stichlist[combos[comb][0]][3], stichlist[combos[comb][1]][3],stichlist[combos[comb][0]][4], stichlist[combos[comb][1]][4]), max(stichlist[combos[comb][0]][3], stichlist[combos[comb][1]][3],stichlist[combos[comb][0]][4], stichlist[combos[comb][1]][4])]
                         del stichlist[combos[comb][1]]
@@ -271,7 +276,7 @@ def hit_sticher(inpdict, extractiontype):
                         
                         ovlp = True
                         break
-                    elif tovlp == 0 and qovlp > 10: #target non overlapping, but query overlapps - do not stich, remove?
+                    elif tovlp == 0 and qovlp > hit_query_ovl: #target non overlapping, but query overlapps - do not stich, remove?
                         #print >> debugfile, "TEST", stichlist[combos[comb][0]],stichlist[combos[comb][1]]
                         if abs(stichlist[combos[comb][0]][0]-stichlist[combos[comb][0]][1]) >= abs(stichlist[combos[comb][1]][0]-stichlist[combos[comb][1]][1]):
                             del stichlist[combos[comb][1]]
@@ -338,7 +343,7 @@ def contig_overlap(inplist):
     ovlp = False
     for comb in range(len(combos)):
         #print combos[comb][1], flatlist[combos[comb][0]][:2],flatlist[combos[comb][1]][:2]
-        if getOverlap(flatlist[combos[comb][0]][:2],flatlist[combos[comb][1]][:2]) > 0:
+        if getOverlap(flatlist[combos[comb][0]][:2],flatlist[combos[comb][1]][:2]) > contig_ovlp:
             #messagefunc("overlapping contigs", debugfile)        
             #print "overlapping contigs", flatlist[combos[comb][0]][:2],flatlist[combos[comb][1]][:2]
             ovlp = True
@@ -373,7 +378,7 @@ def get_sequence(inplist, seq, extractiontype):
     if extractiontype == "-a":
         for i in inplist[1:]:
             if type(i) is not int:
-                start = min(i[0],i[1])
+                start = min(i[0],i[1])-1
                 end = max(i[0],i[1])
                 if inplist[0]:
                     finalseq += seq.seq[start:end]
@@ -390,11 +395,11 @@ def get_sequence(inplist, seq, extractiontype):
         for i in inplist[1:]:
             if type(i) is not int:
                 if f1:
-                    start = min(i[:2])
+                    start = min(i[:2])-1
                     end = max(i[:2])
                     f1 = False
                 else:
-                    start = min(start, i[0], i[1])
+                    start = min(start, i[0], i[1])-1
                     end = max(end, i[0], i[1])
         finalseq = seq.seq[start:end]
         #messagefunc("running extractor: final range "+str([start, end])+", length "+str(len(finalseq)), debugfile)
@@ -402,13 +407,13 @@ def get_sequence(inplist, seq, extractiontype):
         finalseq = seq.seq
         #messagefunc("running extractor: final range is full, length "+str(len(finalseq)), debugfile)
     elif extractiontype == "-s":
-        start = min(inplist[1][0],inplist[1][1])
+        start = min(inplist[1][0],inplist[1][1])-1
         end = max(inplist[1][0],inplist[1][1])
         finalseq = seq.seq[start:end]
         #messagefunc("running extractor: final range "+str([start, end])+", length "+str(len(finalseq)), debugfile)
     elif extractiontype[:2] == "-e":
         flank = int(extractiontype[2:])
-        start = min(inplist[1][0],inplist[1][1])
+        start = min(inplist[1][0],inplist[1][1])-1
         end = max(inplist[1][0],inplist[1][1])
         if start - flank < 0:
             start = 0
