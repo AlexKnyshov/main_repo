@@ -583,7 +583,7 @@ for b in blastlist:
                             seqwritefunc(s1, qname,target_db_name, seq.id)
                         else:
                             s1 = get_sequence(final_table[qname][0][t][1], seq, extractiontype)
-                            final_table[qname][1][final_table[qname][1].index(final_table[qname][0][t][0])] = s1[:5]
+                            final_table[qname][1][final_table[qname][1].index(final_table[qname][0][t][0])] = s1
                             messagefunc(str(c1)+" BUCKET: contig "+final_table[qname][0][t][0]+", query "+qname, debugfile)
                             dump_bucket = True
                             for buck1 in final_table[qname][1]:
@@ -593,7 +593,7 @@ for b in blastlist:
                             if dump_bucket:
                                 s1 = dumper(final_table[qname][1], extractiontype)
                                 messagefunc(str(c1)+" EXTRACTING: bucket "+qname+" dumped", debugfile)
-                                print >> debugfile, "- EXTRACTING: final seq", s1[:10], "ranges", final_table[qname][1]
+                                print >> debugfile, "- EXTRACTING: final seq", s1[:10]#, "ranges", final_table[qname][1]
                                 seqwritefunc(s1, qname,target_db_name, "none")
                         #cleanup
                         del final_table[qname][0][t]
