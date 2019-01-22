@@ -8,6 +8,7 @@ import csv
 import sys
 import math
 import itertools
+import datetime
 if len(sys.argv) == 10:
     blastfilearg = sys.argv[1]
     targetf = sys.argv[2]
@@ -115,8 +116,8 @@ def readblastfilefunc(b, debugfile):
 
 
 #implement reciprocator break value, default 10. DO percet, e.g. 0.1 of the shortes range
-def reciprocator(inpdict, query, range1, range2, emax, bitscore):
-    messagefunc("running reciprocator", debugfile)
+def reciprocator(inpdict, query, range1, range2, emax, bitscore, target):
+    messagefunc("running reciprocator on target "+target, debugfile)
     cond = True
     for key, val in inpdict.items():
         if key != query: #all other queries
@@ -131,7 +132,9 @@ def reciprocator(inpdict, query, range1, range2, emax, bitscore):
                         cond = False
                         break
                     else:
-                        messagefunc("warning, target has equal hits to several loci, cannot decide", debugfile)
+                        wrn = "warning, target "+target+" has equal hits to several queries, cannot decide"
+                        warninglist.append(wrn)
+                        messagefunc(wrn, debugfile)
     return cond
 
 
@@ -488,7 +491,7 @@ for b in blastlist:
             ranks_temp = compute_ranks(hits)
             #print >> debugfile, ranks_temp
             #check reciprocy
-            if reciprocate == False or reciprocate == True and reciprocator(output[1][target], query, ranks_temp[2], ranks_temp[3], ranks_temp[0],ranks_temp[1]):
+            if reciprocate == False or reciprocate == True and reciprocator(output[1][target], query, ranks_temp[2], ranks_temp[3], ranks_temp[0],ranks_temp[1], target):
                 ranks[0][target] = ranks_temp[0]
                 ranks[1][target] = ranks_temp[1]
             else:
@@ -554,8 +557,9 @@ for b in blastlist:
     #get the transcriptome filename, matching blast filename
     for t_file in translist:
         if b[:-6].split("/")[-1] in t_file:
-            #print >> debugfile, b[:-6].split("/")[-1], t_file
+            
             inputf = SeqIO.parse(t_file, "fasta")
+            
             seqname = b[:-6].split("/")[-1]
             target_db_name = t_file.split("/")[-1]
             break
@@ -565,7 +569,7 @@ for b in blastlist:
         break
     c1 = len(final_target_table)
     messagefunc("searching for contigs in: "+target_db_name+", total number of contigs: "+str(c1), debugfile, False)
-    
+
     for seq in inputf: #going over seqs in target file
         if seq.id in final_target_table: #looking up same seq in target file
             for qname in final_target_table[seq.id]: #checking it's queries
@@ -600,6 +604,10 @@ for b in blastlist:
         if len(final_target_table) == 0:
             messagefunc(str(c1)+" search finished", debugfile, False)
             break
+
+print len(warninglist)
+for w in warninglist:
+    print w
 
 print >> debugfile, "done"
 debugfile.close()
