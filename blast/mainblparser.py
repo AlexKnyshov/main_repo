@@ -44,6 +44,7 @@ else:
 dash = "--------------------------------------------------------"
 # starterr = "Start offset is too large"
 # enderr = "End offset is too large"
+warninglist = []
 
 def messagefunc(msg, f, fl=True):
     if fl:
@@ -553,7 +554,6 @@ for b in blastlist:
 
     messagefunc("scanning the target fasta file...", debugfile, False)
     
-    warninglist = []
     #get the transcriptome filename, matching blast filename
     for t_file in translist:
         if b[:-6].split("/")[-1] in t_file:
