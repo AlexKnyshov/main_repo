@@ -49,6 +49,7 @@ recip_olvp = 10 #max overlap on query, after which contigs start compete
 hit_query_ovl = 10 #max overlap on query, after which target hits are merged
 hit_target_ovl = 0 #max overlap on target, after which target hits are merged
 contig_ovlp = 0 #max overlap on query, after which contigs are considered overlapping and are not stiched
+bitAVG = False #using max bitscore or average bitscore to compare blast hits
 
 
 def messagefunc(msg, f, fl=True):
@@ -123,7 +124,6 @@ def readblastfilefunc(b, debugfile):
 
 #implement reciprocator break value, default 10. DO percet, e.g. 0.1 of the shortes range
 def reciprocator(inpdict, query, range1, range2, emax, bitscore, target):
-    messagefunc("running reciprocator on target "+target, debugfile)
     cond = True
     for key, val in inpdict.items():
         if key != query: #all other queries
@@ -138,7 +138,7 @@ def reciprocator(inpdict, query, range1, range2, emax, bitscore, target):
                         cond = False
                         break
                     else:
-                        wrn = "warning, target "+target+" has equal hits to several queries, cannot decide"
+                        wrn = "warning, target "+target+" has equal hits to several queries, saved for both!"
                         warninglist.append(wrn)
                         messagefunc(wrn, debugfile)
     return cond
@@ -222,14 +222,17 @@ def loclenfunc(locusfname):
 
 def compute_ranks(hits):
     eval_max = []
-    bitscore_avg = []
+    bitscore = []
     coord = []
     for key, hit in hits.items():
         eval_max.append(hit[6])
-        bitscore_avg.append(hit[7])
+        bitscore.append(hit[7])
         coord.append(hit[0])
         coord.append(hit[1])
-    return [min(eval_max), float(sum(bitscore_avg)) / max(len(bitscore_avg), 1), min(coord), max(coord)]
+    if bitAVG:
+        return [min(eval_max), float(sum(bitscore)) / max(len(bitscore), 1), min(coord), max(coord)]
+    else:
+        return [min(eval_max), max(bitscore), min(coord), max(coord)]
 
 def hit_sticher(inpdict, extractiontype):
     outlist = []
@@ -248,12 +251,12 @@ def hit_sticher(inpdict, extractiontype):
                 direct = False
             if extractiontype == "-n" or extractiontype == "-s" or extractiontype[:2] == "-e" or len(inpdict.keys()) == 1:
                 if extractiontype == "-n":
-                    outlist = [direct, [-1, -1, val[3], val[4]]]
+                    outlist = [direct, [-1, -1, val[3], val[4], best, bhit]]
                 else:
                     #Option -e is taken care of at the moment of seq extraction
-                    outlist = [direct, [val[0],val[1], val[3], val[4]]]
+                    outlist = [direct, [val[0],val[1], val[3], val[4], best, bhit]]
                     if extractiontype == "-a" or extractiontype == "-b":
-                        messagefunc("stiching was not checked, one element", debugfile)
+                        messagefunc("only one hit region, abort", debugfile)
     if extractiontype == "-a" and len(inpdict.keys()) > 1 or extractiontype == "-b" and len(inpdict.keys()) > 1:
         messagefunc("running hit overlapper...", debugfile)
         stichlist = inpdict.values()
@@ -263,34 +266,38 @@ def hit_sticher(inpdict, extractiontype):
                 break
             else:
                 combos = list(itertools.combinations(range(len(stichlist)), 2))
-                messagefunc("iteration length"+str(len(combos))+", "+str(len(stichlist)), debugfile)
+                messagefunc("combinations: "+str(len(combos))+", number of regions: "+str(len(stichlist)), debugfile)
                 for comb in range(len(combos)):
                     #print >> debugfile, "comparing ...", combos,stichlist
                     tovlp = getOverlap(stichlist[combos[comb][0]][0:2],stichlist[combos[comb][1]][0:2])
                     qovlp = getOverlap(stichlist[combos[comb][0]][3:5],stichlist[combos[comb][1]][3:5])
-                    if tovlp > hit_target_ovl and qovlp > hit_query_ovl: #somehow make the second threshold less arbitrary... perhaps percent?
+                    #messagefunc("TEST: tovlp "+tovlp+", qovlp "+qovlp+", abs dif"+abs(qovlp-tovlp), debugfile)
+                    #print stichlist[combos[comb][0]]
+                    if tovlp > hit_target_ovl and abs(qovlp-tovlp) < hit_query_ovl: #hits overlap on target and roughly same way overlap on query
                         #stichlist[combos[comb][0]] # this is whole record with 8 elements
-                        stichlist[combos[comb][0]] = [min(stichlist[combos[comb][0]][0], stichlist[combos[comb][1]][0],stichlist[combos[comb][0]][1], stichlist[combos[comb][1]][1]), max(stichlist[combos[comb][0]][0], stichlist[combos[comb][1]][0],stichlist[combos[comb][0]][1], stichlist[combos[comb][1]][1]), direct, min(stichlist[combos[comb][0]][3], stichlist[combos[comb][1]][3],stichlist[combos[comb][0]][4], stichlist[combos[comb][1]][4]), max(stichlist[combos[comb][0]][3], stichlist[combos[comb][1]][3],stichlist[combos[comb][0]][4], stichlist[combos[comb][1]][4])]
+                        stichlist[combos[comb][0]] = [min(stichlist[combos[comb][0]][0], stichlist[combos[comb][1]][0],stichlist[combos[comb][0]][1], stichlist[combos[comb][1]][1]), max(stichlist[combos[comb][0]][0], stichlist[combos[comb][1]][0],stichlist[combos[comb][0]][1], stichlist[combos[comb][1]][1]), direct, min(stichlist[combos[comb][0]][3], stichlist[combos[comb][1]][3],stichlist[combos[comb][0]][4], stichlist[combos[comb][1]][4]), max(stichlist[combos[comb][0]][3], stichlist[combos[comb][1]][3],stichlist[combos[comb][0]][4], stichlist[combos[comb][1]][4]),direct,min(stichlist[combos[comb][0]][6], stichlist[combos[comb][1]][6]),max(stichlist[combos[comb][0]][7], stichlist[combos[comb][1]][7])]
                         del stichlist[combos[comb][1]]
-                        messagefunc("overlapped, breaking", debugfile)
+                        messagefunc("overlapped, merging...", debugfile)
                         
                         ovlp = True
                         break
-                    elif tovlp == 0 and qovlp > hit_query_ovl: #target non overlapping, but query overlapps - do not stich, remove?
+                    elif tovlp <= hit_target_ovl and abs(qovlp-tovlp) >= hit_query_ovl: #hits barely overlap on target but a lot on query -- possibly repeated target region? Select best based on scores
                         #print >> debugfile, "TEST", stichlist[combos[comb][0]],stichlist[combos[comb][1]]
-                        if abs(stichlist[combos[comb][0]][0]-stichlist[combos[comb][0]][1]) >= abs(stichlist[combos[comb][1]][0]-stichlist[combos[comb][1]][1]):
+                        messagefunc("warning: repeated hit region? deleting...", debugfile)
+                        print >> debugfile, stichlist[combos[comb][0]], stichlist[combos[comb][1]]
+                        if stichlist[combos[comb][0]][6] < stichlist[combos[comb][1]][6] or stichlist[combos[comb][0]][7] > stichlist[combos[comb][1]][7] or abs(stichlist[combos[comb][0]][0]-stichlist[combos[comb][0]][1]) >= abs(stichlist[combos[comb][1]][0]-stichlist[combos[comb][1]][1]):
                             del stichlist[combos[comb][1]]
                         else:
                             del stichlist[combos[comb][0]]
-                        messagefunc("bad hit region, deleting the shortest, breaking", debugfile)
                         ovlp = True
                         break
-                    elif tovlp > 10 and qovlp == 0: #target overlapping but query is not - remove as well
-                        if abs(stichlist[combos[comb][0]][0]-stichlist[combos[comb][0]][1]) >= abs(stichlist[combos[comb][1]][0]-stichlist[combos[comb][1]][1]):
+                    elif (float(tovlp) / abs(stichlist[combos[comb][0]][0]-stichlist[combos[comb][0]][1]))*100 > 10 and qovlp == 0: #hits overlapping on target but not on query - remove as well as before
+                        messagefunc("warning: disjunct query hits, deleting...", debugfile)
+                        print >> debugfile, stichlist[combos[comb][0]], stichlist[combos[comb][1]], (float(tovlp) / abs(stichlist[combos[comb][0]][0]-stichlist[combos[comb][0]][1]))*100
+                        if stichlist[combos[comb][0]][6] < stichlist[combos[comb][1]][6] or stichlist[combos[comb][0]][7] > stichlist[combos[comb][1]][7] or abs(stichlist[combos[comb][0]][0]-stichlist[combos[comb][0]][1]) >= abs(stichlist[combos[comb][1]][0]-stichlist[combos[comb][1]][1]):
                             del stichlist[combos[comb][1]]
                         else:
                             del stichlist[combos[comb][0]]
-                        messagefunc("bad hit region, deleting the shortest, breaking", debugfile)
                         ovlp = True
                         break
                     else:
@@ -491,8 +498,10 @@ for b in blastlist:
     final_target_table = {}
     for query in output[0].keys():
         #QUERY PROCESSING: first, rank targets by highest eval, also get average bitscore
+        print >> debugfile, dash
         messagefunc("Q: "+query, debugfile)
         ranks = [{},{}] #evail is first, bitscore is second
+        messagefunc("computing initial target contig stats...", debugfile)
         for target, hits in output[0][query].items():
             ranks_temp = compute_ranks(hits)
             #print >> debugfile, ranks_temp
@@ -501,7 +510,7 @@ for b in blastlist:
                 ranks[0][target] = ranks_temp[0]
                 ranks[1][target] = ranks_temp[1]
             else:
-                messagefunc("Reciprocator: target "+target+" removed from query "+query,  debugfile)
+                messagefunc("reciprocator: target "+target+" removed from query "+query,  debugfile)
                 
         #print >> debugfile, ranks
         if len(ranks[0]) == 0:
@@ -510,20 +519,28 @@ for b in blastlist:
         else:
             sorted_evals = sorted(ranks[0], key=lambda x: ranks[0][x])
             sorted_bits = sorted(ranks[1], key=lambda x: ranks[1][x], reverse=True)
+            # print >> debugfile, sorted_evals
+            # print >> debugfile, sorted_bits
+            # print >> debugfile, ranks[0]
+            # print >> debugfile, ranks[1]
             #GET TARGETS ORDERED AND STICHED
             targets = []
             #print "Q:", query
+            messagefunc("sorting target contigs...", debugfile)
+            wrn1 = True
             for x in range(len(ranks[0])): #using length of ranks, since some contigs are removed due to better hit elsewhere
-                if sorted_evals[0] == sorted_bits[0]:
-                    messagefunc("best match: "+sorted_evals[0], debugfile)
-                    
-                else:
-                    messagefunc("eval and bit disagree: "+sorted_evals[0]+" and "+sorted_bits[0], debugfile)
-                    
+                if sorted_evals[0] != sorted_bits[0] and wrn1:
+                    messagefunc("eval and bit disagree at rank "+str(x+1)+" out of "+str(len(ranks[0])), debugfile)
+                    wrn1 = False
+                    if x == 0:
+                        wrn = "warning, eval and bit disagree for query "+query+", sorted based on evals, "+str(ranks[0][sorted_evals[0]])+" "+str(ranks[1][sorted_bits[0]])
+                        warninglist.append(wrn)
+                        messagefunc(wrn, debugfile)
                 tname1 = sorted_evals.pop(0)
                 del sorted_bits[0]
                 #SELECT OPTION:
                 targets.append([tname1, hit_sticher(output[0][query][tname1], extractiontype)])
+            messagefunc("best matching contig: "+targets[0][0]+", total contigs: "+str(len(targets)), debugfile)
             #print >> debugfile, targets
             #CHECK TARGETS FOR OVERLAP
             if interstich:
