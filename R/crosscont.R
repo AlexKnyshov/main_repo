@@ -27,6 +27,9 @@ for (f in files){
 	    else if(grepl("Phymata", rownames(mx)[mx2[r,1]]) == T & grepl("Phpen", rownames(mx)[mx2[r,2]])== T){
 	      print("Phymata, skipped")
 	    }
+	    else if(grepl("Phymata", rownames(mx)[mx2[r,1]]) == T & grepl("Phymata", rownames(mx)[mx2[r,2]])== T){
+	      print("Phymata, skipped")
+	    }
 	    else if(grepl("Phpen", rownames(mx)[mx2[r,1]]) == T & grepl("Phymata", rownames(mx)[mx2[r,2]])== T){
 	      print("Phymata, skipped")
 	    }
