@@ -144,11 +144,31 @@ def reciprocator(inpdict, query, range1, range2, emax, bitscore, target):
     return cond
 
 
-def bltableout(output, bltableout_file):
-    #bltableout_file = open(fname, "a")
+def bltableout(output, bltableout_file, table_type):
     for key, value in sorted(output.items()):
-        print >> bltableout_file, key, value
-    #bltableout_file.close()
+        if table_type == "target":
+            print >> bltableout_file, key+","+",".join(value)
+        elif table_type == "query":
+            # templist = []
+            # for a0 in value[0]: #list of targets
+            #     templist.append(a0[0])
+            #     for b0 in a0[1:]: #b0[0] - target name
+            #         templist.append(str(b0[0]))
+            #         for c0 in b0[1:]:
+            #             if isinstance(c0, (int, long)):
+            #                 templist.append(str(c0))
+            #             else:
+            #                 for d0 in c0:
+            #                     print c0, d0
+            #                     templist.append(str(d0))
+            # if isinstance(value[1], basestring):
+            #     templist.append(value[1])
+            # else:
+            #     for e0 in value[1]:
+            #         templist.append(str(e0))
+            # print templist
+            # print >> bltableout_file, key+","+",".join(templist)
+            print >> bltableout_file, key, value
 
 #function to return a list for dict like this:
 #dict[query] = [target_f, target_r, target_b, query_f, query_r, query_b, eval, bitscore]
@@ -451,9 +471,6 @@ def dumper(inplist, extractiontype):
 
 debugfile = open("mainblparser.log", "w")
 
-qout = open("mainblparser_qtable.tab", "w")
-tout = open("mainblparser_ttable.tab", "w")
-
 messagefunc("mainblparser run with option "+filefolder+" selected", debugfile, False)
 messagefunc("command line parameters: "+' '.join(sys.argv), debugfile, False)
 
@@ -569,8 +586,12 @@ for b in blastlist:
                 final_target_table[t[0]].append(query)
             else:
                 final_target_table[t[0]] = [query]
-    bltableout(final_table,qout)
-    bltableout(final_target_table,tout)
+    qout = open(b.split("/")[-1]+"_qtable.tab", "w")
+    tout = open(b.split("/")[-1]+"_ttable.tab", "w")
+    bltableout(final_table,qout, "query")
+    bltableout(final_target_table,tout, "target")
+    qout.close()
+    tout.close()
 
 #####-----------------------------------------------------------------------
 
@@ -633,6 +654,5 @@ for w in warninglist:
 
 print >> debugfile, "done"
 debugfile.close()
-qout.close()
-tout.close()
+
 print "done"
