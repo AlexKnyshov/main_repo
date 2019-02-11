@@ -147,7 +147,7 @@ def reciprocator(inpdict, query, range1, range2, emax, bitscore, target):
 def bltableout(output, bltableout_file, table_type):
     for key, value in sorted(output.items()):
         if table_type == "target":
-            print >> bltableout_file, key+","+",".join(value)
+            print >> bltableout_file, key+","+str(len(value))+","+",".join(value)
         elif table_type == "query":
             # templist = []
             # for a0 in value[0]: #list of targets
