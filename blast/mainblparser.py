@@ -9,7 +9,7 @@ import sys
 import math
 import itertools
 import datetime
-if len(sys.argv) == 10:
+if len(sys.argv) == 11:
     blastfilearg = sys.argv[1]
     targetf = sys.argv[2]
     queryf = sys.argv[3] #add possibility to interpret this as query file, split it per locus and 
@@ -30,14 +30,18 @@ if len(sys.argv) == 10:
         interstich = True
     else:
         interstich = False
-    print blastfilearg, targetf, queryf, evalue, "filefolder:",filefolder, "extractiontype:",extractiontype, "contignum:",contignum, "reciprocate:", reciprocate, "interstich:",interstich
+    if sys.argv[10] == "-allow_ovlp":
+        allow_ovlp = True
+    else:
+        allow_ovlp = False
+    print blastfilearg, targetf, queryf, evalue, "filefolder:",filefolder, "extractiontype:",extractiontype, "contignum:",contignum, "reciprocate:", reciprocate, "interstich:",interstich, "allow_ovlp:", allow_ovlp
 else:
-    print "FORMAT: python mainblparser.py [blast file or folder] [target file or folder] [query folder] [evalue] [single (-S)/ multiple file mode (-M)] [extraction type] [number of target contigs per query (if 0, extract all)] [check reciprocal best match] [perform intercontig stiching]"
+    print "FORMAT: python mainblparser.py [blast file or folder] [target file or folder] [query folder] [evalue] [single (-S)/ multiple file mode (-M)] [extraction type] [number of target contigs per query (if 0, extract all)] [check reciprocal best match] [perform intercontig stiching] [allow asymmetrical hit overlap]"
     print ""
     print "Extraction types: -n (normal), -s (only best hit region), -e[value] (only best hit region plus flanks in bp), -a (extract all hit regions and join them), -b (extract region between two outmost blast regions)"
     print ""
-    print "EXAMPLE: python mainblparser.py ./blast_outputs/ /transcriptomes/ ./fasta 1e-40 -M -n 2 -Ry -IMy"
-    print "EXAMPLE: python mainblparser.py blast.tab trinity.fas ./fasta/ 1e-40 -S -n 1 -Rn -IMn"
+    print "EXAMPLE: python mainblparser.py ./blast_outputs/ /transcriptomes/ ./fasta 1e-40 -M -n 2 -Ry -IMy -allow_ovlp"
+    print "EXAMPLE: python mainblparser.py blast.tab trinity.fas ./fasta/ 1e-40 -S -n 1 -Rn -IMn -notallow_ovlp"
     sys.exit()
 
 #reciprocate = True
@@ -254,7 +258,7 @@ def compute_ranks(hits):
     else:
         return [min(eval_max), max(bitscore), min(coord), max(coord)]
 
-def hit_sticher(inpdict, extractiontype):
+def hit_sticher(inpdict, extractiontype, ovlpB):
     outlist = []
     #get best item and its direction
     bhit = -1
@@ -303,14 +307,17 @@ def hit_sticher(inpdict, extractiontype):
                         break
                     elif tovlp <= hit_target_ovl and abs(qovlp-tovlp) >= hit_query_ovl: #hits barely overlap on target but a lot on query -- possibly repeated target region? Select best based on scores
                         #print >> debugfile, "TEST", stichlist[combos[comb][0]],stichlist[combos[comb][1]]
-                        messagefunc("warning: repeated hit region? deleting...", debugfile)
+                        messagefunc("warning: repeated hit region?", debugfile)
                         print >> debugfile, stichlist[combos[comb][0]], stichlist[combos[comb][1]]
-                        if stichlist[combos[comb][0]][6] < stichlist[combos[comb][1]][6] or stichlist[combos[comb][0]][7] > stichlist[combos[comb][1]][7] or abs(stichlist[combos[comb][0]][0]-stichlist[combos[comb][0]][1]) >= abs(stichlist[combos[comb][1]][0]-stichlist[combos[comb][1]][1]):
-                            del stichlist[combos[comb][1]]
+                        if ovlpB:
+                            ovlp = False
                         else:
-                            del stichlist[combos[comb][0]]
-                        ovlp = True
-                        break
+                            if stichlist[combos[comb][0]][6] < stichlist[combos[comb][1]][6] or stichlist[combos[comb][0]][7] > stichlist[combos[comb][1]][7] or abs(stichlist[combos[comb][0]][0]-stichlist[combos[comb][0]][1]) >= abs(stichlist[combos[comb][1]][0]-stichlist[combos[comb][1]][1]):
+                                del stichlist[combos[comb][1]]
+                            else:
+                                del stichlist[combos[comb][0]]
+                            ovlp = True
+                            break
                     elif (float(tovlp) / abs(stichlist[combos[comb][0]][0]-stichlist[combos[comb][0]][1]))*100 > 10 and qovlp == 0: #hits overlapping on target but not on query - remove as well as before
                         messagefunc("warning: disjunct query hits, deleting...", debugfile)
                         print >> debugfile, stichlist[combos[comb][0]], stichlist[combos[comb][1]], (float(tovlp) / abs(stichlist[combos[comb][0]][0]-stichlist[combos[comb][0]][1]))*100
@@ -556,7 +563,7 @@ for b in blastlist:
                 tname1 = sorted_evals.pop(0)
                 del sorted_bits[0]
                 #SELECT OPTION:
-                targets.append([tname1, hit_sticher(output[0][query][tname1], extractiontype)])
+                targets.append([tname1, hit_sticher(output[0][query][tname1], extractiontype, allow_ovlp)])
             messagefunc("best matching contig: "+targets[0][0]+", total contigs: "+str(len(targets)), debugfile)
             #print >> debugfile, targets
             #CHECK TARGETS FOR OVERLAP
