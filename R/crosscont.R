@@ -4,6 +4,8 @@ filepath <- args[1]
 files <- list.files(path=filepath, pattern="*.fas", full.names=T, recursive=FALSE)
 write("###", "out.tab")
 for (f in files){
+  print("---------------------------------------------------------------")
+  print(f)
   locus <- read.dna(f, format="fasta", as.character = F)
   #print(dist.dna(locus, model = "raw", pairwise.deletion = T, as.matrix = T))
 	mx <- dist.dna(locus, model = "raw", pairwise.deletion = T, as.matrix = T)
@@ -13,8 +15,6 @@ for (f in files){
 	#mx[lower.tri(mx, diag = T)] <- NA
 	mx2 <- which(mx < 0.01, arr.ind = TRUE)
 	if (length(mx2) > 0){
-	  print("---------------------------------------------------------------")
-	  print(f)
 	  cout1 <- character(length = 0)
 	  #print(unique(rownames(mx2)))
 	  for (r in 1:nrow(mx2)){
