@@ -429,14 +429,14 @@ def get_sequence(inplist, seq, extractiontype):
         for i in inplist[1:]:
             if type(i) is not int:
                 if f1:
-                    start = min(i[:2])-1
+                    start = min(i[:2])
                     end = max(i[:2])
                     f1 = False
                 else:
-                    start = min(start, i[0], i[1])-1
+                    start = min(start, i[0], i[1])
                     end = max(end, i[0], i[1])
-        finalseq = seq.seq[start:end]
-        print >> debugfile, "opt -b seq start", start, "end", end
+        finalseq = seq.seq[start-1:end]
+        print >> debugfile, "opt -b seq start", start-1, "end", end
         #messagefunc("running extractor: final range "+str([start, end])+", length "+str(len(finalseq)), debugfile)
     elif extractiontype == "-n":
         finalseq = seq.seq
