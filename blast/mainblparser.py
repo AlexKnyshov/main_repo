@@ -436,6 +436,7 @@ def get_sequence(inplist, seq, extractiontype):
                     start = min(start, i[0], i[1])-1
                     end = max(end, i[0], i[1])
         finalseq = seq.seq[start:end]
+        print >> debugfile, "opt -b seq start", start, "end", end
         #messagefunc("running extractor: final range "+str([start, end])+", length "+str(len(finalseq)), debugfile)
     elif extractiontype == "-n":
         finalseq = seq.seq
