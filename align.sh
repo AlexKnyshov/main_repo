@@ -34,13 +34,12 @@ elif [[ $3 == slow ]]
 then
 	ADJ="--adjustdirectionaccurately"
 fi
-
+mkdir ./realigned/
 for alf in $1*fas
 do
 	echo "processing file" $alf
-	outf=$(echo $alf | cut -d"/" -f3 | cut -d"." -f1,2)
-	echo "./realigned/$outf.fas"
-	mkdir ./realigned
-	mafft $ADJ $ALG --thread $4 --inputorder "$alf" > "./realigned/$outf.fas"
+	outf=$(echo $alf | rev | cut -d"/" -f1 | rev)
+	echo "./realigned/$outf"
+	mafft $ADJ $ALG --thread $4 --inputorder "$alf" > "./realigned/$outf"
 	#mafft --genafpair --maxiterate 1000 --adjustdirection $alf
 done
