@@ -19,7 +19,7 @@ else:
 	print "FORMAT: python customtrim.py [folder with fasta] [trimming option: -a, -1, -%, -refine, -d, -d%, -tiger] ([trimlist])"
 	print "EXAMPLE: python customtrim.py ./fasta -%"
 	print "EXAMPLE: python customtrim.py ./fasta -1 trimlist.txt"
-	print "EXAMPLE: python customtrim.py ./fasta -tiger bad_positions.txt"
+	print "EXAMPLE: python customtrim.py ./fasta -tiger .tig"
 	sys.exit()
 if len(files) == 0:
 	print "no fasta files in the directory"
@@ -190,7 +190,7 @@ for f in files:
 			if misdata <= (len(names)*float(trimopt[3:])):
 				positions.append(basenum)
 	elif trimopt == "-tiger":
-		with open(tiger_file) as tf:
+		with open(fnew[-1]+tiger_file) as tf:
 			badpos = tf.readline().strip().split("=")[1].split()
 		positions = []
 		for basenum in range(len(seqs[names[0]])):
