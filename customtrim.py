@@ -13,10 +13,13 @@ if len(sys.argv) >= 3:
 	trimopt = sys.argv[2]
 	if trimopt == "-a" or trimopt == "-1" or trimopt[:3] == "-d%":
 		exclusion_file = sys.argv[3]
+	elif trimopt == "-tiger":
+		tiger_file = sys.argv[3]
 else:
-	print "FORMAT: python customtrim.py [folder with fasta] [trimming option: -a, -1, -%, -refine, -d, -d%] ([trimlist])"
+	print "FORMAT: python customtrim.py [folder with fasta] [trimming option: -a, -1, -%, -refine, -d, -d%, -tiger] ([trimlist])"
 	print "EXAMPLE: python customtrim.py ./fasta -%"
 	print "EXAMPLE: python customtrim.py ./fasta -1 trimlist.txt"
+	print "EXAMPLE: python customtrim.py ./fasta -tiger bad_positions.txt"
 	sys.exit()
 if len(files) == 0:
 	print "no fasta files in the directory"
@@ -186,6 +189,13 @@ for f in files:
 					break
 			if misdata <= (len(names)*float(trimopt[3:])):
 				positions.append(basenum)
+	elif trimopt == "-tiger":
+		with open(tiger_file) as tf:
+			badpos = tf.readline().strip().split("=")[1].split()
+		positions = []
+		for basenum in range(len(seqs[names[0]])):
+			if basenum+1 not in badpos:
+				positions.append(basenum)
 	#print startpos, "startpos"
 	#reverse trim
 	if trimopt == "-a" and reftaxa == True:
@@ -273,7 +283,7 @@ for f in files:
 
 	#writing to files
 	if endpos-startpos > 0 or trimopt == "-d" or trimopt[:3] == "-d%" and reftaxa == True:
-		if (trimopt == "-d" or trimopt[:3] == "-d%" and reftaxa == True) and len(positions) > 0:
+		if (trimopt == "-tiger" or trimopt == "-d" or trimopt[:3] == "-d%" and reftaxa == True) and len(positions) > 0:
 			outfile = open(fn2, "w")
 			align = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna)) # new ali
 			for tempseq in inputalignment:
@@ -285,7 +295,7 @@ for f in files:
 			for aliseq in align:
 				print >> outfile, ">"+aliseq.id, "\n", aliseq.seq
 			outfile.close()
-		elif (trimopt == "-d" or trimopt[:3] == "-d%" and reftaxa == True) and len(positions) == 0:
+		elif (trimopt == "-tiger" or trimopt == "-d" or trimopt[:3] == "-d%" and reftaxa == True) and len(positions) == 0:
 			print >> outf, len(positions), "good positions, skipping the locus..."
 			warninglist.append(f)
 		else:
@@ -303,7 +313,7 @@ for f in files:
 	#hashes = '#' * int(progbar * 0.2)
 	#spaces = ' ' * (20 - len(hashes))
 	#print "\rProgress: [{0}] {1}%".format(hashes + spaces, progbar)
-	if trimopt == "-d" or trimopt[:3] == "-d%":
+	if trimopt == "-d" or trimopt[:3] == "-d%" or trimopt == "-tiger":
 		prog = str(progbar)+"% working on file "+str(f)+": "+str(len(positions))+" good positions"
 	else:
 		prog = str(progbar)+"% working on file "+str(f)+": starts "+str(startpos)+", ends "+str(endpos)
