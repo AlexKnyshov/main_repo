@@ -190,7 +190,7 @@ for f in files:
 			if misdata <= (len(names)*float(trimopt[3:])):
 				positions.append(basenum)
 	elif trimopt == "-tiger":
-		with open(fnew[-1]+tiger_file) as tf:
+		with open(f+tiger_file) as tf:
 			badpos = tf.readline().strip().split("=")[1].split()
 		positions = []
 		for basenum in range(len(seqs[names[0]])):
