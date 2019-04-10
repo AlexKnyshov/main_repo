@@ -191,7 +191,8 @@ for f in files:
 				positions.append(basenum)
 	elif trimopt == "-tiger":
 		with open(f+tiger_file) as tf:
-			badpos = tf.readline().strip().split("=")[1].split()
+			badpos = [int(s) for s in tf.readline().strip().split("=")[1].strip(";").split()]
+			#badpos = tf.readline().strip().split("=")[1].strip(";").split()
 		positions = []
 		for basenum in range(len(seqs[names[0]])):
 			if basenum+1 not in badpos:
