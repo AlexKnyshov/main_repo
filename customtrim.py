@@ -275,7 +275,7 @@ for f in files:
 		endpos = potential_endpos
 	#print endpos, "endpos"
 	infile.close()
-	if trimopt == "-d" or trimopt[:3] == "-d%" and reftaxa == True:
+	if trimopt == "-tiger" or trimopt == "-d" or trimopt[:3] == "-d%" and reftaxa == True:
 		print >> outf, len(positions),"good positions:", positions
 	else:
 		print >> outf, "startpos: ", startpos
