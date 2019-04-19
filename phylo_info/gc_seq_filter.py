@@ -31,27 +31,22 @@ for f in files:
 	alignment = AlignIO.read(infile, "fasta")
 	allen = float(alignment.get_alignment_length())
 	seqlist = {}
+	outliers = []
 	for seq in alignment:
 		if len(str(seq.seq).replace("-","").replace("N","")) / allen > 0.25:
 			seqlist[seq.id] = GC(seq.seq)
+		else:
+			outliers.append(seq.id)
 	avg = numpy.mean(seqlist.values())
-	outliers = []
 	for k, v in seqlist.items():
 		if abs(v-avg) > 20:
 			print >> outf, "locus", fl, "outlier", k, "gc", v, "avg", avg
-			# print "avg", avg
 			outliers.append(k)
 	aliout = open("./gc_reduced/"+fl, "w")
 	for seq in alignment:
 		if seq.id not in outliers:
 			print >> aliout, ">"+seq.id, "\n", seq.seq
-	# aliin = open(f, "rU")
-	# for seq in SeqIO.parse(aliin, "fasta"):
-	# 	if seq.id not in outliers:
-	# 	 	print >> aliout, ">"+seq.id, "\n", seq.seq
- # 	status = "long branches detected"
 	aliout.close()
-	# aliin.close()
 	infile.close()
 outf.close()
 print "done"
