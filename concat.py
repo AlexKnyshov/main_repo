@@ -47,7 +47,7 @@ if len(sys.argv) >= 3:
 	partnum = sys.argv[2]
 
 else:
-	print "FORMAT: python concat.py [folder with fasta] [split to codon positions: -3 (yes), -1 (no), -tnt, -nex]"
+	print "FORMAT: python concat.py [folder with fasta] [split to codon positions: -3 (yes), -1 (no), -12 (combine first two), -12a (combine first two across all), -tnt, -nex]"
 	print "EXAMPLE: python concat.py ./fasta -1"
 	print "output is written to COMBINED.phy, partitions are written to partitions.prt"
 	sys.exit()
@@ -97,6 +97,9 @@ start = 0
 end = 0
 if partnum != "-tnt" and partnum != "-nex":
 	outputfile = open("partitions.prt", "w")
+if partnum == "-12a":
+	range12 = []
+	range3 = []
 models = []
 starts = []
 ends = []
@@ -159,6 +162,19 @@ for f in files:
 			print >> outputfile, model+", "+fn+"-3="+str(start+3)+"-"+str(end+1)+"\\3"
 		else:
 			print >> outputfile, model+", "+fn+"="+str(start+1)+"-"+str(end+1)
+	elif partnum == "-12":
+		if model == "DNA":
+			print >> outputfile, model+", "+fn+"-12="+str(start+1)+"-"+str(end+1)+"\\3, "+str(start+2)+"-"+str(end+1)+"\\3"
+			print >> outputfile, model+", "+fn+"-3="+str(start+3)+"-"+str(end+1)+"\\3"
+		else:
+			print >> outputfile, model+", "+fn+"="+str(start+1)+"-"+str(end+1)
+	elif partnum == "-12a":
+		if model == "DNA":
+			range12.append(str(start+1)+"-"+str(end+1)+"\\3")
+			range12.append(str(start+2)+"-"+str(end+1)+"\\3")
+			range3.append(str(start+3)+"-"+str(end+1)+"\\3")
+		else:
+			print "model", model, "is not supported, opt -12a is only for DNA"
 	elif partnum == "-1":
 	 	print >> outputfile, model+", "+fn+"="+str(start+1)+"-"+str(end+1)
 	prog = "working on partition "+str(fn)+": starts "+str(start+1)+", ends "+str(end+1)
@@ -235,5 +251,8 @@ else:
 	for rec in final_matrix.keys():
 		print >> outf, str(rec)+" "+str(final_matrix[rec])
 	outf.close()
+	if partnum == "-12a":
+		print >> outputfile, model+", concat-12="+",".join(range12)
+		print >> outputfile, model+", concat-3="+",".join(range3)
 	outputfile.close()
 print "\ndone"
