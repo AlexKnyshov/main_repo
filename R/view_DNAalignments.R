@@ -168,7 +168,7 @@ for (y in c(1:t))
     if (opt == "-d"){
     image(loci[[x]], main=files[x], show.labels = T, legend = F, cex.lab=1, cex.axis=1, mgp=c(3,.1,0))
     } else if(opt=="-t"){
-      plot(trees[[x]], main=names[x], label.offset=0.01, cex=1.6, edge.width=3)
+      plot(trees[[x]], main=names[x], show.tip.label = F, edge.width=3)
     } else if(opt=="-a"){
       image_alex.AAbin(loci[[x]], main=files[x], show.labels = T, legend = F, cex.lab=1, cex.axis=1, mgp=c(3,.1,0))
     }
