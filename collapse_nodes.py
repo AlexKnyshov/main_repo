@@ -14,7 +14,7 @@ def tabulate_names(tree):
 #-------------------------------------------------------
 
 f = sys.argv[1]
-trsh = sys.argv[2]
+trsh = int(sys.argv[2])
 
 tree = Phylo.read(f, "newick")
 
