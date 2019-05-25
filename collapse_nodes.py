@@ -14,10 +14,11 @@ def tabulate_names(tree):
 #-------------------------------------------------------
 
 f = sys.argv[1]
+trsh = sys.argv[2]
 
 tree = Phylo.read(f, "newick")
 
-tree.collapse_all(lambda c: c.confidence is not None and c.confidence < 70)
+tree.collapse_all(lambda c: c.confidence is not None and c.confidence < trsh)
 
 
 
