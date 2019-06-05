@@ -1,0 +1,6 @@
+library (ape)
+library (phangorn)
+args = commandArgs(trailingOnly=TRUE)
+start <- read.tree(args[1])
+nnis <- nni(start)
+write.tree(nnis, "nni_tree.tre")
