@@ -32,7 +32,7 @@ with open(prts, "rb") as prtfile:
 	for row in prtfile:
 		row1 = row.strip().split(" ")[1].split("=")
 		prtout[row1[0]] = [int(i) for i in row1[1].split("-")]
-print prtout["L74.fas"]
+#print prtout["L74.fas"]
 
 
 finaout = open("prtlls.csv","w")
