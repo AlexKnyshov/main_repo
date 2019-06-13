@@ -22,10 +22,10 @@ for (f in files){
 	  	name1 <- unlist(strsplit(rownames(mx)[mx2[r,1]], "\\|"))
 	  	#print(name1)
 	  	name2 <- unlist(strsplit(rownames(mx)[mx2[r,2]], "\\|"))
-	  	print (rownames(mx)[mx2[r,1]])
+	  	#print (rownames(mx)[mx2[r,1]])
 	  	if (name1[1] == name2[1]){
-	  		len1 <- length(locus_text$rownames(mx)[mx2[r,1]])
-	  		len2 <- length(locus_text$rownames(mx)[mx2[r,2]])
+	  		len1 <- length(locus_text[rownames(mx)[mx2[r,1]]])
+	  		len2 <- length(locus_text[rownames(mx)[mx2[r,2]]])
 	  		print(paste0(name1,"_",len1))
 	  		print(paste0(name2,"_",len2))
 	  	}
