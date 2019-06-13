@@ -13,20 +13,33 @@ for (f in files){
 	rownames(mx) <- trimws(rownames(mx))
 	colnames(mx) <- trimws(colnames(mx))
 	diag(mx) <- NA
+  loop_OK <- TRUE
+  while (loop_OK == TRUE){
 	#mx[lower.tri(mx, diag = T)] <- NA
 	mx2 <- which(mx < 0.01, arr.ind = TRUE)
 	if (length(mx2) > 0){
 	  cout1 <- character(length = 0)
 	  #print(unique(rownames(mx2)))
 	  for (r in 1:nrow(mx2)){
+	  	loop_OK <- FALSE
 	  	name1 <- unlist(strsplit(rownames(mx)[mx2[r,1]], "\\|"))
 	  	name2 <- unlist(strsplit(rownames(mx)[mx2[r,2]], "\\|"))
 	  	#print (names(locus_text))
 	  	if (name1[1] == name2[1]){
 	  		len1 <- length(locus_text[rownames(mx)[mx2[r,1]],][locus_text[rownames(mx)[mx2[r,1]],]!="-"])
 	  		len2 <- length(locus_text[rownames(mx)[mx2[r,2]],][locus_text[rownames(mx)[mx2[r,2]],]!="-"])
-	  		print(paste0(name1,"_",len1))
-	  		print(paste0(name2,"_",len2))
+	  		if (len1 >= len2){
+	  			print(paste0("excluded:_",rownames(mx)[mx2[r,2]]))
+	  			mx <- mx[-mx2[r,2],-mx2[r,2]]
+	  			loop_OK <- TRUE
+	  			break
+	  		}
+	  		else {
+				print(paste0("excluded:_",rownames(mx)[mx2[r,1]]))
+				mx <- mx[-mx2[r,1],-mx2[r,1]]
+				loop_OK <- TRUE
+	  			break
+	  		}
 	  	}
 	    # if(grepl("Vescia", rownames(mx)[mx2[r,1]]) == T & grepl("Vescia", rownames(mx)[mx2[r,2]])== T){
 	    #   print("Vescia, skipped")
@@ -63,4 +76,5 @@ for (f in files){
 	  # f1 <- paste("./ccout/", unlist(strsplit(f, "//"))[2], sep='')
 	  # write.FASTA(locus, f1)
 	}
+}
 }
