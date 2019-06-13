@@ -20,8 +20,8 @@ for (f in files){
 	if (length(mx2) > 0){
 	  cout1 <- character(length = 0)
 	  #print(unique(rownames(mx2)))
+	  loop_OK <- FALSE
 	  for (r in 1:nrow(mx2)){
-	  	loop_OK <- FALSE
 	  	name1 <- unlist(strsplit(rownames(mx)[mx2[r,1]], "\\|"))
 	  	name2 <- unlist(strsplit(rownames(mx)[mx2[r,2]], "\\|"))
 	  	#print (names(locus_text))
