@@ -30,7 +30,7 @@ for (f in files){
 	  		len2 <- length(locus_text[rownames(mx)[mx2[r,2]],][locus_text[rownames(mx)[mx2[r,2]],]!="-"])
 	  		if (len1 >= len2){
 	  			# print(paste0("good:_",rownames(mx)[mx2[r,1]]))
-	  			print(paste0("excluded:_",rownames(mx)[mx2[r,2]]))
+	  			# print(paste0("excluded:_",rownames(mx)[mx2[r,2]]))
 	  			cout1 <- c(cout1,(rownames(mx)[mx2[r,2]]))
 	  			mx <- mx[-mx2[r,2],-mx2[r,2]]
 	  			loop_OK <- TRUE
@@ -38,7 +38,7 @@ for (f in files){
 	  		}
 	  		else {
 	  			# print(paste0("good:_",rownames(mx)[mx2[r,2]]))
-				print(paste0("excluded:_",rownames(mx)[mx2[r,1]]))
+				# print(paste0("excluded:_",rownames(mx)[mx2[r,1]]))
 				cout1 <- c(cout1,(rownames(mx)[mx2[r,1]]))
 				mx <- mx[-mx2[r,1],-mx2[r,1]]
 				loop_OK <- TRUE
