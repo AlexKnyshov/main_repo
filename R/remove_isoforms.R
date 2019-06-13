@@ -7,6 +7,7 @@ for (f in files){
   print("---------------------------------------------------------------")
   print(f)
   locus <- read.dna(f, format="fasta", as.character = F)
+  locus_text <- read.dna(f, format="fasta", as.character = T)
   #print(dist.dna(locus, model = "raw", pairwise.deletion = T, as.matrix = T))
 	mx <- dist.dna(locus, model = "raw", pairwise.deletion = T, as.matrix = T)
 	rownames(mx) <- trimws(rownames(mx))
@@ -21,8 +22,8 @@ for (f in files){
 	  	name1 <- unlist(strsplit(rownames(mx)[mx2[r,1]], "|"))
 	  	name2 <- unlist(strsplit(rownames(mx)[mx2[r,2]], "|"))
 	  	if (name1[1] == name2[1]){
-	  		len1 <- length(locus[rownames(mx)[mx2[r,1]]])
-	  		len2 <- length(locus[rownames(mx)[mx2[r,2]]])
+	  		len1 <- length(locus_text$rownames(mx)[mx2[r,1]])
+	  		len2 <- length(locus_text$rownames(mx)[mx2[r,2]])
 	  		print(paste0(name1,"_",len1))
 	  		print(paste0(name2,"_",len2))
 	  	}
