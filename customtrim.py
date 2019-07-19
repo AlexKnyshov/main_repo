@@ -302,8 +302,10 @@ for f in files:
 			warninglist.append(f)
 		else:
 			outfile = open(fn2, "w")
-			for seq, s in seqs.items():
-				print >> outfile, ">"+seq, "\n", s[startpos:endpos]
+			for tempseq in inputalignment:
+				print >> outfile, ">"+tempseq.id, "\n", tempseq.seq[startpos:endpos]
+			# for seq, s in seqs.items():
+			# 	print >> outfile, ">"+seq, "\n", s[startpos:endpos]
 			outfile.close()
 	else:
 		warninglist.append(f)
