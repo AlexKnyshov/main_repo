@@ -9,17 +9,8 @@ if (length(args) == 0){
 treepath <- args[1]
 seqpath <- args[2]
 threshval <- as.numeric(args[3])
-# 
-# treepath <- "RAxML_bestTree.L217.fas"
-# seqpath <- "L217.fas"
-# threshval <- 4
-# 
-
 
 trs <- read.tree(treepath)
-# if (is.rooted(trs)){
-#   trs <- unroot(trs)
-# }
 
 splittrees <- function(treelist, threshold = 4, return_max = F){
   complete = FALSE
@@ -30,24 +21,27 @@ splittrees <- function(treelist, threshold = 4, return_max = F){
     i = i + 1
     templist <- list()
     complete = T
-    #print (length(treelist))
+
     for (tr1 in treelist){
-      # if (is.rooted(tr1)){
-      #   tr1 <- unroot(tr1)
-      # }
-      #print (tr1)
+
+
       nds <- tr1$edge[which(tr1$edge.length > mean(tr1$edge.length)*threshold)[1],]
-      #print (tr1$edge[which(tr1$edge.length > mean(tr1$edge.length)*threshold)[1],])
-      #if (!is.null(nds) && !is.na(nds)){
+
+      print(nds)
       if (!is.na(nds)){
         if (nds[1] == length(tr1$tip.label)+1){
-          newtr1 <- extract.clade(tr1,nds[2])
+          if (nds[2] <= length(tr1$tip.label)){
+            newtr1 <- drop.tip(tr1, tr1$tip.label[nds[2]])
+          } else {
+            newtr1 <- extract.clade(tr1,nds[2])  
+          }
         } else {
+
           newtr1 <- extract.clade(tr1,nds[1])
         }
-       # print (newtr1)
+
         newtr2 <- drop.tip(tr1, newtr1$tip.label)
-        #print (newtr2)
+
         templist <- c(templist,list(newtr1, newtr2))
         complete = F
       } else {
@@ -65,20 +59,9 @@ splittrees <- function(treelist, threshold = 4, return_max = F){
 }
 trsout <- splittrees(list(trs), threshval, T)
 
-# plot(trs, show.tip.label = F, type="unrooted")
-# edgelabels()
-# nodelabels()
-# newtr1 <- extract.clade(trs,134)
-# plot(newtr1, show.tip.label = F, type="unrooted")
-# nds <- newtr1$edge[which(newtr1$edge.length > mean(newtr1$edge.length)*4)[1],]
-# if (nds[1] == length(newtr1$tip.label)+1){
-#   extract.clade(newtr1,nds[2])
-# }
-# extract.clade(newtr1,8)
-# drop.tip(newtr1, extract.clade(newtr1,nds[2])$tip.label)
 
 locus <- read.dna(seqpath, format="fasta")
-#rownames(locus)
+
 
 if (length(trsout$tip.label)>0){
   seqs <- match(trsout$tip.label,trimws(rownames(locus)))
