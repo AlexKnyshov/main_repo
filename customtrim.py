@@ -47,6 +47,7 @@ warninglist = []
 progbarc = 0
 print "creating log file and output folder..."
 outf = open("customtrim.out", "w")
+print >> outf, "command line parameters:",' '.join(sys.argv)
 
 if not os.path.exists ("./trimmed"):
 	os.makedirs("./trimmed")
