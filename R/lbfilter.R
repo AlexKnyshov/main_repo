@@ -28,7 +28,7 @@ splittrees <- function(treelist, threshold = 4, return_max = F){
       nds <- tr1$edge[which(tr1$edge.length > mean(tr1$edge.length)*threshold)[1],]
 
       print(nds)
-      if (!is.na(nds)){
+      if (!is.na(nds[1]) && !is.na(nds[2])){
         if (nds[1] == length(tr1$tip.label)+1){
           if (nds[2] <= length(tr1$tip.label)){
             newtr1 <- drop.tip(tr1, tr1$tip.label[nds[2]])
