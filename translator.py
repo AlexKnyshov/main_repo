@@ -500,7 +500,7 @@ elif opt == "-u":
 		fn2 = "./translated/"+fn.split(".")[0]+".fas"
 		outfile = open(fn2, "w")
 		for seq in seqs:
-			transseq = seq.seq.translate()
+			transseq = str(seq.seq.translate()).upper().replace("*","X")
 			print >> outfile, ">"+seq.id, "\n", transseq
 		outfile.close()
 if opt == "-orf":
