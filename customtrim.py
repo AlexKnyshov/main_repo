@@ -15,6 +15,12 @@ if len(sys.argv) >= 3:
 		exclusion_file = sys.argv[3]
 	elif trimopt == "-tiger":
 		tiger_file = sys.argv[3]
+	elif trimopt == "-d":
+		ff = sys.argv[3]
+		if ff == "dna":
+			alph = Gapped(IUPAC.ambiguous_dna)
+		elif ff == "prot":
+			alph = Gapped(IUPAC.protein, '-')
 else:
 	print "FORMAT: python customtrim.py [folder with fasta] [trimming option: -a, -1, -%, -refine, -d, -d%, -tiger] ([trimlist])"
 	print "EXAMPLE: python customtrim.py ./fasta -%"
@@ -286,17 +292,33 @@ for f in files:
 	#writing to files
 	if endpos-startpos > 0 or trimopt == "-d" or trimopt[:3] == "-d%" and reftaxa == True:
 		if (trimopt == "-tiger" or trimopt == "-d" or trimopt[:3] == "-d%" and reftaxa == True) and len(positions) > 0:
+			###########################################
+			###change code to output masked file too###
 			outfile = open(fn2, "w")
-			align = MultipleSeqAlignment([], Gapped(IUPAC.ambiguous_dna)) # new ali
+			outmask = open(fn2+"_masked", "w")
+			align = MultipleSeqAlignment([], alph) # new ali
+			alignmasked = MultipleSeqAlignment([], alph) # new ali
+			inpalilen = inputalignment.get_alignment_length()
 			for tempseq in inputalignment:
-				seqrec = SeqRecord(Seq("", Gapped(IUPAC.ambiguous_dna)), id=tempseq.id) #add taxa
-				for p in positions:
-					seqrec += tempseq[p]
+				seqrec = SeqRecord(Seq("", alph), id=tempseq.id) #add taxa
+				maskedseqrec = SeqRecord(Seq("", alph), id=tempseq.id) #add taxa
+				for p in range(inpalilen):
+					# good position
+					if p in positions:
+						seqrec += tempseq[p]
+						maskedseqrec += tempseq[p]
+					#bad position
+					else:
+						maskedseqrec += "$"
 				align.extend([seqrec])
+				alignmasked.extend([maskedseqrec])
 			#AlignIO.write(align, outfile, "fasta")
 			for aliseq in align:
 				print >> outfile, ">"+aliseq.id, "\n", aliseq.seq
 			outfile.close()
+			for aliseq in alignmasked:
+				print >> outmask, ">"+aliseq.id, "\n", aliseq.seq
+			outmask.close()
 		elif (trimopt == "-tiger" or trimopt == "-d" or trimopt[:3] == "-d%" and reftaxa == True) and len(positions) == 0:
 			print >> outf, len(positions), "good positions, skipping the locus..."
 			warninglist.append(f)
