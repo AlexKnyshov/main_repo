@@ -176,7 +176,11 @@ for f in files:
 			for name in names:
 				baselist.append(seqs[name][basenum])
 			for base in baselist:
-				if base == "-" or base == "N" or base == "?":
+				if base == "-" or base == "?":
+					misdata += 1
+				if base == "N" and ff == "dna":
+					misdata += 1
+				if base == "X" and ff == "prot":
 					misdata += 1
 				if misdata > (len(names)*0.4):
 					break
