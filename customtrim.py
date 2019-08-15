@@ -314,10 +314,10 @@ for f in files:
 				alignmasked.extend([maskedseqrec])
 			#AlignIO.write(align, outfile, "fasta")
 			for aliseq in align:
-				print >> outfile, ">"+aliseq.id, "\n", aliseq.seq
+				print >> outfile, ">"+aliseq.id.rstrip(), "\n", aliseq.seq
 			outfile.close()
 			for aliseq in alignmasked:
-				print >> outmask, ">"+aliseq.id, "\n", aliseq.seq
+				print >> outmask, ">"+aliseq.id.rstrip(), "\n", aliseq.seq
 			outmask.close()
 		elif (trimopt == "-tiger" or trimopt == "-d" or trimopt[:3] == "-d%" and reftaxa == True) and len(positions) == 0:
 			print >> outf, len(positions), "good positions, skipping the locus..."

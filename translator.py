@@ -501,7 +501,7 @@ elif opt == "-u":
 		outfile = open(fn2, "w")
 		for seq in seqs:
 			transseq = str(seq.seq.translate()).upper().replace("*","X")
-			print >> outfile, ">"+seq.id, "\n", transseq
+			print >> outfile, ">"+seq.id.rstrip(), "\n", transseq
 		outfile.close()
 if opt == "-orf":
 	outfile.close()
