@@ -12,14 +12,18 @@ if len(sys.argv) == 4:
 		exclusion_file = sys.argv[3]
 	elif sys.argv[2] == "-l" or sys.argv[2] == "-ll":
 		threshold = float(sys.argv[3])
+	elif sys.argv[2] == "-m":
+		trimfolder = sys.argv[3]
+		trimfiles = glob.glob(trimfolder+"/*.fas")
 	else:
 		print "incorrect command line parameters"
 		sys.exit()
 else:
-	print "FORMAT: python removeTaxa.py [folder with fasta] [option: -a (leave specified taxa), -ar (leave and rename specified taxa), -r (rename only specified taxa leaving all the rest unchanged), -e (exclude specified taxa), -l (exclude short seq taxa), -ll (exclude loci with few taxa)] [taxalist (or csv) or lenght percent threshold]"
+	print "FORMAT: python removeTaxa.py [folder with fasta] [option: -a (leave specified taxa), -ar (leave and rename specified taxa), -r (rename only specified taxa leaving all the rest unchanged), -e (exclude specified taxa), -l (exclude short seq taxa), -ll (exclude loci with few taxa), -m (exclude taxa which not present in a companion file)] [taxalist (or csv) or lenght percent threshold or folder to companion files]"
 	print "EXAMPLE: python removeTaxa.py ./fasta -l 0.75"
 	print "EXAMPLE: python removeTaxa.py ./fasta -a list.lst"
 	print "EXAMPLE: python removeTaxa.py ./fasta -r list.csv"
+	print "EXAMPLE: python removeTaxa.py ./fasta -m ./trimmedfasta"
 	sys.exit()
 
 if sys.argv[2] == "-a" or sys.argv[2] == "-e":
@@ -61,25 +65,34 @@ for f in files:
  	else:
 		outputfile=open("./rmtaxaout/"+fn, "w")
 		count = 0
+		if sys.argv[2] == "-m":
+			keeplist = []
+			with open(trimfolder+"/"+fn) as trimhandle:
+				for trimseq in SeqIO.parse(trimhandle, "fasta"):
+					keeplist.append(trimseq.id)
 		for seq in SeqIO.parse(f, "fasta"):
 			if sys.argv[2] == "-e" and seq.id not in exclusion_list:
-				print >> outputfile, ">"+seq.id, "\n", seq.seq
+				print >> outputfile, ">"+seq.id+"\n"+seq.seq
 				count += 1
 			elif sys.argv[2] == "-a" and seq.id in exclusion_list:
-				print >> outputfile, ">"+seq.id, "\n", seq.seq
+				print >> outputfile, ">"+seq.id+"\n"+seq.seq
 				count += 1
 			elif sys.argv[2] == "-ar" and seq.id in exclusion_list:
-				print >> outputfile, ">"+exclusion_list[seq.id], "\n", seq.seq
+				print >> outputfile, ">"+exclusion_list[seq.id]+"\n"+seq.seq
 				count += 1
 			elif sys.argv[2] == "-r":
 				if seq.id in exclusion_list:
-					print >> outputfile, ">"+exclusion_list[seq.id], "\n", seq.seq
+					print >> outputfile, ">"+exclusion_list[seq.id]+"\n"+seq.seq
 				else:
-					print >> outputfile, ">"+seq.id, "\n", seq.seq
+					print >> outputfile, ">"+seq.id+"\n"+seq.seq
 				count += 1
 			elif sys.argv[2] == "-l" and float(len(str(seq.seq).replace("-", "").upper().replace("N", "").replace("?", "").replace("X", "")))/len(seq.seq)>threshold:
-				print >> outputfile, ">"+seq.id, "\n", seq.seq
+				print >> outputfile, ">"+seq.id+"\n"+seq.seq
 				count += 1
+			elif sys.argv[2] == "-m":
+				if seq.id in keeplist:
+					print >> outputfile, ">"+seq.id+"\n"+seq.seq
+					count += 1
 		outputfile.close()
 		if count == 0:
 			os.remove("./rmtaxaout/"+fn)
