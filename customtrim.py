@@ -314,8 +314,9 @@ for f in files:
 					#bad position
 					else:
 						maskedseqrec += "$"
-				align.extend([seqrec])
-				alignmasked.extend([maskedseqrec])
+				if len(str(seqrec.seq).replace("-","").replace("$", "")) / float(len(seqrec.seq)) >= 0.1:
+					align.extend([seqrec])
+					alignmasked.extend([maskedseqrec])
 			#AlignIO.write(align, outfile, "fasta")
 			for aliseq in align:
 				print >> outfile, ">"+aliseq.id
