@@ -2,13 +2,14 @@ library(ape)
 
 args = commandArgs(trailingOnly=TRUE)
 if (length(args) == 0){
-  cat("Syntax: Rscript lbfilter.R [path to tree] [path to alignment] [threshold]\n")
-  cat("Example: Rscript lbfilter.R locus.tre locus.fas 4\n")
+  cat("Syntax: Rscript lbfilter.R [path to tree] [path to alignment] [seq type: dna, prot] [threshold]\n")
+  cat("Example: Rscript lbfilter.R locus.tre locus.fas dna 4\n")
   quit()
 }
 treepath <- args[1]
 seqpath <- args[2]
-threshval <- as.numeric(args[3])
+seqtype <- args[3]
+threshval <- as.numeric(args[4])
 
 trs <- read.tree(treepath)
 
@@ -59,11 +60,21 @@ splittrees <- function(treelist, threshold = 4, return_max = F){
 }
 trsout <- splittrees(list(trs), threshval, T)
 
-
-locus <- read.dna(seqpath, format="fasta")
+if (seqtype == "dna"){
+  locus <- read.dna(seqpath, format="fasta")
+} else if (seqtype == "prot") {
+  library(seqinr)
+  locus <- read.alignment(seqpath, format = "fasta")
+  locus <- as.matrix.alignment(locus)
+  locus <- toupper(locus)
+  locus <- as.AAbin.character(locus)
+} else {
+  cat ("incorrect sequence type in the command, exit\n")
+  quit()
+}
 
 if (length(trsout$tip.label)>0){
-  locus <- locus[trimws(names(locus)) %in% trsout$tip.label]
+  locus <- locus[trimws(rownames(locus)) %in% trsout$tip.label,]
 }
 
 write.FASTA(locus, paste0(seqpath,".edited"))
