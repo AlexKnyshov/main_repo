@@ -63,7 +63,7 @@ trsout <- splittrees(list(trs), threshval, T)
 locus <- read.dna(seqpath, format="fasta")
 
 if (length(trsout$tip.label)>0){
-  locus <- locus[trimws(rownames(locus)) %in% trsout$tip.label,]
+  locus <- locus[trimws(names(locus)) %in% trsout$tip.label]
 }
 
 write.FASTA(locus, paste0(seqpath,".edited"))
