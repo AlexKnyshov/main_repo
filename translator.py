@@ -490,6 +490,8 @@ if opt == "-t" or opt == "-orf":
 			#alignment.seek(0)
 			print >> debug, "---------------------------------------------------------"
 elif opt == "-u":
+	if not os.path.exists ("./nt_translator"):
+		os.makedirs("./nt_translator")
 	for f in files:
 		prog = "working on file "+str(f)
 	 	sys.stdout.write(prog+"\r")
@@ -498,12 +500,31 @@ elif opt == "-u":
 		fnew = f.split("/")
 		fn = fnew[len(fnew)-1]
 		fn2 = "./translated/"+fn.split(".")[0]+".fas"
+		fn3 = "./nt_translator/"+fn.split(".")[0]+".fas"
 		outfile = open(fn2, "w")
+		outfile2 = open(fn3, "w")
 		for seq in seqs:
-			transseq = str(seq.seq.translate()).upper().replace("*","X")
-			print >> outfile, ">"+seq.id.rstrip()
-			print >> outfile, transseq
+			transseq = str(seq.seq.translate()).upper()#.replace("*","X")
+			stopindex = [pos for pos, char in enumerate(transseq) if char == "*"]
+			if len(stopindex) > 0:
+				filtered_nt = ""
+				filtered_aa = ""
+				for basenum in range(0,len(seq.seq),3):
+					if basenum/3 not in stopindex:
+						filtered_aa += transseq[basenum/3]
+						filtered_nt += seq.seq[basenum:basenum+3]
+				if len(filtered_nt) > 0 and len(filtered_aa) > 0:
+					print >> outfile, ">"+seq.id.rstrip()
+					print >> outfile, filtered_aa
+					print >> outfile2, ">"+seq.id.rstrip()
+					print >> outfile2, filtered_nt
+			else:
+				print >> outfile, ">"+seq.id.rstrip()
+				print >> outfile, transseq
+				print >> outfile2, ">"+seq.id.rstrip()
+				print >> outfile2, seq.seq
 		outfile.close()
+		outfile2.close()
 if opt == "-orf":
 	outfile.close()
 if opt == "-t" or opt == "-orf":
