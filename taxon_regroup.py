@@ -54,7 +54,7 @@ for f in files:
 			print >> fhandle2, ">"+str(key)
 			print >> fhandle2, sortdict[key]
 	if sys.argv[1] == "-tree":
-		for key in sorted(sortdict, key = lambda r: d[r.id]):# lambda r: len(str(value).replace("-", "").upper().replace("N", ""))):
+		for key in sorted(sortdict, key = lambda r: d[r]):# lambda r: len(str(value).replace("-", "").upper().replace("N", ""))):
 			print >> fhandle2, ">"+str(key)
 			print >> fhandle2, sortdict[key]
 	if sys.argv[1] == "-seqname":
