@@ -2,7 +2,7 @@ from Bio import SeqIO
 import sys
 
 
-if len(sys.argv) >= 3:
+if len(sys.argv) >= 2:
 	infname = sys.argv[1]
 
 else:
