@@ -2,6 +2,7 @@ from Bio import SeqIO
 import sys
 import os
 import shutil
+import csv
 
 if len(sys.argv) >= 2:
 	blastfile = sys.argv[1]
