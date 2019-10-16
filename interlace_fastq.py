@@ -10,9 +10,10 @@ else:
 	print "FORMAT: argument1 = read1, argument2 = read2, mode = b (use biopython) or t (simple text mode)"
 	print "EXAMPLE: read1.fq read2.fq b"
 	print "EXAMPLE: read1.fq read2.fq t"
-	print "output is written to reads.fq"
+	print "output is written to readsN.fq"
 	sys.exit()
-
+bucket = 0
+readcount = 0
 if mode == "b":
 	from Bio import SeqIO
 	readhandle1 = open(readname1)
@@ -27,7 +28,7 @@ if mode == "b":
 else:
 	readhandle1 = open(readname1)
 	readhandle2 = open(readname2)
-	readhandle3 = open("reads.fq","w")
+	readhandle3 = open("reads"+str(bucket)+".fq","w")
 	r2lines = []
 	for r1line in readhandle1:
 		if len(r2lines) < 4:
@@ -39,6 +40,10 @@ else:
 			r2lines = []
 			print >> readhandle3, r1line.strip()
 			r2lines.append(readhandle2.next().strip())
+		if readcount == 1000000:
+			readhandle3.close()
+			bucket += 1
+			readhandle3 = open("reads"+str(bucket)+".fq","w")
 	if len(r2lines) == 4:
 		for r2line in r2lines:
 			print >> readhandle3, r2line
