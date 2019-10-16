@@ -33,10 +33,7 @@ else:
 	readhandle3 = open(samplename+"."+str(bucket)+".fq","w")
 	r2lines = []
 	for r1line in readhandle1:
-		if len(r2lines) < 4:
-			print >> readhandle3, r1line.strip()
-			r2lines.append(readhandle2.next().strip())
-		else:
+		if len(r2lines) == 4:
 			for r2line in r2lines:
 				print >> readhandle3, r2line
 			r2lines = []
@@ -46,8 +43,15 @@ else:
 				bucket += 1
 				readhandle3 = open(samplename+"."+str(bucket)+".fq","w")
 				readcount = 0
-			print >> readhandle3, r1line.strip()
-			r2lines.append(readhandle2.next().strip())
+		if r1line[0] == "@":
+			wr1 = "@KQ034098:247:HFMH3CCXY:8:1101:"+str(readcount)+":"+str(readcount)+"/1"
+			wr2 = "@KQ034098:247:HFMH3CCXY:8:1101:"+str(readcount)+":"+str(readcount)+"/2"
+			readhandle2.next()
+		else:
+			wr1 = r1line.strip()
+			wr2 = readhandle2.next().strip()
+		print >> readhandle3, wr1
+		r2lines.append(wr2)
 	if len(r2lines) == 4:
 		for r2line in r2lines:
 			print >> readhandle3, r2line
