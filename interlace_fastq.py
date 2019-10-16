@@ -31,6 +31,11 @@ else:
 	readhandle3 = open("reads"+str(bucket)+".fq","w")
 	r2lines = []
 	for r1line in readhandle1:
+		if readcount == 1000000:
+			readhandle3.close()
+			bucket += 1
+			readhandle3 = open("reads"+str(bucket)+".fq","w")
+			readcount = 0
 		if len(r2lines) < 4:
 			print >> readhandle3, r1line.strip()
 			r2lines.append(readhandle2.next().strip())
@@ -41,11 +46,6 @@ else:
 			print >> readhandle3, r1line.strip()
 			r2lines.append(readhandle2.next().strip())
 			readcount += 1
-		if readcount == 1000000:
-			readhandle3.close()
-			bucket += 1
-			readhandle3 = open("reads"+str(bucket)+".fq","w")
-			readcount = 0
 	if len(r2lines) == 4:
 		for r2line in r2lines:
 			print >> readhandle3, r2line
