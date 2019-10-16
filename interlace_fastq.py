@@ -12,8 +12,7 @@ else:
 	print "EXAMPLE: read1.fq read2.fq t"
 	print "output is written to readsN.fq"
 	sys.exit()
-bucket = 0
-readcount = 0
+
 if mode == "b":
 	from Bio import SeqIO
 	readhandle1 = open(readname1)
@@ -26,16 +25,13 @@ if mode == "b":
 	readhandle1.close()
 	readhandle3.close()
 else:
+	bucket = 0
+	readcount = 0
 	readhandle1 = open(readname1)
 	readhandle2 = open(readname2)
 	readhandle3 = open("reads"+str(bucket)+".fq","w")
 	r2lines = []
 	for r1line in readhandle1:
-		if readcount == 1000000:
-			readhandle3.close()
-			bucket += 1
-			readhandle3 = open("reads"+str(bucket)+".fq","w")
-			readcount = 0
 		if len(r2lines) < 4:
 			print >> readhandle3, r1line.strip()
 			r2lines.append(readhandle2.next().strip())
@@ -43,9 +39,14 @@ else:
 			for r2line in r2lines:
 				print >> readhandle3, r2line
 			r2lines = []
+			readcount += 1
+			if readcount == 1000000:
+				readhandle3.close()
+				bucket += 1
+				readhandle3 = open("reads"+str(bucket)+".fq","w")
+				readcount = 0
 			print >> readhandle3, r1line.strip()
 			r2lines.append(readhandle2.next().strip())
-			readcount += 1
 	if len(r2lines) == 4:
 		for r2line in r2lines:
 			print >> readhandle3, r2line
