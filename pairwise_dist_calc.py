@@ -27,14 +27,14 @@ for f in files:
 				match += 1
 			else:
 				mismatch += 1
-	pc_match = str(round(match / float(length) * 100, 3))
+	pc_match = round(match / float(length) * 100, 3)
 	list_pc_match.append(pc_match)
-	pc_mismatch = str(round(mismatch / float(length) * 100, 3))
+	pc_mismatch = round(mismatch / float(length) * 100, 3)
 	list_pc_mismatch.append(pc_mismatch)
-	pc_bait_gap = str(round(bait_gap / float(length) * 100, 3))
+	pc_bait_gap = round(bait_gap / float(length) * 100, 3)
 	list_pc_bait_gap.append(pc_bait_gap)
-	pc_target_gap = str(round(target_gap / float(length) * 100, 3))
+	pc_target_gap = round(target_gap / float(length) * 100, 3)
 	list_pc_target_gap.append(pc_target_gap)
-	print f+'\t'+pc_match+'\t'+pc_mismatch+'\t'+pc_bait_gap+'\t'+pc_target_gap
+	print f+'\t'+str(pc_match)+'\t'+str(pc_mismatch)+'\t'+str(pc_bait_gap)+'\t'+str(pc_target_gap)
 
-print "mean"+'\t'+sum(list_pc_match)/len(list_pc_match)+'\t'+sum(list_pc_mismatch)/len(list_pc_match)+'\t'+sum(list_pc_bait_gap)/len(list_pc_match)+'\t'+sum(list_pc_target_gap)/len(list_pc_match)
+print "mean"+'\t'+str(sum(list_pc_match)/len(list_pc_match))+'\t'+str(sum(list_pc_mismatch)/len(list_pc_match))+'\t'+str(sum(list_pc_bait_gap)/len(list_pc_match))+'\t'+str(sum(list_pc_target_gap)/len(list_pc_match))
