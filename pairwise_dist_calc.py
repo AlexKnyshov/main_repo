@@ -18,9 +18,9 @@ for f in files:
 	mismatch = 0
 	match = 0
 	for pos in range(length):
-		if aln[0][pos] == "-":
+		if aln[0][pos] == "-" or aln[0][pos] == "n":
 			bait_gap += 1
-		elif aln[1][pos] == "-":
+		elif aln[1][pos] == "-" or aln[1][pos] == "n":
 			target_gap += 1
 		else:
 			if aln[0][pos] == aln[1][pos]:
