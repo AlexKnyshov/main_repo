@@ -8,6 +8,8 @@ list_pc_match = []
 list_pc_mismatch = []
 list_pc_bait_gap = []
 list_pc_target_gap = []
+list_bait_len = []
+list_target_len = []
 for f in files:
 	aln = AlignIO.read(open(f), "fasta")
 	for seq in aln:
@@ -17,16 +19,22 @@ for f in files:
 	target_gap = 0
 	mismatch = 0
 	match = 0
+	bait_length = 0
+	target_length = 0
 	for pos in range(length):
 		if aln[0][pos] == "-" or aln[0][pos] == "n" or aln[0][pos] == "N":
 			bait_gap += 1
+			target_length += 1
 		elif aln[1][pos] == "-" or aln[1][pos] == "n" or aln[1][pos] == "N":
 			target_gap += 1
+			bait_length += 1
 		else:
 			if aln[0][pos] == aln[1][pos]:
 				match += 1
 			else:
 				mismatch += 1
+			bait_length += 1
+			target_length += 1
 	pc_match = round(match / float(length) * 100, 3)
 	list_pc_match.append(pc_match)
 	pc_mismatch = round(mismatch / float(length) * 100, 3)
@@ -35,6 +43,8 @@ for f in files:
 	list_pc_bait_gap.append(pc_bait_gap)
 	pc_target_gap = round(target_gap / float(length) * 100, 3)
 	list_pc_target_gap.append(pc_target_gap)
-	print f+'\t'+str(pc_match)+'\t'+str(pc_mismatch)+'\t'+str(pc_bait_gap)+'\t'+str(pc_target_gap)
+	list_bait_len.append(bait_length)
+	list_target_len.append(target_length)
+	print f+'\t'+str(pc_match)+'\t'+str(pc_mismatch)+'\t'+str(pc_bait_gap)+'\t'+str(pc_target_gap)+'\t'+str(bait_length)+'\t'+str(target_length)
 
-print "mean"+'\t'+str(sum(list_pc_match)/len(list_pc_match))+'\t'+str(sum(list_pc_mismatch)/len(list_pc_match))+'\t'+str(sum(list_pc_bait_gap)/len(list_pc_match))+'\t'+str(sum(list_pc_target_gap)/len(list_pc_match))
+print "mean"+'\t'+str(sum(list_pc_match)/len(list_pc_match))+'\t'+str(sum(list_pc_mismatch)/len(list_pc_match))+'\t'+str(sum(list_pc_bait_gap)/len(list_pc_match))+'\t'+str(sum(list_pc_target_gap)/len(list_pc_match))+'\t'+str(sum(list_bait_len)/len(list_pc_match))+'\t'+str(sum(list_target_len)/len(list_pc_match))
