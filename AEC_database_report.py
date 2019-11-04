@@ -154,6 +154,7 @@ if filtername:
 	list1 = set()
 	with open(filtername) as filterhandle:
 		for l in filterhandle:
+			l = l.decode("utf-8-sig").encode("utf-8")
 			list1.add(l.rstrip())
 
 with open(dbname) as dbhandle:
@@ -164,18 +165,20 @@ with open(dbname) as dbhandle:
 		if line[0] != "PBIUSI" and line[0] != '': #only parse lines with USI and not the header
 			if not filtername or line[0] in list1: #only parse lines if no filter file given or if USI is in filter
 				#create new species
-				if line[1]+"_"+line[2] not in main_dict:
-					main_dict[line[1]+"_"+line[2]] = {"Holotype":{},"Paratype":{},"Nontype":{}}
+				main_sp = "main_sp"
+				#alt: main_sp = line[1]+"_"+line[2]
+				if main_sp not in main_dict:
+					main_dict[main_sp] = {"Holotype":{},"Paratype":{},"Nontype":{}}
 				#populate holotype data
 				if line[15] == "Holotype":
-					main_dict[line[1]+"_"+line[2]]["Holotype"] = add_item(line, main_dict[line[1]+"_"+line[2]]["Holotype"])
+					main_dict[main_sp]["Holotype"] = add_item(line, main_dict[main_sp]["Holotype"])
 				#populate paratype data
 				elif line[15] == "Paratype":
-					main_dict[line[1]+"_"+line[2]]["Paratype"] = add_item(line, main_dict[line[1]+"_"+line[2]]["Paratype"])
+					main_dict[main_sp]["Paratype"] = add_item(line, main_dict[main_sp]["Paratype"])
 				#populate other data
 				else:
-					main_dict[line[1]+"_"+line[2]]["Nontype"] = add_item(line, main_dict[line[1]+"_"+line[2]]["Nontype"])
-				c+=1 
+					main_dict[main_sp]["Nontype"] = add_item(line, main_dict[main_sp]["Nontype"])
+				c+=1
 sys.stdout.write("<p>Total records reported: "+str(c)+"\n")
 # print output
 for species, dat in sorted(main_dict.items()):
