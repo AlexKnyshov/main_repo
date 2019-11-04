@@ -14,7 +14,7 @@ def add_item(item, d):
 	#this part multiplies records by number of specimens (in case several on same pin)
 	for r in range(int(item[24])):
 		if item[0] == '':	
-			print "error, record without USI"
+			sys.stdout.write("error, record without USI\n")
 			sys.exit()
 			# usi.append("NA")
 		else:
@@ -89,7 +89,7 @@ def print_data(d):
 								msg3 = locality
 							#print locality
 							sys.stdout.write(msg3)
-							loc_counter = 0
+							col_counter = 0
 							for start_date, val7 in val6.items():
 								for end_date, val8 in val7.items():
 									for collector, val9 in val8.items():
@@ -98,12 +98,12 @@ def print_data(d):
 											total_date = start_date
 										else:
 											total_date = start_date+" - "+end_date
-										if loc_counter > 0:
+										if col_counter > 0:
 											msg3a = "; "+total_date+", "+collector
 										else:
 											msg3a = ", "+total_date+", "+collector
 										sys.stdout.write(msg3a)
-										loc_counter += 1
+										col_counter += 1
 										museum_counter = 0
 										for museum, val10 in val9.items():
 											for sex, USI in sorted(val10.items(), reverse=True):
@@ -145,8 +145,8 @@ def print_data(d):
 												museum_counter += 1
 											#print museum after all groups output
 											sys.stdout.write( " ("+museum+")")
-					#print period after the entire locality output
-					sys.stdout.write(". ")
+							#print period after the entire locality output
+							sys.stdout.write(". ")
 	sys.stdout.write("\n")
 
 
@@ -161,27 +161,28 @@ with open(dbname) as dbhandle:
 	c = 0
 	for line in dbhandle:
 		line = line.rstrip().split("\t")
-		if line[0] != "PBIUSI" and line[0] != '':
-			if not filtername or line[0] in list1:
+		if line[0] != "PBIUSI" and line[0] != '': #only parse lines with USI and not the header
+			if not filtername or line[0] in list1: #only parse lines if no filter file given or if USI is in filter
+				#create new species
 				if line[1]+"_"+line[2] not in main_dict:
-					main_dict[line[1]+"_"+line[2]] = {}
-					main_dict[line[1]+"_"+line[2]]["Holotype"] = {}
-					main_dict[line[1]+"_"+line[2]]["Paratype"] = {}
-					main_dict[line[1]+"_"+line[2]]["Nontype"] = {}
+					main_dict[line[1]+"_"+line[2]] = {"Holotype":{},"Paratype":{},"Nontype":{}}
+				#populate holotype data
 				if line[15] == "Holotype":
 					main_dict[line[1]+"_"+line[2]]["Holotype"] = add_item(line, main_dict[line[1]+"_"+line[2]]["Holotype"])
+				#populate paratype data
 				elif line[15] == "Paratype":
 					main_dict[line[1]+"_"+line[2]]["Paratype"] = add_item(line, main_dict[line[1]+"_"+line[2]]["Paratype"])
+				#populate other data
 				else:
 					main_dict[line[1]+"_"+line[2]]["Nontype"] = add_item(line, main_dict[line[1]+"_"+line[2]]["Nontype"])
 				c+=1 
-print "<p>Total records reported:", c
+sys.stdout.write("<p>Total records reported: "+str(c)+"\n")
 # print output
 for species, dat in sorted(main_dict.items()):
-	print "<h3>"+species+"</h3>"
-	print "<p>Holotype:"
+	sys.stdout.write("<h3>"+species+"</h3>\n")
+	sys.stdout.write("<p>Holotype: ")
 	print_data(main_dict[species]["Holotype"])
-	print "<p>Paratypes:"
+	sys.stdout.write("<p>Paratypes: ")
 	print_data(main_dict[species]["Paratype"])
-	print "<p>Other Specimens Examined:"
+	sys.stdout.write("<p>Other Specimens Examined: ")
 	print_data(main_dict[species]["Nontype"])
