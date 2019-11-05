@@ -154,32 +154,40 @@ if filtername:
 	list1 = set()
 	with open(filtername) as filterhandle:
 		for l in filterhandle:
-			l = l.decode("utf-8-sig").encode("utf-8")
 			list1.add(l.rstrip())
 
 with open(dbname) as dbhandle:
 	main_dict = {} # [genus_species] = {{holotype}, {paratypes}, {nontypes}}
 	c = 0
+	ignored = 0
+	ignore_list = []
 	for line in dbhandle:
 		line = line.rstrip().split("\t")
 		if line[0] != "PBIUSI" and line[0] != '': #only parse lines with USI and not the header
 			if not filtername or line[0] in list1: #only parse lines if no filter file given or if USI is in filter
-				#create new species
-				main_sp = "main_sp"
-				#alt: main_sp = line[1]+"_"+line[2]
-				if main_sp not in main_dict:
-					main_dict[main_sp] = {"Holotype":{},"Paratype":{},"Nontype":{}}
-				#populate holotype data
-				if line[15] == "Holotype":
-					main_dict[main_sp]["Holotype"] = add_item(line, main_dict[main_sp]["Holotype"])
-				#populate paratype data
-				elif line[15] == "Paratype":
-					main_dict[main_sp]["Paratype"] = add_item(line, main_dict[main_sp]["Paratype"])
-				#populate other data
+				if len(line) == 53:
+					#create new species
+					main_sp = "main_sp"
+					#alt: main_sp = line[1]+"_"+line[2]
+					if main_sp not in main_dict:
+						main_dict[main_sp] = {"Holotype":{},"Paratype":{},"Nontype":{}}
+					#populate holotype data
+					if line[15] == "Holotype":
+						main_dict[main_sp]["Holotype"] = add_item(line, main_dict[main_sp]["Holotype"])
+					#populate paratype data
+					elif line[15] == "Paratype":
+						main_dict[main_sp]["Paratype"] = add_item(line, main_dict[main_sp]["Paratype"])
+					#populate other data
+					else:
+						main_dict[main_sp]["Nontype"] = add_item(line, main_dict[main_sp]["Nontype"])
+					c+=1
 				else:
-					main_dict[main_sp]["Nontype"] = add_item(line, main_dict[main_sp]["Nontype"])
-				c+=1
+					ignored += 1
+					ignore_list.append(line[0])
 sys.stdout.write("<p>Total records reported: "+str(c)+"\n")
+sys.stdout.write("<p>Total records ignored: "+str(ignored)+"\n")
+for ii in ignore_list:
+	sys.stdout.write("<p>"+ii+"\n")
 # print output
 for species, dat in sorted(main_dict.items()):
 	sys.stdout.write("<h3>"+species+"</h3>\n")
