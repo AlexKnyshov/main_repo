@@ -415,7 +415,7 @@ if opt == "-t" or opt == "-orf":
 			if opt == "-t":
 				fnew = f.split("/")
 				fn = fnew[len(fnew)-1]
-				fn2 = "./translated/"+fn.split(".")[0]+".fas"
+				fn2 = "./translated/"+".".join(fn.split(".")[:-1])+".fas"
 				outfile = open(fn2, "w")
 				for seq in alignment:
 					t1 = str(seq.seq).replace("-", "N")
@@ -499,8 +499,8 @@ elif opt == "-u":
 		seqs = SeqIO.parse(f, "fasta")
 		fnew = f.split("/")
 		fn = fnew[len(fnew)-1]
-		fn2 = "./translated/"+fn.split(".")[0]+".fas"
-		fn3 = "./nt_translator/"+fn.split(".")[0]+".fas"
+		fn2 = "./translated/"+".".join(fn.split(".")[:-1])+".fas"
+		fn3 = "./nt_translator/"+".".join(fn.split(".")[:-1])+".fas"
 		outfile = open(fn2, "w")
 		outfile2 = open(fn3, "w")
 		for seq in seqs:
