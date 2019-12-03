@@ -11,6 +11,7 @@ else:
 degree_sign="&#176"
 def add_item(item, d):
 	usi = []
+	return_sex = ""
 	#this part multiplies records by number of specimens (in case several on same pin)
 	for r in range(int(item[24])):
 		if item[0] == '':	
@@ -54,7 +55,7 @@ def add_item(item, d):
 			d[item[3]][item[4]] = {item[5] : {item[6] : {item[7] : {item[8] : {item[9] : {item[10] : {item[11] : {item[13] : {item[12] : usi}}}}}}}}}
 	else:
 		d[item[3]] = {item[4] : {item[5] : {item[6] : {item[7] : {item[8] : {item[9] : {item[10] : {item[11] : {item[13] : {item[12] : usi}}}}}}}}}}
-	return d
+	return item[12], d
 
 def print_data(d):
 	for country, val1 in sorted(d.items()):
@@ -158,6 +159,7 @@ if filtername:
 
 with open(dbname) as dbhandle:
 	main_dict = {} # [genus_species] = {{holotype}, {paratypes}, {nontypes}}
+	sex_dict = {}
 	c = 0
 	ignored = 0
 	ignore_list = []
@@ -173,19 +175,25 @@ with open(dbname) as dbhandle:
 						main_dict[main_sp] = {"Holotype":{},"Paratype":{},"Nontype":{}}
 					#populate holotype data
 					if line[15] == "Holotype":
-						main_dict[main_sp]["Holotype"] = add_item(line, main_dict[main_sp]["Holotype"])
+						rs, main_dict[main_sp]["Holotype"] = add_item(line, main_dict[main_sp]["Holotype"])
 					#populate paratype data
 					elif line[15] == "Paratype":
-						main_dict[main_sp]["Paratype"] = add_item(line, main_dict[main_sp]["Paratype"])
+						rs, main_dict[main_sp]["Paratype"] = add_item(line, main_dict[main_sp]["Paratype"])
 					#populate other data
 					else:
-						main_dict[main_sp]["Nontype"] = add_item(line, main_dict[main_sp]["Nontype"])
+						rs, main_dict[main_sp]["Nontype"] = add_item(line, main_dict[main_sp]["Nontype"])
 					c+=1
+					if rs in sex_dict:
+						sex_dict[rs] += 1
+					else:
+						sex_dict[rs] = 1
 				else:
 					ignored += 1
 					ignore_list.append(line[0])
 sys.stdout.write("<p>Total records reported: "+str(c)+"\n")
 sys.stdout.write("<p>Total records ignored: "+str(ignored)+"\n")
+for skey, sval in sex_dict.items():
+	sys.stdout.write("<p>Total "+skey+": "+str(sval)+"\n")
 for ii in ignore_list:
 	sys.stdout.write("<p>"+ii+"\n")
 # print output
