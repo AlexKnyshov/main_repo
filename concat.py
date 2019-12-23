@@ -47,7 +47,7 @@ if len(sys.argv) >= 3:
 	partnum = sys.argv[2]
 
 else:
-	print "FORMAT: python concat.py [folder with fasta] [split to codon positions: -3 (yes), -1 (no), -12 (combine first two), -12a (combine first two across all), -tnt, -nex]"
+	print "FORMAT: python concat.py [folder with fasta] [split to codon positions: -3 (yes), -1 (no), -12 (combine first two), -12a (combine first two across all), -tnt, -nex, -nex2 (recode DNA as discrete)]"
 	print "EXAMPLE: python concat.py ./fasta -1"
 	print "output is written to COMBINED.phy, partitions are written to partitions.prt"
 	sys.exit()
@@ -95,7 +95,7 @@ print "second pass: concatenating..."
 final_matrix = dict.fromkeys(d.keys(),"")
 start = 0
 end = 0
-if partnum != "-tnt" and partnum != "-nex":
+if partnum != "-tnt" and partnum != "-nex" and partnum != "-nex2":
 	outputfile = open("partitions.prt", "w")
 if partnum == "-12a":
 	range12 = []
@@ -215,29 +215,43 @@ if partnum == "-tnt":
 	outf.close()
 elif partnum == "-nex":
 	outf = open("COMBINED.nex", "w")
-	# mline = ""
-	# for part in range(0, len(models)):
-	# 	if models[part] == "MULTI":
-	# 		models[part] = "Standard"
-	# 	if part == 0:
-	# 		mline += models[0]
-	# 		mline += ":"
-	# 		mline += str(starts[0])
-	# 	else:
-	# 		if models[part] != models[part-1]:
-	# 			mline += "-"
-	# 			mline += str(ends[part-1])
-	# 			mline += ","
-	# 			mline += models[part]
-	# 			mline += ":"
-	# 			mline += str(starts[part])
-	# mline += "-"
-	# mline += str(ends[part])
-	# mline += ") interleave=yes  GAP = - MISSING = ? SYMBOLS = \"  0 1 2 3 4 5\";"
+	mline = ""
+	for part in range(0, len(models)):
+		if models[part] == "MULTI":
+			models[part] = "Standard"
+		if part == 0:
+			mline += models[0]
+			mline += ":"
+			mline += str(starts[0])
+		else:
+			if models[part] != models[part-1]:
+				mline += "-"
+				mline += str(ends[part-1])
+				mline += ","
+				mline += models[part]
+				mline += ":"
+				mline += str(starts[part])
+	mline += "-"
+	mline += str(ends[part])
 	print >> outf, "#nexus"
 	print >> outf, "begin data;"
 	print >> outf, "dimensions ntax="+str(len(final_matrix))+" nchar="+str(start)+";"
-	# print >> outf, "format datatype=mixed("+mline
+	print >> outf, "format datatype=mixed("+mline+") interleave=yes  GAP = - MISSING = ?;"
+	print >> outf, "matrix"
+	for rec in final_matrix.keys():
+		print >> outf, str(rec)+"\t"+str(final_matrix[rec])
+	print >> outf, ";"
+	print >> outf, "end;"
+	# print >> outf, "begin sets;"
+	for part in range(0, len(models)):
+		print >> outf, "charset", models[part]+str(part)+"="+str(starts[part])+"-"+str(ends[part])+";"
+	# print >> outf, "end;"
+	outf.close()
+elif partnum == "-nex2":
+	outf = open("COMBINED.nex", "w")
+	print >> outf, "#nexus"
+	print >> outf, "begin data;"
+	print >> outf, "dimensions ntax="+str(len(final_matrix))+" nchar="+str(start)+";"
 	print >> outf, "format datatype=STANDARD interleave=yes  GAP = - MISSING = ? SYMBOLS = \"  0 1 2 3 4 5\";"
 	print >> outf, "matrix"
 	for rec in final_matrix.keys():
