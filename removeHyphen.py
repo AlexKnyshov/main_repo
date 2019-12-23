@@ -28,7 +28,8 @@ for f in files:
 	print "processing file", f
 	outupf = open("./dealigned/"+fnew, "w")
 	for seq in inputf:
-		line = str(seq.seq).replace("-", "").upper().replace("N", "")	
+		line = str(seq.seq).replace("-", "").upper()#.replace("N", "")	
 		print >> outupf, ">"+seq.id, "\n", line
+		#print len(seq.seq), len(line)
 	outupf.close()
 print "done"
