@@ -81,10 +81,10 @@ for f in files:
 		for clade in tree.find_clades():
 			if len(tree.get_path(clade)) > 1:
 				parent = get_parent(tree, clade)
-				if tree.distance(clade, parent) / treeavg > 6:
+				if tree.distance(clade, parent) / treeavg > 3:
 					excludelist.append(clade)#.get_terminals()[0])
 			else:
-				if tree.distance(clade) / treeavg > 6:
+				if tree.distance(clade) / treeavg > 3:
 					excludelist.append(clade)#.get_terminals()[0])
 
 		if len(excludelist)>0:
