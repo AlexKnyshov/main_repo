@@ -61,7 +61,7 @@ for f in files:
  	sys.stdout.flush()
  	if sys.argv[2] == "-ll":
  		if len(list(SeqIO.parse(f, "fasta"))) >= threshold:
- 			shutil.copy2(inputfolder+fn, "./rmtaxaout")
+ 			shutil.copy2(inputfolder+"/"+fn, "./rmtaxaout")
  	else:
 		outputfile=open("./rmtaxaout/"+fn, "w")
 		count = 0
