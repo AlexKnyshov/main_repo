@@ -97,8 +97,13 @@ step_a <- as.numeric(args[3])
 cat("read files...\n")
 mainlen = 0
 if (opt == "-d")
-{loci <- lapply(files, function(x)
 {
+  right = function (string, char){
+  substr(string,nchar(string)-(char-1),nchar(string))
+  }
+  loci <- lapply(files, function(x)
+{
+  cat('\r',right(x,10))
   locus <- read.dna(x, format="fasta", as.character = T)
   locus[order(rownames(locus)),]
   rownames(locus) <- strtrim(rownames(locus), width = 3)
@@ -114,14 +119,21 @@ mainlen <<- length(loci)
 } else if(opt == "-a"){
   loci <- lapply(files, function(x)
   {
-    locus <- read.alignment(x, format = "fasta")
-    locus <- as.matrix.alignment(locus)
-    locus <- toupper(locus)
-    rownames(locus) <- strtrim(rownames(locus), width = 3)
-    locus <- as.AAbin.character(locus)
+    cat('\r',x)
+    if (file.size(x) > 0){
+      locus <- read.alignment(x, format = "fasta")
+      locus <- as.matrix.alignment(locus)
+      locus <- toupper(locus)
+      rownames(locus) <- strtrim(rownames(locus), width = 3)
+      locus <- as.AAbin.character(locus)
+    } else {
+            # error handler picks up where error was generated
+            print(paste("Read.table didn't work!:  ",x))
+    }
   })
   mainlen <<- length(loci)
 }
+cat('\n')
 #main body
 if (mainlen>step_a) #if num files > step
 {
