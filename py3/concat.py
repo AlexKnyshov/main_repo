@@ -58,7 +58,7 @@ nexus = ["nexus", "nex"]
 
 print ("first pass: creating a list of taxa...")
 d = {}
-files = glob.glob(inputfolder+"/*")
+files = sorted(glob.glob(inputfolder+"/*"))
 for f in files:
 	fnew = f.split("/")
 	fn = fnew[len(fnew)-1]
