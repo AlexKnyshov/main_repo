@@ -122,7 +122,7 @@ for f in files:
 			model = "DNA"
 		elif alph == "Prot":
 			alignment = AlignIO.read(f, fformat, alphabet = Gapped(IUPAC.protein, '-'))
-			model = "WAG"
+			model = "LG"
 		length = alignment.get_alignment_length()
 		for seq in alignment:
 			if seq.id in final_matrix:
