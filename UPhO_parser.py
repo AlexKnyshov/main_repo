@@ -24,7 +24,7 @@ maindict = {}
 csvfile = open(csvfilename, "r")
 reader = csv.reader(csvfile)
 for row in reader:
-	maindict[row[0]] = []
+	maindict["_".join(row[0].split("/")[1].split("_")[:-1])] = []
 	for r in row[1:]:
 		if r != '':
 			maindict[row[0]].append(r)
@@ -44,34 +44,3 @@ for key, value in maindict.items():
 #print "read", len(exclusion_list), "records"
 outputfile.close()
 orig.close()
-# print "parsing the files..."
-# for f in files:
-# 	fn = f.split("/")[-1]
-# 	prog = "working on file "+fn
-#  	sys.stdout.write(prog+"\r")
-#  	sys.stdout.flush()
-#  	if sys.argv[2] == "-ll":
-#  		#print len([SeqIO.parse(f, "fasta")])
-#  		if len(list(SeqIO.parse(f, "fasta"))) >= threshold:
-#  			shutil.copy2(inputfolder+fn, "./reduced")
-#  	else:
-# 		outputfile=open("./reduced/"+fn, "w")
-# 		count = 0
-# 		for seq in SeqIO.parse(f, "fasta"):
-# 			#print seq.id, len(str(seq.seq).replace("-", "").replace("N", "")), len(seq.seq), float(len(str(seq.seq).replace("-", "").replace("N", "")))/len(seq.seq)
-# 			if sys.argv[2] == "-e" and seq.id not in exclusion_list:
-# 				print >> outputfile, ">"+seq.id, "\n", seq.seq
-# 				count += 1
-# 			elif sys.argv[2] == "-a" and seq.id in exclusion_list:
-# 				print >> outputfile, ">"+seq.id, "\n", seq.seq
-# 				count += 1
-# 			elif sys.argv[2] == "-ar" and seq.id in exclusion_list:
-# 				print >> outputfile, ">"+exclusion_list[seq.id], "\n", seq.seq
-# 				count += 1
-# 			elif sys.argv[2] == "-l" and float(len(str(seq.seq).replace("-", "").upper().replace("N", "").replace("?", "")))/len(seq.seq)>threshold:
-# 				print >> outputfile, ">"+seq.id, "\n", seq.seq
-# 				count += 1
-# 		outputfile.close()
-# 		if count == 0:
-# 			os.remove("./reduced/"+fn)
-# print "\ndone"
