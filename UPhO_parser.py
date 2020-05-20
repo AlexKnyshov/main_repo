@@ -33,6 +33,7 @@ csvfile.close()
 
 for key, value in maindict.items():
 	orig = open(seqfolder+"/"+key+".fas")
+	print "processing", key
 	outputfile=open("./reduced/"+key+".fas", "w")
 	for seq in SeqIO.parse(orig, "fasta"):
 		if seq.id in value:
