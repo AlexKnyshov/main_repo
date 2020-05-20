@@ -24,10 +24,11 @@ maindict = {}
 csvfile = open(csvfilename, "r")
 reader = csv.reader(csvfile)
 for row in reader:
-	maindict["_".join(row[0].split("/")[1].split("_")[:-1])] = []
+	locus = "_".join(row[0].split("/")[1].split("_")[:-1])
+	maindict[locus] = []
 	for r in row[1:]:
 		if r != '':
-			maindict[row[0]].append(r)
+			maindict[locus].append(r)
 csvfile.close()
 print maindict
 sys.exit()
