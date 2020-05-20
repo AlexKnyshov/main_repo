@@ -30,18 +30,15 @@ for row in reader:
 		if r != '':
 			maindict[locus].append(r)
 csvfile.close()
-print maindict
-sys.exit()
+
 for key, value in maindict.items():
 	if len(maindict) == 1:
-		orig = open(seqfolder+"/"+f.split("bipartitions.")[1].split("_UPhO")[0])
-		outputfile=open("./reduced/"+f.split("bipartitions.")[1].split("_UPhO")[0], "w")
+		orig = open(seqfolder+"/"+key+".fas")
+		outputfile=open("./reduced/"+key+".fas", "w")
 		for seq in SeqIO.parse(orig, "fasta"):
 			if seq.id in value:
 				print >> outputfile, ">"+seq.id.split("|")[0], "\n", seq.seq
 	else:
 		print "skip for now"
-		#len(value)
-#print "read", len(exclusion_list), "records"
-outputfile.close()
-orig.close()
+	outputfile.close()
+	orig.close()
