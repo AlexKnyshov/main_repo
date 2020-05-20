@@ -32,13 +32,10 @@ for row in reader:
 csvfile.close()
 
 for key, value in maindict.items():
-	if len(maindict) == 1:
-		orig = open(seqfolder+"/"+key+".fas")
-		outputfile=open("./reduced/"+key+".fas", "w")
-		for seq in SeqIO.parse(orig, "fasta"):
-			if seq.id in value:
-				print >> outputfile, ">"+seq.id.split("|")[0], "\n", seq.seq
-		outputfile.close()
-		orig.close()
-	else:
-		print "skip for now"
+	orig = open(seqfolder+"/"+key+".fas")
+	outputfile=open("./reduced/"+key+".fas", "w")
+	for seq in SeqIO.parse(orig, "fasta"):
+		if seq.id in value:
+			print >> outputfile, ">"+seq.id.split("|")[0], "\n", seq.seq
+	outputfile.close()
+	orig.close()
