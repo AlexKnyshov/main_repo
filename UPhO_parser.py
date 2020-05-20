@@ -38,7 +38,7 @@ for key, value in maindict.items():
 		for seq in SeqIO.parse(orig, "fasta"):
 			if seq.id in value:
 				print >> outputfile, ">"+seq.id.split("|")[0], "\n", seq.seq
+		outputfile.close()
+		orig.close()
 	else:
 		print "skip for now"
-	outputfile.close()
-	orig.close()
