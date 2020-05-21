@@ -25,10 +25,16 @@ csvfile = open(csvfilename, "r")
 reader = csv.reader(csvfile)
 for row in reader:
 	locus = "_".join(row[0].split("/")[1].split("_")[:-1])
-	maindict[locus] = []
+	taxa = []
 	for r in row[1:]:
 		if r != '':
-			maindict[locus].append(r)
+			taxa.append(r)
+	if locus in maindict:
+		if len(taxa) > len(maindict[locus]):
+			maindict[locus] = taxa
+	else:
+		maindict[locus] = taxa
+	
 csvfile.close()
 
 for key, value in maindict.items():
