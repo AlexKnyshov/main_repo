@@ -11,7 +11,7 @@ if (length(args) == 0){
 }
 
 tree <- read.tree(treefilename)
-seqs <- read.dna(x, format="fasta", as.character = T)
+seqs <- read.dna(seqfilename, format="fasta", as.character = T)
 
 phy1 <- drop.tip(tree, tree$tip.label[!(tree$tip.label %in% rownames(seqs))])
 
