@@ -14,7 +14,7 @@ if len(sys.argv) == 4:
 		threshold = float(sys.argv[3])
 	elif sys.argv[2] == "-m":
 		trimfolder = sys.argv[3]
-		trimfiles = glob.glob(trimfolder+"/*.fas")
+		trimfiles = [os.path.basename(x) for x in glob.glob(trimfolder+"/*.fas")]
 	else:
 		print "incorrect command line parameters"
 		sys.exit()
@@ -67,9 +67,10 @@ for f in files:
 		count = 0
 		if sys.argv[2] == "-m":
 			keeplist = []
-			with open(trimfolder+"/"+fn) as trimhandle:
-				for trimseq in SeqIO.parse(trimhandle, "fasta"):
-					keeplist.append(trimseq.id)
+			if fn in trimfiles:
+				with open(trimfolder+"/"+fn) as trimhandle:
+					for trimseq in SeqIO.parse(trimhandle, "fasta"):
+						keeplist.append(trimseq.id)
 		for seq in SeqIO.parse(f, "fasta"):
 			if sys.argv[2] == "-e" and seq.id not in exclusion_list:
 				print >> outputfile, ">"+seq.id+"\n"+seq.seq
