@@ -9,9 +9,7 @@ with open(infile) as inhandle:
 	counter = 1
 	for seq in seqs:
 		if counter == inrange:
-			outhandle = open(infile+".edited", "w")
-			print >> outhandle, ">"+seq.id
-			print >> outhandle, seq.seq
-			outhandle.close()
+			print ">"+seq.id
+			print seq.seq
 			break
 		counter += 1
