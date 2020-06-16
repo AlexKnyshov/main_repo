@@ -1,18 +1,33 @@
 library(ape)
 library(seqinr)
 args = commandArgs(trailingOnly=TRUE)
-if (length(args) == 0){
-  cat("Syntax: Rscript distfilter.R [path to concat dna] [path to dna folder] [path to concat protein] [path to protein folder]\n")
+argsLen <- length(args);
+if (argsLen == 0){
+  cat("Syntax: Rscript distfilter.R [path to concat dna] [path to dna folder] [path to concat protein] [path to protein folder] ([upperN] ([lowerN])) \n")
   cat("Example: Rscript distfilter.R concatdna.fas ./dna/ concataa.fas ./aa/\n")
+  cat("Example: Rscript distfilter.R concatdna.fas ./dna/ concataa.fas ./aa/ 1.5\n")
+  cat("Example: Rscript distfilter.R concatdna.fas ./dna/ concataa.fas ./aa/ 3 3\n")
   quit()
+}
+if (argsLen == 4) {
+	upperN = 3
+	lowerN = 3
+}
+if (argsLen == 5) {
+	upperN = as.numeric(args[5])
+	lowerN = 3
+}
+if (argsLen == 6) {
+	upperN = as.numeric(args[5])
+	lowerN = as.numeric(args[6])
 }
 FindOutliers <- function(data) {
   lowerq = quantile(data, na.rm = T)[2]
   upperq = quantile(data, na.rm = T)[4]
   iqr = upperq - lowerq #Or use IQR(data)
   # we identify extreme outliers
-  extreme.threshold.upper = (iqr * 3) + upperq
-  extreme.threshold.lower = lowerq - (iqr * 3)
+  extreme.threshold.upper = (iqr * upperN) + upperq
+  extreme.threshold.lower = lowerq - (iqr * lowerN)
   result <- which(data > extreme.threshold.upper | data < extreme.threshold.lower)
 }
 concatdna <- args[1]
