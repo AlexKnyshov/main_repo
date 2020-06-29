@@ -37,10 +37,10 @@ FindOutliers <- function(data) {
   # identify the outliers
   extreme.threshold.upper = (iqr * upperN) + upperq
   extreme.threshold.lower = lowerq - (iqr * lowerN)
-  result <- which(data > extreme.threshold.upper | data < extreme.threshold.lower)
+  return(list(upperO = which(data > extreme.threshold.upper), lowerO=which(data < extreme.threshold.lower)))
 }
 ComputeDistMatrix <- function(alignment) {
-	alignmentmx <- as.phyDat(alignment)
+	alignmentmx <- as.phyDat.AAbin(alignment)
 	dist_mx_dims <- c(length(alignmentmx), length(alignmentmx[[1]]))
 	dist_mx <- matrix(NA, nrow =dist_mx_dims[1], ncol=dist_mx_dims[1], dimnames = list(names(alignmentmx),names(alignmentmx)) )
 	logicmx <- lower.tri(dist_mx,diag = FALSE) 
@@ -118,21 +118,27 @@ for (i in 1:length(commonfiles)){
 		#get difference
 		dnadiff <- avgdnalocusdist - avgdnadistsubset
 		proteindiff <- avgproteinlocusdist - avgproteindistsubset
-		dnaoutliers <- names(dnadiff[FindOutliers(dnadiff)])
-		proteinoutliers <- names(proteindiff[FindOutliers(proteindiff)])
+		NdnaU <- length(FindOutliers(dnadiff)$upperO)
+		NdnaL <- length(FindOutliers(dnadiff)$lowerO)
+		dnaoutliers <- names(dnadiff[c(FindOutliers(dnadiff)$upperO, FindOutliers(dnadiff)$lowerO)])
+		NproteinU <- length(FindOutliers(proteindiff)$upperO)
+		NproteinL <- length(FindOutliers(proteindiff)$lowerO)
+		proteinoutliers <- names(proteindiff[c(FindOutliers(proteindiff)$upperO, FindOutliers(proteindiff)$lowerO)])
 		outliers <- union(dnaoutliers, proteinoutliers)
 		if (length(outliers) / length(nameorder) < 0.5){	
 			if (length(outliers)>0){
 				dnalocus <- dnalocus[!(rownames(dnalocus) %in% outliers),]
 				proteinlocus <- proteinlocus[!(rownames(proteinlocus) %in% outliers),]
-				print(paste0("edited file: ", commonfiles[i], ", discarded ", length(outliers)))
+				print(paste0("edited file: ", commonfiles[i], ", discarded ", length(outliers),
+					", NTU: ", NdnaU, ", NTL: ", NdnaL, ", AAU: ", NproteinU, ", AAL: ", NproteinL))
 			} else {
 				print(paste0("unchanged file: ", commonfiles[i]))
 			}
 			write.FASTA(dnalocus, paste0(dnafile,".edited"))
 			write.FASTA(proteinlocus, paste0(proteinfile,".edited"))
 		} else {
-			print(paste0("removed file: ", commonfiles[i]))
+			print(paste0("removed file: ", commonfiles[i], length(outliers),
+				", NTU: ", NdnaU, ", NTL: ", NdnaL, ", AAU: ", NproteinU, ", AAL: ", NproteinL))
 		}
 	} else {
 		print(paste0("removed empty file: ", commonfiles[i]))
