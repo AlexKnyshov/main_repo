@@ -10,7 +10,7 @@ if len(sys.argv) == 4:
 	files = glob.glob(inputfolder+"/*.fas")
 	if sys.argv[2] == "-a" or sys.argv[2] == "-ar" or sys.argv[2] == "-e" or sys.argv[2] == "-r":
 		exclusion_file = sys.argv[3]
-	elif sys.argv[2] == "-l" or sys.argv[2] == "-ll":
+	elif sys.argv[2] == "-l" or sys.argv[2] == "-ll" or sys.argv[2] == "-la":
 		threshold = float(sys.argv[3])
 	elif sys.argv[2] == "-m":
 		trimfolder = sys.argv[3]
@@ -62,6 +62,9 @@ for f in files:
 	if sys.argv[2] == "-ll":
 		if len(list(SeqIO.parse(f, "fasta"))) >= threshold:
 			shutil.copy2(inputfolder+"/"+fn, "./rmtaxaout")
+	elif sys.argv[2] == "-la":
+ 		if len(SeqIO.parse(f, "fasta").next().seq) >= threshold:
+ 			shutil.copy2(inputfolder+"/"+fn, "./rmtaxaout")
 	else:
 		outputfile=open("./rmtaxaout/"+fn, "w")
 		count = 0
