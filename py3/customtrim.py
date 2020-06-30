@@ -305,9 +305,12 @@ for f in files:
 			warninglist.append(f)
 		else:
 			outfile = open(fn2, "w")
+			outmask = open(fn2+"_masked", "w")
 			for tempseq in inputalignment:
 				print (">"+tempseq.id, "\n", tempseq.seq[startpos:endpos], file=outfile)
+				print (">"+tempseq.id, "\n", ("$"*startpos)+tempseq.seq[startpos:endpos]+("$"*len(tempseq.seq)-endpos-1), file=outmask)
 			outfile.close()
+			outmask.close()
 	else:
 		warninglist.append(f)
 	
