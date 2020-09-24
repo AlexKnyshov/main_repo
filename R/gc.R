@@ -2,8 +2,8 @@ library(ape)
 
 args = commandArgs(trailingOnly=TRUE)
 if (length(args) == 0){
-  cat("Syntax: Rscript gc3.R [path to the folder with alignments]\n")
-  cat("Example: Rscript gc3.R ./fasta/\n")
+  cat("Syntax: Rscript gc.R [path to the folder with alignments]\n")
+  cat("Example: Rscript gc.R ./fasta/\n")
   quit()
 } else if (length(args) == 1){
 	dnaseqpath <- args[1]
@@ -26,20 +26,16 @@ for (i in 1:length(dnafiles)){
 	dnalocus <- read.dna(dnafile, format="fasta", as.character=T, as.matrix=T)
 	# pos1
 	mask = c(T,F,F)
-	#seq based
-	seqbasedGC1 <- getGCcontent(dnalocus[,mask], 1)
-	#pos based
-	posbasedGC1 <- getGCcontent(dnalocus[,mask], 2)
+	seqbasedGC1 <- getGCcontent(dnalocus[,mask], 1) #seq based
+	posbasedGC1 <- getGCcontent(dnalocus[,mask], 2) #pos based
+	# pos2
 	mask = c(F,T,F)
-	#seq based
-	seqbasedGC2 <- getGCcontent(dnalocus[,mask], 1)
-	#pos based
-	posbasedGC2 <- getGCcontent(dnalocus[,mask], 2)
+	seqbasedGC2 <- getGCcontent(dnalocus[,mask], 1) #seq based
+	posbasedGC2 <- getGCcontent(dnalocus[,mask], 2) #pos based
+	# pos3
 	mask = c(F,F,T)
-	#seq based
-	seqbasedGC3 <- getGCcontent(dnalocus[,mask], 1)
-	#pos based
-	posbasedGC3 <- getGCcontent(dnalocus[,mask], 2)
+	seqbasedGC3 <- getGCcontent(dnalocus[,mask], 1) #seq based
+	posbasedGC3 <- getGCcontent(dnalocus[,mask], 2) #pos based
 
 	locidata <- rbind(locidata, data.frame(locus=dnafiles[i],
 		loclen=length(dnalocus[1,]),
