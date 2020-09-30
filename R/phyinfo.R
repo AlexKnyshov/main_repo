@@ -71,4 +71,4 @@ for (prt in 1:length(sets[,1])){
 
   print(paste0("gene ", prtname))
 }
-write.csv(fitAll, "test.csv")
+write.csv(fitAll, "phyinfo.csv")
