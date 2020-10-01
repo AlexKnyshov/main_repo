@@ -2,7 +2,7 @@ import sys
 from Bio import AlignIO
 from Bio.SeqUtils import GC
 
-if len(sys.argv) == 2:
+if len(sys.argv) == 3:
 	infilename = sys.argv[1]
 	informat = sys.argv[2]
 else:
