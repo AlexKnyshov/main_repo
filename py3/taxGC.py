@@ -14,9 +14,9 @@ maindict = {}
 fhandle = open(infilename, "r")
 for seq in AlignIO.read(fhandle, informat):
 	datalist = []
-	datalist.append(str(round(GC(str(seq.seq)),2)))
+	datalist.append(str(round(GC(str(seq.seq).replace("-", "").replace("?", "").upper().replace("N", "")),2)))
 	for pos in range(3):
-		datalist.append(str(round(GC(str(seq.seq)[pos::3]),2)))
+		datalist.append(str(round(GC(str(seq.seq)[pos::3].replace("-", "").replace("?", "").upper().replace("N", "")),2)))
 	maindict[seq.id] = datalist
 
 outhandle = open("GC_per_taxon.csv", "w")
