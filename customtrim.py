@@ -11,8 +11,15 @@ if len(sys.argv) >= 3:
 	inputfolder = sys.argv[1]
 	files = glob.glob(inputfolder+"/*.fas")
 	trimopt = sys.argv[2]
-	if trimopt == "-a" or trimopt == "-1" or trimopt[:3] == "-d%":
+	if trimopt == "-a" or trimopt == "-1":
 		exclusion_file = sys.argv[3]
+	elif trimopt[:3] == "-d%":
+		exclusion_file = sys.argv[3]
+		ff = sys.argv[4]
+		if ff == "dna":
+			alph = Gapped(IUPAC.ambiguous_dna)
+		elif ff == "prot":
+			alph = Gapped(IUPAC.protein, '-')
 	elif trimopt == "-tiger":
 		tiger_file = sys.argv[3]
 	elif trimopt == "-d":
@@ -26,6 +33,7 @@ else:
 	print "EXAMPLE: python customtrim.py ./fasta -%"
 	print "EXAMPLE: python customtrim.py ./fasta -1 trimlist.txt"
 	print "EXAMPLE: python customtrim.py ./fasta -tiger .tig"
+	print "EXAMPLE: python customtrim.py ./fasta -d%0.5 trimlist dna"
 	sys.exit()
 if len(files) == 0:
 	print "no fasta files in the directory"
