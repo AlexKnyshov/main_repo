@@ -26,6 +26,15 @@ else:
 	print ("EXAMPLE: python removeTaxa.py ./fasta -m ./trimmedfasta")
 	sys.exit()
 
+def return_len(inputseq):
+	strseq = str(inputseq)
+	dnaiupac=set("GATCRYWSMKHBVDN-?")
+	leftover = set(strseq.upper()) - dnaiupac
+	if len(leftover) == 0:
+		return float(len(strseq.replace("-", "").upper().replace("?", "").replace("N", "")))/len(strseq)
+	else:
+		return float(len(strseq.replace("-", "").upper().replace("?", "").replace("X", "")))/len(strseq)
+
 if sys.argv[2] == "-a" or sys.argv[2] == "-e":
 	print ("reading taxalist...")
 	exclusion_list = []
@@ -90,9 +99,10 @@ for f in files:
 				else:
 					print (">"+seq.id+"\n"+seq.seq, file=outputfile)
 				count += 1
-			elif sys.argv[2] == "-l" and float(len(str(seq.seq).replace("-", "").upper().replace("N", "").replace("?", "").replace("X", "")))/len(seq.seq)>threshold:
-				print (">"+seq.id+"\n"+seq.seq, file=outputfile)
-				count += 1
+			elif sys.argv[2] == "-l":
+				if return_len(seq.seq) > threshold:
+					print (">"+seq.id+"\n"+seq.seq, file=outputfile)
+					count += 1
 			elif sys.argv[2] == "-m":
 				if seq.id in keeplist:
 					print (">"+seq.id+"\n"+seq.seq, file=outputfile)
