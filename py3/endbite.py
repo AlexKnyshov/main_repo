@@ -23,40 +23,54 @@ with open(infile) as inhandle:
 		posdict = Counter(alignment[:,p])
 		totalnongap = float(len(alignment[:,p].replace("-","")))
 		for s1 in range(len(alignment[:,p])):
-			s = alignment[s1,p]
-			if s != "-" and s!= "X":
-				if alignment[s1].id not in fineseqs and posdict[s] / totalnongap < threshold:
-					if alignment[s1].id in trimdict:
-						trimdict[alignment[s1].id].add(p)
+			if totalnongap > 0:
+				s = alignment[s1,p]
+				if s != "-" and s!= "X":
+					if alignment[s1].id not in fineseqs and posdict[s] / totalnongap < threshold:
+						if alignment[s1].id in trimdict:
+							trimdict[alignment[s1].id].add(p)
+						else:
+							trimdict[alignment[s1].id] = set([p])
 					else:
-						trimdict[alignment[s1].id] = set([p])
+						fineseqs.add(alignment[s1].id)
+			else:
+				if alignment[s1].id in trimdict:
+					trimdict[alignment[s1].id].add(p)
 				else:
-					fineseqs.add(alignment[s1].id)
+					trimdict[alignment[s1].id] = set([p])
 	fineseqs = set()
 	for p in range(allen-1, allen-endlen-1, -1):
 		posdict = Counter(alignment[:,p])
 		totalnongap = float(len(alignment[:,p].replace("-","").replace("X","")))
 		for s1 in range(len(alignment[:,p])):
-			s = alignment[s1,p]
-			if s != "-" and s!= "X":
-				if alignment[s1].id not in fineseqs and posdict[s] / totalnongap < threshold:
-					if alignment[s1].id in trimdict:
-						trimdict[alignment[s1].id].add(p)
+			if totalnongap > 0:
+				s = alignment[s1,p]
+				if s != "-" and s!= "X":
+					if alignment[s1].id not in fineseqs and posdict[s] / totalnongap < threshold:
+						if alignment[s1].id in trimdict:
+							trimdict[alignment[s1].id].add(p)
+						else:
+							trimdict[alignment[s1].id] = set([p])
 					else:
-						trimdict[alignment[s1].id] = set([p])
+						fineseqs.add(alignment[s1].id)
+			else:
+				if alignment[s1].id in trimdict:
+					trimdict[alignment[s1].id].add(p)
 				else:
-					fineseqs.add(alignment[s1].id)
+					trimdict[alignment[s1].id] = set([p])
 
 	#bite internal ends
 	for s in alignment:
 		seqdict = Counter(s)
 		if seqdict["-"] / float(allen) + seqdict["X"] / float(allen) > wingapthresh:
 			junctions = {}
+			winbreak = False
 			for w in range(0, allen, winstep):
 				if w+window < allen:
 					win = s[w:w+window]
 				else:
 					win = s[w:allen]
+					winbreak = True
 				windict = Counter(win)
 				totalgap = 0
 				if "-" in windict:
@@ -71,27 +85,31 @@ with open(infile) as inhandle:
 							junctions[str(p+1+w)] = "F"
 						elif (p1 != "-" and p1 != "X") and (p2 == "-" or p2 == "X"):
 							junctions[str(p+w)] = "R"
+				if winbreak:
+					break
 			for j in junctions:
 				if junctions[j] == "F":
 					for p in range(int(j), int(j)+endlen):
 						posdict = Counter(alignment[:,p])
 						totalnongap = float(len(alignment[:,p].replace("-","").replace("X","")))
-						if posdict[s[p]] / totalnongap < threshold:
-							if s.id in trimdict:
-								trimdict[s.id].add((int(j),int(j)+endlen))
-							else:
-								trimdict[s.id] = set([(int(j),int(j)+endlen)])
-							break
+						if totalnongap > 0:
+							if posdict[s[p]] / totalnongap < threshold:
+								if s.id in trimdict:
+									trimdict[s.id].add((int(j),int(j)+endlen))
+								else:
+									trimdict[s.id] = set([(int(j),int(j)+endlen)])
+								break
 				if junctions[j] == "R":
 					for p in range(int(j), int(j)-endlen, -1):
 						posdict = Counter(alignment[:,p])
 						totalnongap = float(len(alignment[:,p].replace("-","").replace("X","")))
-						if posdict[s[p]] / totalnongap < threshold:
-							if s.id in trimdict:
-								trimdict[s.id].add((int(j)-endlen+1,int(j)+1))
-							else:
-								trimdict[s.id] = set([(int(j)-endlen+1,int(j)+1)])
-							break
+						if totalnongap > 0:
+							if posdict[s[p]] / totalnongap < threshold:
+								if s.id in trimdict:
+									trimdict[s.id].add((int(j)-endlen+1,int(j)+1))
+								else:
+									trimdict[s.id] = set([(int(j)-endlen+1,int(j)+1)])
+								break
 
 	#output trimmed
 	trimposcounter = 0
