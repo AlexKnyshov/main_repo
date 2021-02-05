@@ -89,7 +89,11 @@ with open(infile) as inhandle:
 					break
 			for j in junctions:
 				if junctions[j] == "F":
-					for p in range(int(j), int(j)+endlen):
+					if int(j)+endlen < allen:
+						tailcoord = int(j)+endlen
+					else:
+						tailcoord = allen
+					for p in range(int(j), tailcoord):
 						posdict = Counter(alignment[:,p])
 						totalnongap = float(len(alignment[:,p].replace("-","").replace("X","")))
 						if totalnongap > 0:
