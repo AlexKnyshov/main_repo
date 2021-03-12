@@ -19,8 +19,8 @@ FindOutliers <- function(data) {
   lowerq = quantile(data, na.rm = T)[2]
   upperq = quantile(data, na.rm = T)[4]
   iqr = upperq - lowerq
-  extreme.threshold.upper = (iqr * 1.5) + upperq
-  extreme.threshold.lower = lowerq - (iqr * 1.5)
+  extreme.threshold.upper = (iqr * 3) + upperq
+  extreme.threshold.lower = lowerq - (iqr * 3)
   result <- which(data > extreme.threshold.upper)
 }
 
