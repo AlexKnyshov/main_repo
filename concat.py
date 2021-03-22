@@ -58,7 +58,7 @@ nexus = ["nexus", "nex"]
 files = sorted(glob.glob(inputfolder+"/*"))
 
 print "concatenating..."
-final_matrix = dict.fromkeys(d.keys(),"")
+final_matrix = {}
 d = set([])
 start = 0
 end = 0
