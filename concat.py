@@ -1,6 +1,5 @@
 from Bio import AlignIO
 from Bio.Alphabet import IUPAC, Gapped
-#from Bio.Alphabet.IUPAC import *
 from Bio import SeqIO
 from Bio.Seq import Seq 
 from Bio.SeqRecord import SeqRecord 
@@ -56,43 +55,11 @@ fasta = ["fasta", "fas", "fa"]
 phylip = ["phylip", "phy"]
 nexus = ["nexus", "nex"]
 
-print "first pass: creating a list of taxa..."
-d = {}
 files = sorted(glob.glob(inputfolder+"/*"))
-for f in files:
-	fnew = f.split("/")
-	fn = fnew[len(fnew)-1]
-	if f.split(".")[-1] in fasta or f.split(".")[-1] in phylip or f.split(".")[-1] in nexus:
-		if f.split(".")[-1] in fasta:
-			fformat = "fasta"
-		elif f.split(".")[-1] in nexus:
-			fformat = "nexus"
-		else:
-			fformat = "phylip-relaxed"
-		alph = check_alphabet(f, fformat)
-		if alph == "DNA":
-			alignment = AlignIO.read(f, fformat, alphabet = Gapped(IUPAC.ambiguous_dna))
-		elif alph == "Prot":
-			alignment = AlignIO.read(f, fformat, alphabet = Gapped(IUPAC.protein, '-'))
-		length = alignment.get_alignment_length()
-		for seq in alignment:
-			if seq.id in d:
-				d[seq.id].append(fn)
-			else:
-				d[seq.id] = []
-				d[seq.id].append(fn)
-	elif f.split(".")[-1]=="ss":
-		matrix = ss_parser(f)
-		for rec in matrix.keys():
-			if rec in d:
-				d[rec].append(fn)
-			else:
-				d[rec] = []
-				d[rec].append(fn)
-print len(d), "taxa found in input files"
 
-print "second pass: concatenating..."
+print "concatenating..."
 final_matrix = dict.fromkeys(d.keys(),"")
+d = set([])
 start = 0
 end = 0
 if partnum != "-tnt" and partnum != "-nex" and partnum != "-nex2":
@@ -128,9 +95,13 @@ for f in files:
 			if seq.id in final_matrix:
 			 	final_matrix[seq.id] += str(seq.seq)
 			else:
-				final_matrix[seq.id] = ""
+				if len(ends) > 0:
+					final_matrix[seq.id] = "?"*ends[-1]
+				else:
+					final_matrix[seq.id] = ""
 				final_matrix[seq.id] += str(seq.seq)
-			missed.remove(seq.id)
+			if seq.id in missed:
+				missed.remove(seq.id)
 	elif f.split(".")[-1]=="ss":
 		matrix = ss_parser(f)
 		length = len(matrix.values()[0])
@@ -139,9 +110,14 @@ for f in files:
 			if rec in final_matrix:
 				final_matrix[rec] += matrix[rec]
 			else:
-				final_matrix[rec] = ""
+				if len(ends) > 0:
+					final_matrix[rec] = "?"*ends[-1]
+				else:
+					final_matrix[rec] = ""
 				final_matrix[rec] += matrix[rec]
-			missed.remove(rec)
+				d.add(rec)
+			if rec in missed:
+				missed.remove(rec)
 	else:#skip non fasta / ss files
 		continue
 	if len(missed) > 0:
@@ -175,9 +151,10 @@ for f in files:
 			range3.append(str(start+3)+"-"+str(end+1)+"\\3")
 		else:
 			print "model", model, "is not supported, opt -12a is only for DNA"
+			sys.exit()
 	elif partnum == "-1":
 	 	print >> outputfile, model+", "+fn+"="+str(start+1)+"-"+str(end+1)
-	prog = "working on partition "+str(fn)+": starts "+str(start+1)+", ends "+str(end+1)
+	prog = "working on partition "+str(len(starts))+", "+str(fn)+": starts "+str(start+1)+", ends "+str(end+1)
   	sys.stdout.write(prog+"\r")
   	sys.stdout.flush()
 	start = end + 1
@@ -208,7 +185,7 @@ if partnum == "-tnt":
 			print >> outf, "&[dna]"
 		elif tntm[tntp] == "MULTI":
 			print >> outf, "&[num]"
-		for rec in final_matrix.keys():
+		for rec in sorted(final_matrix.keys()):
 			print >> outf, str(rec)+" "+str(final_matrix[rec][tnts[tntp]:tnte[tntp]])
 	print >> outf, ";"
 	print >> outf, "proc/;"
@@ -238,7 +215,7 @@ elif partnum == "-nex":
 	print >> outf, "dimensions ntax="+str(len(final_matrix))+" nchar="+str(start)+";"
 	print >> outf, "format datatype=mixed("+mline+") interleave=yes  GAP = - MISSING = ?;"
 	print >> outf, "matrix"
-	for rec in final_matrix.keys():
+	for rec in sorted(final_matrix.keys()):
 		print >> outf, str(rec)+"\t"+str(final_matrix[rec])
 	print >> outf, ";"
 	print >> outf, "end;"
@@ -254,7 +231,7 @@ elif partnum == "-nex2":
 	print >> outf, "dimensions ntax="+str(len(final_matrix))+" nchar="+str(start)+";"
 	print >> outf, "format datatype=STANDARD interleave=yes  GAP = - MISSING = ? SYMBOLS = \"  0 1 2 3 4 5\";"
 	print >> outf, "matrix"
-	for rec in final_matrix.keys():
+	for rec in sorted(final_matrix.keys()):
 		print >> outf, str(rec)+"\t"+str(final_matrix[rec]).replace("a", "0").replace("t", "1").replace("g", "2").replace("c", "3").replace("w", "?").replace("n", "?").replace("r", "?").replace("y", "?").replace("s", "?").replace("m", "?")
 	print >> outf, ";"
 	print >> outf, "end;"
@@ -262,7 +239,7 @@ elif partnum == "-nex2":
 else:
 	outf = open("COMBINED.phy", "w")
 	print >> outf, str(len(final_matrix))+" "+str(start)
-	for rec in final_matrix.keys():
+	for rec in sorted(final_matrix.keys()):
 		print >> outf, str(rec)+" "+str(final_matrix[rec])
 	outf.close()
 	if partnum == "-12a":
