@@ -100,6 +100,7 @@ for f in files:
 				else:
 					final_matrix[seq.id] = ""
 				final_matrix[seq.id] += str(seq.seq)
+				d.add(seq.id)
 			if seq.id in missed:
 				missed.remove(seq.id)
 	elif f.split(".")[-1]=="ss":
@@ -162,12 +163,10 @@ if partnum == "-tnt":
 	outf = open("COMBINED.tnt", "w")
 	print >> outf, "xread"
 	print >> outf, str(start)+" "+str(len(final_matrix))
-	#print >> outf, models, starts, ends
 	tntm = []
 	tnts = []
 	tnte = []
 	for part in range(0, len(models)):
-		#print >> outf, "part", part
 		if part == 0:
 			tnts.append(starts[0]-1)
 			tnte.append(ends[0])
@@ -180,7 +179,6 @@ if partnum == "-tnt":
 				tnte.append(ends[part])
 				tntm.append(models[part])
 	for tntp in range(0, len(tntm)):
-		#print >> outf, tnts[tntp], tnte[tntp]
 		if tntm[tntp] == "DNA":
 			print >> outf, "&[dna]"
 		elif tntm[tntp] == "MULTI":
@@ -219,10 +217,8 @@ elif partnum == "-nex":
 		print >> outf, str(rec)+"\t"+str(final_matrix[rec])
 	print >> outf, ";"
 	print >> outf, "end;"
-	# print >> outf, "begin sets;"
 	for part in range(0, len(models)):
 		print >> outf, "charset", models[part]+str(part)+"="+str(starts[part])+"-"+str(ends[part])+";"
-	# print >> outf, "end;"
 	outf.close()
 elif partnum == "-nex2":
 	outf = open("COMBINED.nex", "w")
