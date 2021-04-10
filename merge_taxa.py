@@ -43,7 +43,7 @@ if opt == "-i":
         with open("./merged/"+loc+".fas", "w") as fhandle:
             for key, val in indices.items():
                 if loc in val:
-                    print >> fhandle ">"+key+"\n"+str(indices[key][loc].seq).upper()
+                    print >> fhandle, ">"+key+"\n"+str(indices[key][loc].seq).upper()
 
 else:
     for f in files:
