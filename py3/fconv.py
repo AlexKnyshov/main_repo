@@ -104,7 +104,7 @@ for f in files:
 			print (">"+seq.id, "\n", seq.seq, file=output_handle)
 	elif option == "-print" and outputformat == "phylip-relaxed":
 		alignments = AlignIO.read(input_handle, inputformat)
-		print >> output_handle, str(len(alignments))+" "+str(alignments.get_alignment_length())
+		print (str(len(alignments))+" "+str(alignments.get_alignment_length()), file=output_handle)
 		for seq in alignments:
 			print (str(seq.id)+" "+str(seq.seq), file=output_handle)
 	output_handle.close()
