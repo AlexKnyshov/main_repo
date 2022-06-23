@@ -105,7 +105,7 @@ for f in files:
 				missed.remove(seq.id)
 	elif f.split(".")[-1]=="ss":
 		matrix = ss_parser(f)
-		length = len(matrix.values()[0])
+		length = len(list(matrix.values())[0])
 		model = "MULTI"
 		for rec in matrix.keys():
 			if rec in final_matrix:
