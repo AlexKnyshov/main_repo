@@ -21,7 +21,10 @@ def ss_parser(filename):
 			line=line.strip()
 			if line == ";":
 				break
-			output[line.split(" ")[0]] = line.split(" ")[-1]
+			if "\t" in line:
+				output[line.split("\t")[0]] = line.split("\t")[-1]
+			else:
+				output[line.split(" ")[0]] = line.split(" ")[-1]
 	return output
 
 def check_alphabet(filename, fformat):#code for this function is modified from https://stackoverflow.com/questions/41588725/estimate-alphabet-in-biopython-from-fasta-file/41596563#41596563
